@@ -1,0 +1,93 @@
+
+* {
+    font-family: Bahnschrift, serif;
+}
+div {
+    padding: 10px;
+}
+
+#crashdownCanvas {
+    background-color: white;
+    width: 400px;
+    height: 400px;
+    position: relative;
+    border: 3px solid black;
+}
+
+#crashdownCanvas:hover {
+    cursor: pointer;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    max-height: 100vh;
+    margin: 0;
+    background-color: wheat;
+    font-size: 2vh;
+}
+
+h2:active, p:active, span:active, li:active {
+    color: black;
+}
+
+h2::selection, p::selection, span::selection, li::selection {
+    color: black;
+}
+
+
+.p-note {
+    font-size: 1.75vh;
+    font-style: italic;
+    color: grey;
+}
+
+.select-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#colorSelect {
+    margin-bottom: 10px;
+    font-size: 2vh;
+    font-weight: bold;
+    padding: 5px
+}
+
+#addRowButton {
+    font-size: 2vh;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+#startNewGame {
+    font-size: 2vh;
+    font-weight: bold;
+}
+
+#startGameButton {
+    font-size: 2vh;
+    font-weight: bold;
+}
+
+#safeTimer {
+    text-align: center;
+}
+
+#timerDisplay {
+    display: inline;
+    font-size: 3vh;
+    font-weight: bold;
+    color: forestgreen
+}
+
+#timeUpMessage {
+    display: none;
+    color: red;
+    font-size: 3vh;
+    font-weight: bold;
+
+}

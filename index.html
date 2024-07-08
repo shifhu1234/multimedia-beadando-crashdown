@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <link rel="stylesheet" href="style.css">
+    <meta charset="utf-8">
+    <title>Crashdown</title>
+</head>
+<body>
+<!--Ha hangos lenne valamelyik zene/hangeffekt, script.js első soraiban módosítható!-->
+<div class="select-option">
+
+    <label for="colorSelect" hidden></label>
+    <select id="colorSelect">
+        <option value="2">2 szín</option>
+        <option value="3" selected>3 szín</option>
+        <option value="4">4 szín</option>
+        <option value="5">5 szín</option>
+    </select>
+
+    <span style="margin-bottom: 10px; text-align: center">
+    <button id="addRowButton" disabled>Új sor hozzáadása</button><br>
+    <button id="startNewGame">Új játék indítása</button>
+  <button id="startGameButton">Játék indítása</button>
+</span>
+</div>
+
+<div>
+    <canvas id="crashdownCanvas" width="400" height="400"></canvas>
+
+    <div id="safeTimer">
+        <h2 style="display: inline;">Hátralévő idő: </h2>
+        <p id="timerDisplay">02:00</p>
+        <p id="timeUpMessage" style="">Lejárt az idő!</p>
+        <h2>Pontszám: <span id="score">0</span></h2>
+    </div>
+</div>
+
+<div id="myModal" class="modal">
+    <div class="modal-content" id="appear-leaderboard" style="display: none">
+        <p>Gratulálok! Kérem, adja meg a nevét a toplista számára:</p>
+        <p class="p-note">Ahhoz, hogy felkerülj a listára, szükséged van:</p>
+        <ul class="p-note">
+            <li><p class="p-note">Legalább 1000 pontra</p></li>
+            <li><p class="p-note"> 3-30 karakter hosszú névre</p></li>
+        </ul>
+        <label for="jatekosNev" hidden></label><input type="text" id="jatekosNev" placeholder="Név">
+        <button id="toplistaHozzaadas">Hozzáadás a Toplistához</button>
+    </div>
+    <h2>Toplista:</h2>
+    <ul id="toplistaLista"></ul>
+</div>
+<img src="volume_on_icon.png" id="toggleVol" alt="" width="100px" height="100px">
+<script src="script.js">
+</script>
+</body>
+</html>
