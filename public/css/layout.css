@@ -1,0 +1,240 @@
+/* ================================================================
+   CRASHDOWN ARCADE - LAYOUT & RESPONSIVE ARCHITECTURE
+   ================================================================ */
+
+/* Közös alap panel stílusok */
+.app-shell {
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+    z-index: 10;
+}
+
+.panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.45);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow: hidden;
+}
+
+/* ==================== DESKTOP ÉS LAPTOP NÉZET (>= 1024px) ==================== */
+@media (min-width: 1024px) {
+    html, body {
+        overflow-y: auto;
+        overflow-x: hidden;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        padding-bottom: 24px;
+    }
+
+    .top-nav-bar {
+        position: relative;
+        margin-top: 6px;
+        margin-bottom: 10px;
+        max-width: 1144px;
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    /* Asztali nézetben a mobil tab navigáció szigorúan rejtett */
+    .mobile-nav {
+        display: none !important;
+    }
+
+    .app-shell {
+        display: grid;
+        grid-template-columns: 310px 464px 330px;
+        grid-template-rows: auto;
+        gap: 18px;
+        width: 1144px;
+        max-width: calc(100vw - 32px);
+        align-items: stretch;
+        justify-content: center;
+        margin-top: 0;
+    }
+
+    .panel {
+        height: auto;
+        min-height: 590px;
+        max-height: 640px;
+    }
+
+    .game-stage {
+        height: auto;
+        min-height: 590px;
+        max-height: 640px;
+    }
+
+    /* Asztali gépen az információs csík a HUD és a Canvas között kap helyet teljes szélességben */
+    .hud-bar {
+        order: 1;
+    }
+
+    .combo-indicator-wrap {
+        order: 2;
+        width: 100%;
+        height: 24px;
+        min-height: 24px;
+        margin: 2px 0;
+    }
+
+    .canvas-wrapper {
+        order: 3;
+    }
+
+    .stage-actions {
+        order: 4;
+    }
+}
+
+/* ==================== MOBIL ÉS TABLET RESZPONZÍV NÉZET (< 1024px) ==================== */
+@media (max-width: 1023px) {
+    html, body {
+        overflow-x: hidden;
+        overflow-y: auto;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-bottom: 24px;
+    }
+
+    .top-nav-bar {
+        position: sticky;
+        top: 0;
+        background: #141824;
+        border-bottom: 1px solid var(--border-subtle);
+        padding: 6px 10px;
+        flex-direction: column;
+        gap: 6px;
+        max-width: 480px;
+        width: 100%;
+        z-index: 100;
+    }
+
+    .user-profile-bar {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .mobile-nav {
+        display: flex;
+        width: 100%;
+        gap: 6px;
+    }
+
+    .mobile-tab-btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        height: 38px;
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        background: var(--bg-card);
+        color: var(--text-secondary);
+        font-size: 0.82rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+
+    .mobile-tab-btn.active {
+        background: var(--color-blue);
+        color: #ffffff;
+        border-color: var(--color-blue);
+        box-shadow: 0 2px 0 var(--color-blue-dark);
+    }
+
+    .app-shell {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: 480px;
+        gap: 12px;
+        padding: 8px 12px;
+    }
+
+    /* Mobilon tabos elrendezés: csak az aktív panel látható */
+    .controls-panel,
+    .game-stage,
+    .leaderboard-panel {
+        display: none !important;
+        width: 100% !important;
+        height: auto !important;
+        max-height: none !important;
+    }
+
+    .controls-panel.active,
+    .game-stage.active,
+    .leaderboard-panel.active {
+        display: flex !important;
+    }
+
+    /* Mobilon a vászon és kerete reszponzívan skálázódik */
+    .game-stage {
+        padding: 0;
+    }
+
+    .hud-bar {
+        order: 1;
+        width: 100%;
+    }
+
+    .canvas-wrapper {
+        order: 2;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1 / 1;
+        max-width: 440px;
+        padding: 8px;
+        margin: 0 auto;
+    }
+
+    #crashdownCanvas {
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Mobilon a felhasználó kérésének megfelelően a kombó infó csík a pálya alatt jelenik meg */
+    .combo-indicator-wrap {
+        order: 3;
+        width: 100% !important;
+        height: 26px !important;
+        min-height: 26px !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        margin: 4px 0 !important;
+    }
+
+    .stage-actions {
+        order: 4;
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 6px !important;
+        margin-top: 2px !important;
+    }
+
+    .legend-card {
+        max-height: 280px;
+    }
+
+    .leaderboard-panel {
+        min-height: 480px;
+    }
+}

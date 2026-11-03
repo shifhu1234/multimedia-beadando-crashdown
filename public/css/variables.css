@@ -1,0 +1,164 @@
+/* ================================================================
+   CRASHDOWN ARCADE - VARIABLES & BASE STYLES
+   ================================================================ */
+
+:root {
+    --bg-main: #10141d;
+    --bg-panel: #181d2a;
+    --bg-card: #202738;
+    --bg-input: #131722;
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-hover: rgba(255, 255, 255, 0.16);
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    
+    --color-blue: #3b82f6;
+    --color-blue-dark: #1d4ed8;
+    --color-green: #10b981;
+    --color-green-dark: #047857;
+    --color-amber: #f59e0b;
+    --color-amber-dark: #b45309;
+    --color-red: #ef4444;
+    --color-red-dark: #b91c1c;
+
+    --radius-lg: 16px;
+    --radius-md: 10px;
+    --radius-sm: 6px;
+    --font-ui: 'Outfit', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: var(--font-ui);
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh;
+    background-color: var(--bg-main);
+    background-image: 
+        radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+        radial-gradient(circle at 50% 0%, #1a2234 0%, transparent 70%);
+    background-size: 24px 24px, 100% 100%;
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ==================== FELSŐ SÁV (AUTH ÉS FEJLÉC) ==================== */
+.top-nav-bar {
+    width: 100%;
+    max-width: 1144px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 10px 16px;
+    margin: 0 auto;
+    z-index: 50;
+}
+
+.user-profile-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.top-nav-btn {
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: all 0.15s ease;
+    border: 1px solid var(--border-subtle);
+    white-space: nowrap;
+    text-decoration: none;
+    line-height: 1;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.top-nav-btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-auth-trigger {
+    background: #1f2738;
+    color: #e2e8f0;
+}
+.btn-auth-trigger:hover {
+    background: #2a344a;
+    border-color: var(--color-blue);
+    color: #ffffff;
+}
+
+.btn-achievements-trigger {
+    background: rgba(251, 191, 36, 0.12);
+    border-color: rgba(251, 191, 36, 0.35);
+    color: #fbbf24;
+}
+.btn-achievements-trigger:hover {
+    background: rgba(251, 191, 36, 0.22);
+    border-color: #fbbf24;
+    color: #ffffff;
+}
+
+.btn-user-box {
+    background: rgba(99, 102, 241, 0.14);
+    border-color: rgba(129, 140, 248, 0.35);
+    color: #e0e7ff;
+}
+.btn-user-box:hover {
+    background: rgba(99, 102, 241, 0.25);
+    border-color: #818cf8;
+    color: #ffffff;
+}
+
+.btn-change-pw-box {
+    background: rgba(56, 189, 248, 0.1);
+    border-color: rgba(56, 189, 248, 0.3);
+    color: #7dd3fc;
+}
+.btn-change-pw-box:hover {
+    background: rgba(56, 189, 248, 0.22);
+    border-color: #38bdf8;
+    color: #ffffff;
+}
+
+.btn-logout-box {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.25);
+    color: #fca5a5;
+}
+.btn-logout-box:hover {
+    background: rgba(239, 68, 68, 0.22);
+    border-color: #ef4444;
+    color: #ffffff;
+}
+
+.current-user-name {
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.btn-logout-link {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.74rem;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0 4px;
+}
+
+.btn-logout-link:hover {
+    color: var(--color-red);
+}

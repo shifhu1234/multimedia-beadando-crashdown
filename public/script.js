@@ -1,29 +1,101 @@
-// ==================== TELJES ADATBÁZIS & TÁROLÓ NULLÁZÁSA (RESET TO 0) ====================
-(function resetAllDataToZero() {
-    const RESET_FLAG = 'crashdown_reset_zero_v2026_complete';
-    if (!localStorage.getItem(RESET_FLAG)) {
-        console.warn('Crashdown adatbázis és tároló teljes nullázása...');
-        try {
-            localStorage.removeItem('toplista');
-            localStorage.removeItem('crashdown_player_profiles');
-            localStorage.removeItem('crashdown_achievements');
-            localStorage.removeItem('crashdown_chosen_title');
-            localStorage.removeItem('crashdown_chosen_avatar');
-            localStorage.removeItem('crashdown_users');
-            localStorage.removeItem('crashdown_current_user');
-            localStorage.setItem(RESET_FLAG, 'true');
-        } catch (e) {}
+// ==================== MODULE: public/js/config.js ====================
+/* ================================================================
+   CRASHDOWN ARCADE - CONFIGURATION & CONSTANTS
+   ================================================================ */
 
-        // Firebase Realtime Database nullázása ha csatlakozva van
-        setTimeout(() => {
-            if (window.leaderboardService && typeof window.leaderboardService.resetLeaderboard === 'function') {
-                window.leaderboardService.resetLeaderboard().catch(() => {});
-            }
-        }, 1200);
-    }
-})();
+const LOGICAL_SIZE = 440;
+const sorok = 10;
+const oszlopok = 10;
+const negyzetMeret = LOGICAL_SIZE / oszlopok; // 44px
 
-/*############################## AUDIO & CONFIG REGION ##############################*/
+// 9 Színtéma palettái
+const THEME_PALETTES = {
+    retro:  ['#ef4444', '#10b981', '#f59e0b', '#06b6d4', '#8b5cf6'],
+    cyber:  ['#FF2E4C', '#22C55E', '#FACC15', '#3B82F6', '#D946EF'],
+    candy:  ['#fb7185', '#34d399', '#fde047', '#38bdf8', '#c084fc'],
+    space:  ['#f43f5e', '#10b981', '#eab308', '#4f46e5', '#ec4899'],
+    sunset: ['#f43f5e', '#fb923c', '#facc15', '#a855f7', '#6366f1'],
+    forest: ['#10b981', '#84cc16', '#14b8a6', '#059669', '#0284c7'],
+    lava:   ['#dc2626', '#ea580c', '#f59e0b', '#7f1d1d', '#f97316'],
+    noir:   ['#e2e8f0', '#94a3b8', '#64748b', '#475569', '#334155'],
+    ocean:  ['#06b6d4', '#0284c7', '#3b82f6', '#0d9488', '#6366f1']
+};
+
+// Téma katalógus az unlockoláshoz
+const THEMES_CATALOG = [
+    { id: 'retro', name: 'Retro Arcade', achId: null },
+    { id: 'cyber', name: 'Cyber Neon', achId: null },
+    { id: 'candy', name: 'Candy Pop', achId: 'first_500' },
+    { id: 'space', name: 'Deep Space', achId: 'score_1500' },
+    { id: 'sunset', name: 'Sunset Synthwave', achId: 'powerup_10' },
+    { id: 'forest', name: 'Emerald Forest', achId: 'play_time_5m' },
+    { id: 'lava', name: 'Vulkán Láva', achId: 'powerup_25' },
+    { id: 'noir', name: 'Monokróm Noir', achId: 'inspect_profile' },
+    { id: 'ocean', name: 'Mélytengeri Misztikum', achId: 'score_5000' }
+];
+
+// 3D plasztikus színek és árnyalatok a vászon kirajzolásához
+const COLOR_STYLES = {
+    // Cyber & Standard
+    '#FF2E4C': { top: '#f87171', bottom: '#dc2626', border: '#fca5a5' },
+    '#22C55E': { top: '#34d399', bottom: '#059669', border: '#86efac' },
+    '#FACC15': { top: '#fbbf24', bottom: '#d97706', border: '#fde68a' },
+    '#3B82F6': { top: '#60a5fa', bottom: '#2563eb', border: '#bfdbfe' },
+    '#D946EF': { top: '#c084fc', bottom: '#7c3aed', border: '#e9d5ff' },
+
+    // Candy Pop & Retro & Space extra színek
+    '#fb7185': { top: '#fda4af', bottom: '#e11d48', border: '#ffe4e6' },
+    '#34d399': { top: '#6ee7b7', bottom: '#059669', border: '#a7f3d0' },
+    '#fde047': { top: '#fef08a', bottom: '#eab308', border: '#fef9c3' },
+    '#38bdf8': { top: '#7dd3fc', bottom: '#0284c7', border: '#e0f2fe' },
+    '#c084fc': { top: '#d8b4fe', bottom: '#9333ea', border: '#f3e8ff' },
+    '#ef4444': { top: '#f87171', bottom: '#dc2626', border: '#fca5a5' },
+    '#10b981': { top: '#34d399', bottom: '#047857', border: '#a7f3d0' },
+    '#f59e0b': { top: '#fbbf24', bottom: '#d97706', border: '#fde68a' },
+    '#06b6d4': { top: '#22d3ee', bottom: '#0891b2', border: '#a5f3fc' },
+    '#8b5cf6': { top: '#a78bfa', bottom: '#6d28d9', border: '#ddd6fe' },
+    '#f43f5e': { top: '#fb7185', bottom: '#be123c', border: '#ffe4e6' },
+    '#eab308': { top: '#fde047', bottom: '#ca8a04', border: '#fef08a' },
+    '#4f46e5': { top: '#818cf8', bottom: '#3730a3', border: '#c7d2fe' },
+    '#ec4899': { top: '#f472b6', bottom: '#be185d', border: '#fbcfe8' },
+
+    // Sunset, Forest, Lava, Noir, Ocean új színek
+    '#fb923c': { top: '#fdba74', bottom: '#ea580c', border: '#ffedd5' },
+    '#facc15': { top: '#fde047', bottom: '#ca8a04', border: '#fef08a' },
+    '#a855f7': { top: '#c084fc', bottom: '#7e22ce', border: '#f3e8ff' },
+    '#84cc16': { top: '#a3e635', bottom: '#4d7c0f', border: '#ecfccb' },
+    '#059669': { top: '#10b981', bottom: '#047857', border: '#a7f3d0' },
+    '#dc2626': { top: '#ef4444', bottom: '#991b1b', border: '#fecaca' },
+    '#ea580c': { top: '#f97316', bottom: '#9a3412', border: '#ffedd5' },
+    '#7f1d1d': { top: '#b91c1c', bottom: '#450a0a', border: '#fca5a5' },
+    '#e2e8f0': { top: '#f8fafc', bottom: '#cbd5e1', border: '#ffffff' },
+    '#94a3b8': { top: '#cbd5e1', bottom: '#64748b', border: '#f1f5f9' },
+    '#64748b': { top: '#94a3b8', bottom: '#334155', border: '#cbd5e1' },
+    '#475569': { top: '#64748b', bottom: '#1e293b', border: '#94a3b8' },
+    '#334155': { top: '#475569', bottom: '#0f172a', border: '#64748b' },
+    '#0d9488': { top: '#14b8a6', bottom: '#115e59', border: '#99f6e4' },
+
+    // Power-up színek és ikonfeliratok
+    'cyan':      { top: '#38bdf8', bottom: '#0284c7', border: '#bae6fd', label: '2×' },
+    'pink':      { top: '#f472b6', bottom: '#db2777', border: '#fbcfe8', label: '⇄' },
+    '#f97316':   { top: '#fb923c', bottom: '#ea580c', border: '#fed7aa', label: '⇅' },
+    'darkgreen': { top: '#4ade80', bottom: '#15803d', border: '#bbf7d0', label: 'TNT' },
+    '#14b8a6':   { top: '#2dd4bf', bottom: '#0f766e', border: '#99f6e4', label: '✦' },
+    '#6366f1':   { top: '#818cf8', bottom: '#4338ca', border: '#c7d2fe', label: '⟳' },
+    '#581845':   { top: '#c084fc', bottom: '#6b21a8', border: '#e9d5ff', label: '+5s' },
+    '#0284c7':   { top: '#7dd3fc', bottom: '#0284c7', border: '#e0f2fe', label: '❄' },
+    '#e11d48':   { top: '#fb7185', bottom: '#be123c', border: '#ffe4e6', label: '🧲' }
+};
+
+// Aktív színek és téma alapértelmezések
+let currentTheme = localStorage.getItem('crashdown_theme') || 'retro';
+let negyzetSzinek = THEME_PALETTES[currentTheme] || THEME_PALETTES.retro;
+
+
+// ==================== MODULE: public/js/audio.js ====================
+/* ================================================================
+   CRASHDOWN ARCADE - AUDIO & HAPTIC FEEDBACK SYSTEM
+   ================================================================ */
 
 const hatterZene = new Audio('hopes_and_dreams.mp3');
 hatterZene.loop = true;
@@ -95,155 +167,39 @@ function toggleVolume() {
     applyAudioSettings();
 }
 
-const toggleVolBtn = document.getElementById('toggleVolBtn') || document.getElementById('toggleVol');
-if (toggleVolBtn) {
-    toggleVolBtn.addEventListener('click', toggleVolume);
-}
-
-const volumeSlider = document.getElementById('volumeSlider');
-if (volumeSlider) {
-    volumeSlider.addEventListener('input', function () {
-        masterVolume = parseInt(this.value, 10) / 100;
-        toggledVOlume = masterVolume === 0;
-        localStorage.setItem('crashdownVolume', String(masterVolume));
-        localStorage.setItem('crashdownMuted', String(toggledVOlume));
-        applyAudioSettings();
-    });
-}
-
-/*############################## JATEK ALLAPOT & CANVAS ##############################*/
-
-const canvas = document.getElementById('crashdownCanvas');
-const ctx = canvas.getContext('2d');
-const LOGICAL_SIZE = 440;
-const sorok = 10;
-const oszlopok = 10;
-const negyzetMeret = LOGICAL_SIZE / oszlopok; // 44px
-
-// Alapértelmezett színek és témák
-let negyzetSzinek = ['#FF2E4C', '#22C55E', '#FACC15', '#3B82F6', '#D946EF'];
-
-const THEME_PALETTES = {
-    retro:  ['#ef4444', '#10b981', '#f59e0b', '#06b6d4', '#8b5cf6'],
-    cyber:  ['#FF2E4C', '#22C55E', '#FACC15', '#3B82F6', '#D946EF'],
-    candy:  ['#fb7185', '#34d399', '#fde047', '#38bdf8', '#c084fc'],
-    space:  ['#f43f5e', '#10b981', '#eab308', '#4f46e5', '#ec4899'],
-    sunset: ['#f43f5e', '#fb923c', '#facc15', '#a855f7', '#6366f1'],
-    forest: ['#10b981', '#84cc16', '#14b8a6', '#059669', '#0284c7'],
-    lava:   ['#dc2626', '#ea580c', '#f59e0b', '#7f1d1d', '#f97316'],
-    noir:   ['#e2e8f0', '#94a3b8', '#64748b', '#475569', '#334155'],
-    ocean:  ['#06b6d4', '#0284c7', '#3b82f6', '#0d9488', '#6366f1']
-};
-
-const THEMES_CATALOG = [
-    { id: 'retro', name: 'Retro Arcade', achId: null },
-    { id: 'cyber', name: 'Cyber Neon', achId: 'first_match' },
-    { id: 'candy', name: 'Candy Pop', achId: 'first_500' },
-    { id: 'space', name: 'Deep Space', achId: 'score_1500' },
-    { id: 'sunset', name: 'Sunset Synthwave', achId: 'powerup_10' },
-    { id: 'forest', name: 'Emerald Forest', achId: 'play_time_5m' },
-    { id: 'lava', name: 'Vulkán Láva', achId: 'powerup_25' },
-    { id: 'noir', name: 'Monokróm Noir', achId: 'inspect_profile' },
-    { id: 'ocean', name: 'Mélytengeri Misztikum', achId: 'score_5000' }
-];
-
-const COLOR_STYLES = {
-    // Cyber & Standard
-    '#FF2E4C': { top: '#f87171', bottom: '#dc2626', border: '#fca5a5' },
-    '#22C55E': { top: '#34d399', bottom: '#059669', border: '#86efac' },
-    '#FACC15': { top: '#fbbf24', bottom: '#d97706', border: '#fde68a' },
-    '#3B82F6': { top: '#60a5fa', bottom: '#2563eb', border: '#bfdbfe' },
-    '#D946EF': { top: '#c084fc', bottom: '#7c3aed', border: '#e9d5ff' },
-
-    // Candy Pop & Retro & Space extra színek
-    '#fb7185': { top: '#fda4af', bottom: '#e11d48', border: '#ffe4e6' },
-    '#34d399': { top: '#6ee7b7', bottom: '#059669', border: '#a7f3d0' },
-    '#fde047': { top: '#fef08a', bottom: '#eab308', border: '#fef9c3' },
-    '#38bdf8': { top: '#7dd3fc', bottom: '#0284c7', border: '#e0f2fe' },
-    '#c084fc': { top: '#d8b4fe', bottom: '#9333ea', border: '#f3e8ff' },
-    '#ef4444': { top: '#f87171', bottom: '#dc2626', border: '#fca5a5' },
-    '#10b981': { top: '#34d399', bottom: '#047857', border: '#a7f3d0' },
-    '#f59e0b': { top: '#fbbf24', bottom: '#d97706', border: '#fde68a' },
-    '#06b6d4': { top: '#22d3ee', bottom: '#0891b2', border: '#a5f3fc' },
-    '#8b5cf6': { top: '#a78bfa', bottom: '#6d28d9', border: '#ddd6fe' },
-    '#f43f5e': { top: '#fb7185', bottom: '#be123c', border: '#ffe4e6' },
-    '#eab308': { top: '#fde047', bottom: '#ca8a04', border: '#fef08a' },
-    '#4f46e5': { top: '#818cf8', bottom: '#3730a3', border: '#c7d2fe' },
-    '#ec4899': { top: '#f472b6', bottom: '#be185d', border: '#fbcfe8' },
-
-    // Sunset, Forest, Lava, Noir, Ocean új színek
-    '#fb923c': { top: '#fdba74', bottom: '#ea580c', border: '#ffedd5' },
-    '#facc15': { top: '#fde047', bottom: '#ca8a04', border: '#fef08a' },
-    '#a855f7': { top: '#c084fc', bottom: '#7e22ce', border: '#f3e8ff' },
-    '#84cc16': { top: '#a3e635', bottom: '#4d7c0f', border: '#ecfccb' },
-    '#059669': { top: '#10b981', bottom: '#047857', border: '#a7f3d0' },
-    '#dc2626': { top: '#ef4444', bottom: '#991b1b', border: '#fecaca' },
-    '#ea580c': { top: '#f97316', bottom: '#9a3412', border: '#ffedd5' },
-    '#7f1d1d': { top: '#b91c1c', bottom: '#450a0a', border: '#fca5a5' },
-    '#e2e8f0': { top: '#f8fafc', bottom: '#cbd5e1', border: '#ffffff' },
-    '#94a3b8': { top: '#cbd5e1', bottom: '#64748b', border: '#f1f5f9' },
-    '#64748b': { top: '#94a3b8', bottom: '#334155', border: '#cbd5e1' },
-    '#475569': { top: '#64748b', bottom: '#1e293b', border: '#94a3b8' },
-    '#334155': { top: '#475569', bottom: '#0f172a', border: '#64748b' },
-    '#0d9488': { top: '#14b8a6', bottom: '#115e59', border: '#99f6e4' },
-
-    // Power-up színek és címkék
-    'cyan':      { top: '#38bdf8', bottom: '#0284c7', border: '#bae6fd', label: '2×' },
-    'pink':      { top: '#f472b6', bottom: '#db2777', border: '#fbcfe8', label: '⇄' },
-    '#f97316':   { top: '#fb923c', bottom: '#ea580c', border: '#fed7aa', label: '⇅' },
-    'darkgreen': { top: '#4ade80', bottom: '#15803d', border: '#bbf7d0', label: 'TNT' },
-    '#14b8a6':   { top: '#2dd4bf', bottom: '#0f766e', border: '#99f6e4', label: '✦' },
-    '#6366f1':   { top: '#818cf8', bottom: '#4338ca', border: '#c7d2fe', label: '⟳' },
-    '#581845':   { top: '#c084fc', bottom: '#6b21a8', border: '#e9d5ff', label: '+5s' },
-    '#0284c7':   { top: '#7dd3fc', bottom: '#0284c7', border: '#e0f2fe', label: '❄' },
-    '#e11d48':   { top: '#fb7185', bottom: '#be123c', border: '#ffe4e6', label: '🧲' }
-};
-
-let grid = [];
-let pontSzam = 0;
-let displayedScore = 0;
-let szinek = [];
-let kattOffset = false;
-let jatekFut = false;
-let vegeAJateknak = false;
-let remainingTime = 60;
-let MAX_TIME = 60;
-let timerInterval = null;
-let pendingRowTimeout = null;
-let currentLeaderboardColorFilter = 'all';
-let currentLeaderboardTimeFilter = 'all';
-
-// Pontduplázó (5 mp Frenzy) állapot
-let isDoublePointsActive = false;
-let doublePointsRemainingTime = 0;
-let doublePointsInterval = null;
-const FRENZY_MAX_TIME = 5;
-
-// Időfagyasztó (4 mp) állapot
-let isFrozen = false;
-let freezeRemainingTime = 0;
-let freezeInterval = null;
-
-// Kombó-szorzó állapot
-let comboStreak = 0;
-let comboMultiplier = 1;
-let comboResetTimeout = null;
-
-// Téma állapot (Alapértelmezett: Retro Arcade)
-let currentTheme = localStorage.getItem('crashdown_theme') || 'retro';
-
-// Haptikus rezgés
 function triggerHaptic(type = 'light') {
-    if (typeof navigator !== 'undefined' && navigator.vibrate) {
-        try {
-            if (type === 'light') navigator.vibrate(15);
-            else if (type === 'medium') navigator.vibrate(35);
-            else if (type === 'heavy') navigator.vibrate([40, 30, 50]);
-            else if (type === 'success') navigator.vibrate([30, 50, 70]);
-            else if (type === 'freeze') navigator.vibrate([20, 20, 20, 20]);
-        } catch (e) {}
+    if (!navigator.vibrate) return;
+    try {
+        if (type === 'light') navigator.vibrate(15);
+        else if (type === 'medium') navigator.vibrate([25, 20, 25]);
+        else if (type === 'heavy') navigator.vibrate([40, 30, 60]);
+    } catch (_) {}
+}
+
+// Hangerő gomb és csúszka események bekötése
+function initAudioListeners() {
+    const toggleVolBtn = document.getElementById('toggleVolBtn') || document.getElementById('toggleVol');
+    if (toggleVolBtn) {
+        toggleVolBtn.addEventListener('click', toggleVolume);
+    }
+
+    const volumeSlider = document.getElementById('volumeSlider');
+    if (volumeSlider) {
+        volumeSlider.addEventListener('input', function () {
+            masterVolume = parseInt(this.value, 10) / 100;
+            toggledVOlume = masterVolume === 0;
+            localStorage.setItem('crashdownVolume', String(masterVolume));
+            localStorage.setItem('crashdownMuted', String(toggledVOlume));
+            applyAudioSettings();
+        });
     }
 }
+
+
+// ==================== MODULE: public/js/achievements.js ====================
+/* ================================================================
+   CRASHDOWN ARCADE - ACHIEVEMENTS, TITLES, AVATARS & USER STATS
+   ================================================================ */
 
 // ==================== MÉRFÖLDKÖVEK & JELVÉNYEK (36 DB) ====================
 const ACHIEVEMENTS = [
@@ -268,7 +224,7 @@ const ACHIEVEMENTS = [
     { id: 'tnt_boom', icon: '💣', title: 'TNT Szakértő', desc: 'Robbants fel egy 3×3-as TNT power-up blokkot!' },
     { id: 'freeze_time', icon: '❄️', title: 'Jégvarázs', desc: 'Fagyaszd be az időt az Időfagyasztó Jégkockával!' },
     { id: 'magnet_pull', icon: '🧲', title: 'Szuper Mágnes', desc: 'Ránts össze egy egész színt egy blokkba a Mágnessel!' },
-    { id: 'color_bomb', icon: '✦', title: 'Szín-kataklizma', desc: 'Tisztíts le egy teljes színt a Szín-bomba használatával!' },
+    { id: 'color_bomb', icon: '✦', title: 'Szín-kataklizma', desc: 'Tisztíts let egy teljes színt a Szín-bomba használatával!' },
     { id: 'frenzy_master', icon: '⚡', title: 'Dupla vagy Semmi', desc: 'Aktiválj egy 2× Pontduplázó Frenzy időszakot!' },
     { id: 'time_bonus', icon: '⌛', title: 'Időutazó', desc: 'Gyűjts be egy +5 másodperces extra idő blokkot!' },
 
@@ -317,115 +273,7 @@ const PROFILE_AVATARS = [
     { id: 'avatar_flame_hand', symbol: '💥', name: 'Plazmagömb', achId: 'powerup_50' }
 ];
 
-let recentSuccessfulClicks = [];
-
-let currentAchievementFilter = 'all';
-
-function getUnlockedAchievements() {
-    try {
-        const raw = localStorage.getItem('crashdown_achievements');
-        return raw ? JSON.parse(raw) : [];
-    } catch (e) {
-        return [];
-    }
-}
-
-function checkAchievement(id) {
-    const list = getUnlockedAchievements();
-    const set = new Set(list);
-    if (set.has(id)) return;
-
-    const ach = ACHIEVEMENTS.find(a => a.id === id);
-    if (!ach) return;
-
-    set.add(id);
-    localStorage.setItem('crashdown_achievements', JSON.stringify([...set]));
-
-    const currentUser = window.authService?.getCurrentUser();
-    if (currentUser && currentUser.displayName) {
-        updatePlayerStatsRecord(currentUser.displayName, 0, '3', 0);
-    }
-
-    triggerHaptic('success');
-    playSound(sikeresKatt);
-    showToast(`🏆 Jelvény feloldva: ${ach.icon} ${ach.title}!`, 'success');
-
-    updateAchievementsUI();
-}
-
-function updateAchievementsUI() {
-    const unlockedList = getUnlockedAchievements();
-    const unlockedSet = new Set(unlockedList);
-    const totalCount = ACHIEVEMENTS.length;
-    const unlockedCount = unlockedList.length;
-    const lockedCount = totalCount - unlockedCount;
-    const percent = Math.round((unlockedCount / totalCount) * 100);
-
-    const countEl = document.getElementById('unlockedAchievementsCount');
-    const totalEl = document.getElementById('totalAchievementsCount');
-    if (countEl) countEl.textContent = unlockedCount;
-    if (totalEl) totalEl.textContent = totalCount;
-
-    const summaryCountEl = document.getElementById('achievementsSummaryCount');
-    const totalSummaryCountEl = document.getElementById('achievementsTotalSummaryCount');
-    const percentEl = document.getElementById('achievementsPercent');
-    const progressFill = document.getElementById('achievementsProgressFill');
-
-    if (summaryCountEl) summaryCountEl.textContent = unlockedCount;
-    if (totalSummaryCountEl) totalSummaryCountEl.textContent = totalCount;
-    if (percentEl) percentEl.textContent = `${percent}%`;
-    if (progressFill) progressFill.style.width = `${percent}%`;
-
-    const fAll = document.getElementById('achFilterAllCount');
-    const fUn = document.getElementById('achFilterUnlockedCount');
-    const fLock = document.getElementById('achFilterLockedCount');
-    if (fAll) fAll.textContent = totalCount;
-    if (fUn) fUn.textContent = unlockedCount;
-    if (fLock) fLock.textContent = lockedCount;
-
-    const listContainer = document.getElementById('achievementsList');
-    if (!listContainer) return;
-
-    // Rendereljük a kártyákat ha még üres vagy ha változott az állapot
-    listContainer.innerHTML = ACHIEVEMENTS.map(ach => {
-        const isUnlocked = unlockedSet.has(ach.id);
-        const shouldHide = (currentAchievementFilter === 'unlocked' && !isUnlocked) || (currentAchievementFilter === 'locked' && isUnlocked);
-        return `
-            <div class="achievement-card ${isUnlocked ? 'unlocked' : 'locked'} ${shouldHide ? 'card-filtered-out' : ''}" data-ach-id="${ach.id}" data-unlocked="${isUnlocked ? '1' : '0'}">
-                <div class="ach-card-header">
-                    <div class="achievement-icon-wrap">${ach.icon}</div>
-                    <span class="achievement-status">${isUnlocked ? 'Feloldva ✓' : '🔒 Zárolva'}</span>
-                </div>
-                <div class="achievement-info">
-                    <strong>${ach.title}</strong>
-                    <small>${ach.desc}</small>
-                </div>
-            </div>
-        `;
-    }).join('');
-
-    updateThemeSelectUI();
-}
-
-function applyAchievementFilter(filter) {
-    currentAchievementFilter = filter;
-    const listContainer = document.getElementById('achievementsList');
-    if (!listContainer) return;
-
-    const cards = listContainer.querySelectorAll('.achievement-card');
-    cards.forEach(card => {
-        const isUnlocked = card.getAttribute('data-unlocked') === '1';
-        if (filter === 'all') {
-            card.classList.remove('card-filtered-out');
-        } else if (filter === 'unlocked') {
-            card.classList.toggle('card-filtered-out', !isUnlocked);
-        } else if (filter === 'locked') {
-            card.classList.toggle('card-filtered-out', isUnlocked);
-        }
-    });
-}
-
-// ==================== RANGCÍMEK (PROFILE TITLES) RENDSZER (17 DB) ====================
+// ==================== RANGCÍMEK (PROFILE TITLES) RENDSZER ====================
 const PROFILE_TITLES = [
     {
         id: 'title_beginner',
@@ -632,7 +480,117 @@ const PROFILE_TITLES = [
     }
 ];
 
-// ==================== JÁTÉKOS PROFIL & STATISZTIKA MOTOR ====================
+let recentSuccessfulClicks = [];
+let currentAchievementFilter = 'all';
+
+function getUnlockedAchievements() {
+    try {
+        const raw = localStorage.getItem('crashdown_achievements');
+        return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function checkAchievement(id) {
+    const list = getUnlockedAchievements();
+    const set = new Set(list);
+    if (set.has(id)) return;
+
+    const ach = ACHIEVEMENTS.find(a => a.id === id);
+    if (!ach) return;
+
+    set.add(id);
+    localStorage.setItem('crashdown_achievements', JSON.stringify([...set]));
+
+    const currentUser = window.authService?.getCurrentUser();
+    if (currentUser && currentUser.displayName) {
+        updatePlayerStatsRecord(currentUser.displayName, 0, '3', 0);
+    }
+
+    triggerHaptic('success');
+    playSound(sikeresKatt);
+    if (typeof showToast === 'function') {
+        showToast(`🏆 Jelvény feloldva: ${ach.icon} ${ach.title}!`, 'success');
+    }
+
+    updateAchievementsUI();
+}
+
+function updateAchievementsUI() {
+    const unlockedList = getUnlockedAchievements();
+    const unlockedSet = new Set(unlockedList);
+    const totalCount = ACHIEVEMENTS.length;
+    const unlockedCount = unlockedList.length;
+    const lockedCount = totalCount - unlockedCount;
+    const percent = Math.round((unlockedCount / totalCount) * 100);
+
+    const countEl = document.getElementById('unlockedAchievementsCount');
+    const totalEl = document.getElementById('totalAchievementsCount');
+    if (countEl) countEl.textContent = unlockedCount;
+    if (totalEl) totalEl.textContent = totalCount;
+
+    const summaryCountEl = document.getElementById('achievementsSummaryCount');
+    const totalSummaryCountEl = document.getElementById('achievementsTotalSummaryCount');
+    const percentEl = document.getElementById('achievementsPercent');
+    const progressFill = document.getElementById('achievementsProgressFill');
+
+    if (summaryCountEl) summaryCountEl.textContent = unlockedCount;
+    if (totalSummaryCountEl) totalSummaryCountEl.textContent = totalCount;
+    if (percentEl) percentEl.textContent = `${percent}%`;
+    if (progressFill) progressFill.style.width = `${percent}%`;
+
+    const fAll = document.getElementById('achFilterAllCount');
+    const fUn = document.getElementById('achFilterUnlockedCount');
+    const fLock = document.getElementById('achFilterLockedCount');
+    if (fAll) fAll.textContent = totalCount;
+    if (fUn) fUn.textContent = unlockedCount;
+    if (fLock) fLock.textContent = lockedCount;
+
+    const listContainer = document.getElementById('achievementsList');
+    if (!listContainer) return;
+
+    listContainer.innerHTML = ACHIEVEMENTS.map(ach => {
+        const isUnlocked = unlockedSet.has(ach.id);
+        const shouldHide = (currentAchievementFilter === 'unlocked' && !isUnlocked) || (currentAchievementFilter === 'locked' && isUnlocked);
+        return `
+            <div class="achievement-card ${isUnlocked ? 'unlocked' : 'locked'} ${shouldHide ? 'card-filtered-out' : ''}" data-ach-id="${ach.id}" data-unlocked="${isUnlocked ? '1' : '0'}">
+                <div class="ach-card-header">
+                    <div class="achievement-icon-wrap">${ach.icon}</div>
+                    <span class="achievement-status">${isUnlocked ? 'Feloldva ✓' : '🔒 Zárolva'}</span>
+                </div>
+                <div class="achievement-info">
+                    <strong>${ach.title}</strong>
+                    <small>${ach.desc}</small>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    if (typeof updateThemeSelectUI === 'function') {
+        updateThemeSelectUI();
+    }
+}
+
+function applyAchievementFilter(filter) {
+    currentAchievementFilter = filter;
+    const listContainer = document.getElementById('achievementsList');
+    if (!listContainer) return;
+
+    const cards = listContainer.querySelectorAll('.achievement-card');
+    cards.forEach(card => {
+        const isUnlocked = card.getAttribute('data-unlocked') === '1';
+        if (filter === 'all') {
+            card.classList.remove('card-filtered-out');
+        } else if (filter === 'unlocked') {
+            card.classList.toggle('card-filtered-out', !isUnlocked);
+        } else if (filter === 'locked') {
+            card.classList.toggle('card-filtered-out', isUnlocked);
+        }
+    });
+}
+
+// Játékos profil statisztika frissítése és tárolása
 function updatePlayerStatsRecord(username, score, colorCount, durationSeconds) {
     if (!username) return;
     try {
@@ -666,7 +624,6 @@ function updatePlayerStatsRecord(username, score, colorCount, durationSeconds) {
             const dKey = String(durationSeconds || '120');
             p.durations[dKey] = (p.durations[dKey] || 0) + 1;
 
-            // Legutóbbi 10 meccs előzményének rögzítése
             p.history.unshift({
                 score: score,
                 color: cKey,
@@ -759,62 +716,159 @@ function getPlayerProfileStats(username, allScores = []) {
         profile.achievements = getUnlockedAchievements();
         profile.chosenTitle = localStorage.getItem('crashdown_chosen_title') || profile.chosenTitle;
         profile.chosenAvatar = localStorage.getItem('crashdown_chosen_avatar') || profile.chosenAvatar || 'avatar_default';
-    } else {
-        const inferred = new Set(profile.achievements || []);
-        if (profile.totalMatches >= 1) inferred.add('first_match');
-        if (profile.bestScore >= 500) inferred.add('first_500');
-        if (profile.bestScore >= 1500) inferred.add('score_1500');
-        if (profile.bestScore >= 5000) inferred.add('score_5000');
-        if (profile.bestScore >= 10000) inferred.add('score_10k');
-        if (profile.bestScore >= 25000) inferred.add('score_25k');
-        if (profile.bestScore >= 50000) inferred.add('score_50k');
-        if (profile.totalMatches >= 5) inferred.add('play_5_matches');
-        if (profile.totalMatches >= 20) inferred.add('play_20_matches');
-        if (profile.bestScore >= 3000) {
-            inferred.add('combo_x2');
-            inferred.add('combo_x3');
-        }
-        if (profile.bestScore >= 8000) {
-            inferred.add('combo_x5');
-            inferred.add('mega_clear');
-        }
-        profile.achievements = Array.from(inferred);
     }
-
-    // Rangcím meghatározása
-    const achSet = new Set(profile.achievements || []);
-    let activeTitle = null;
-
-    if (profile.chosenTitle) {
-        const found = PROFILE_TITLES.find(t => t.id === profile.chosenTitle);
-        if (found && found.isUnlocked(profile, achSet)) {
-            activeTitle = found;
-        }
-    }
-
-    if (!activeTitle) {
-        for (let i = PROFILE_TITLES.length - 1; i >= 0; i--) {
-            if (PROFILE_TITLES[i].isUnlocked(profile, achSet)) {
-                activeTitle = PROFILE_TITLES[i];
-                break;
-            }
-        }
-    }
-    profile.activeTitle = activeTitle || PROFILE_TITLES[0];
-
-    // Profilkép (Avatar) meghatározása
-    let activeAvatar = null;
-    if (profile.chosenAvatar) {
-        const foundAv = PROFILE_AVATARS.find(a => a.id === profile.chosenAvatar);
-        if (foundAv && (!foundAv.achId || achSet.has(foundAv.achId))) {
-            activeAvatar = foundAv;
-        }
-    }
-    profile.activeAvatar = activeAvatar || PROFILE_AVATARS[0];
 
     return profile;
 }
 
+
+// ==================== MODULE: public/js/ui.js ====================
+/* ================================================================
+   CRASHDOWN ARCADE - UI, MODALS, THEMES & LEADERBOARD
+   ================================================================ */
+
+let currentLeaderboardColorFilter = 'all';
+let currentLeaderboardTimeFilter = 'all';
+let pendingScore = null;
+
+// ==================== TOAST RENDSZER (MAXIMUM 3 DARAB) ====================
+function showToast(message, type = 'info') {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+
+    // Szigorúan maximum 3 darab toast maradhat
+    while (container.children.length >= 3) {
+        container.firstElementChild.remove();
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(8px)';
+        toast.style.transition = 'all 0.22s ease';
+        setTimeout(() => toast.remove(), 220);
+    }, 2400);
+}
+
+// ==================== STÁTUSZ & PONT KIJELZŐ ====================
+function setComboStatus(text, highlight = false) {
+    const pill = document.getElementById('comboIndicator');
+    if (!pill) return;
+    pill.textContent = text;
+    if (highlight) {
+        pill.style.background = 'rgba(16, 185, 129, 0.25)';
+        pill.style.borderColor = 'rgba(16, 185, 129, 0.55)';
+        pill.style.color = '#6ee7b7';
+    } else {
+        pill.style.background = 'rgba(59, 130, 246, 0.2)';
+        pill.style.borderColor = 'rgba(59, 130, 246, 0.4)';
+        pill.style.color = '#93c5fd';
+    }
+}
+
+function updateScoreUI(instant = false) {
+    const scoreEl = document.getElementById('score');
+    if (instant) {
+        displayedScore = pontSzam;
+        if (scoreEl) scoreEl.textContent = pontSzam;
+    }
+    const reqScore = document.getElementById('reqScore');
+    if (reqScore) {
+        reqScore.classList.toggle('met', pontSzam >= 1000);
+    }
+    if (pontSzam >= 500) checkAchievement('first_500');
+    if (pontSzam >= 1500) checkAchievement('score_1500');
+    if (pontSzam >= 5000) checkAchievement('score_5000');
+    if (pontSzam >= 10000) checkAchievement('score_10k');
+    if (pontSzam >= 25000) checkAchievement('score_25k');
+    if (pontSzam >= 50000) checkAchievement('score_5000');
+    const colorSelect = document.getElementById('colorSelect');
+    if (colorSelect && colorSelect.value === '5' && pontSzam >= 2000) checkAchievement('master_5_color');
+}
+
+// ==================== TÉMA KEZELÉS ====================
+function updateThemeSelectUI() {
+    const themeSelect = document.getElementById('themeSelect');
+    if (!themeSelect) return;
+    const unlockedAchs = getUnlockedAchievements();
+    const achSet = new Set(unlockedAchs);
+
+    themeSelect.innerHTML = THEMES_CATALOG.map(t => {
+        const isUnlocked = !t.achId || achSet.has(t.achId);
+        return `<option value="${t.id}">${isUnlocked ? '' : '🔒 '}${t.name}</option>`;
+    }).join('');
+
+    themeSelect.value = currentTheme;
+}
+
+function applyTheme(themeKey) {
+    if (!THEME_PALETTES[themeKey]) themeKey = 'retro';
+
+    const unlockedAchs = getUnlockedAchievements();
+    const achSet = new Set(unlockedAchs);
+    const themeObj = THEMES_CATALOG.find(t => t.id === themeKey) || THEMES_CATALOG[0];
+
+    if (themeObj.achId && !achSet.has(themeObj.achId)) {
+        const reqAch = ACHIEVEMENTS.find(a => a.id === themeObj.achId);
+        showToast(`🔒 Ez a téma még zárolva van! Feloldáshoz: ${reqAch?.title || 'Mérföldkő'}`, 'warning');
+        themeKey = currentTheme || 'retro';
+    }
+
+    currentTheme = themeKey;
+    localStorage.setItem('crashdown_theme', themeKey);
+
+    document.body.className = document.body.className.replace(/\btheme-[^\s]+\b/g, '').trim();
+    document.body.classList.add(`theme-${themeKey}`);
+
+    negyzetSzinek = THEME_PALETTES[themeKey] || THEME_PALETTES.retro;
+    const colorSelect = document.getElementById('colorSelect');
+    if (colorSelect) {
+        getSzinek(colorSelect.value);
+    } else {
+        getSzinek(3);
+    }
+
+    const themeSelect = document.getElementById('themeSelect');
+    if (themeSelect && themeSelect.value !== themeKey) {
+        themeSelect.value = themeKey;
+    }
+
+    // Canvas azonnali frissítése újraszínezéssel
+    if (jatekFut && palya && palya.length) {
+        palya.forEach(sor => {
+            sor.forEach(cella => {
+                if (cella && (!cella.type || cella.type === 'normal')) {
+                    if (!negyzetSzinek.includes(cella.color)) {
+                        cella.color = negyzetSzinek[Math.floor(Math.random() * negyzetSzinek.length)];
+                    }
+                }
+            });
+        });
+        if (typeof drawGrid === 'function') drawGrid();
+    } else {
+        if (typeof initPreviewBoard === 'function') initPreviewBoard();
+        if (typeof drawGrid === 'function') drawGrid();
+    }
+}
+
+// ==================== MOBIL TAB NAVIGÁCIÓ (AUTO GÖRGETÉSSEL A TETEJÉRE) ====================
+function switchToMobileTab(targetId, shouldScroll = true) {
+    document.querySelectorAll('.mobile-tab-btn').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-target') === targetId);
+    });
+    document.querySelectorAll('.controls-panel, .game-stage, .leaderboard-panel').forEach(panel => {
+        panel.classList.toggle('active', panel.id === targetId);
+    });
+    if (shouldScroll) {
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    }
+}
+
+// ==================== JÁTÉKOS PROFIL MODAL ====================
 async function openPlayerProfileModal(username) {
     let allScores = [];
     if (window.leaderboardService) {
@@ -849,7 +903,6 @@ async function openPlayerProfileModal(username) {
         avatarEl.title = `Profilkép: ${stats.activeAvatar.name}`;
     }
 
-    // Rangcím beállítása
     if (titleEl) titleEl.textContent = stats.activeTitle.name;
 
     if (titleSelectEl) {
@@ -894,7 +947,6 @@ async function openPlayerProfileModal(username) {
         }
     }
 
-    // Profilkép (Avatar) választó rács inicializálása
     const avatarSection = document.getElementById('profileAvatarSection');
     const avatarGrid = document.getElementById('profileAvatarGrid');
     if (avatarSection && avatarGrid) {
@@ -992,7 +1044,6 @@ async function openPlayerProfileModal(username) {
         }).join('');
     }
 
-    // Mini jelvények intelligens lebegő tooltippel (soha nem vágódik le az ablak szélén)
     if (badgesListEl) {
         badgesListEl.innerHTML = ACHIEVEMENTS.map(a => {
             const unlocked = achSet.has(a.id);
@@ -1052,7 +1103,6 @@ async function openPlayerProfileModal(username) {
         });
     }
 
-    // Meccselőzmények (Utolsó 10 játék) renderelése
     const historyListEl = document.getElementById('profileHistoryList');
     if (historyListEl) {
         const history = stats.history || [];
@@ -1081,181 +1131,18 @@ async function openPlayerProfileModal(username) {
     if (modal) modal.classList.remove('hidden');
 }
 
-function updateThemeSelectUI() {
-    const themeSelect = document.getElementById('themeSelect');
-    if (!themeSelect) return;
-    const unlockedAchs = getUnlockedAchievements();
-    const achSet = new Set(unlockedAchs);
-
-    themeSelect.innerHTML = THEMES_CATALOG.map(t => {
-        const isUnlocked = !t.achId || achSet.has(t.achId);
-        if (isUnlocked) {
-            return `<option value="${t.id}">${t.name}</option>`;
-        } else {
-            return `<option value="${t.id}" disabled>🔒 ${t.name}</option>`;
-        }
-    }).join('');
-
-    themeSelect.value = currentTheme;
-}
-
-function applyTheme(themeKey) {
-    if (!THEME_PALETTES[themeKey]) themeKey = 'retro';
-
-    const unlockedAchs = getUnlockedAchievements();
-    const achSet = new Set(unlockedAchs);
-    const themeObj = THEMES_CATALOG.find(t => t.id === themeKey) || THEMES_CATALOG[0];
-
-    if (themeObj.achId && !achSet.has(themeObj.achId)) {
-        const reqAch = ACHIEVEMENTS.find(a => a.id === themeObj.achId);
-        showToast(`🔒 Ez a téma még zárolva van! Feloldáshoz: ${reqAch?.title || 'Teljesíts több mérföldkövet'}`, 'warning');
-        themeKey = currentTheme || 'retro';
-    }
-
-    currentTheme = themeKey;
-    localStorage.setItem('crashdown_theme', themeKey);
-
-    document.body.className = document.body.className.replace(/\btheme-[^\s]+\b/g, '').trim();
-    if (themeKey !== 'retro') {
-        document.body.classList.add(`theme-${themeKey}`);
-    }
-
-    negyzetSzinek = THEME_PALETTES[themeKey] || THEME_PALETTES.retro;
-    const colorSelect = document.getElementById('colorSelect');
-    if (colorSelect) {
-        getSzinek(colorSelect.value);
-    } else {
-        getSzinek(3);
-    }
-
-    const themeSelect = document.getElementById('themeSelect');
-    if (themeSelect && themeSelect.value !== themeKey) {
-        themeSelect.value = themeKey;
-    }
-
-    if (!jatekFut && !vegeAJateknak) {
-        initPreviewBoard();
-    }
-}
-
-// Vizuális effektek tárolói
-let particles = [];
-let floatingTexts = [];
-let shockwaves = [];
-let hoverCell = null;
-let hoverHighlightSet = new Set();
-let hoverPreviewText = '';
-let screenShake = 0;
-let lastFrameTime = performance.now();
-
-// Pálya újrakeverés állapotok
-let isShufflingBoard = false;
-const SHUFFLE_COOLDOWN_SEC = 10;
-let shuffleCooldownRemaining = 0;
-let shuffleCooldownInterval = null;
-let palyaUjratoltesFolyamatban = false;
-
-function setupHiDPICanvas() {
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = LOGICAL_SIZE * dpr;
-    canvas.height = LOGICAL_SIZE * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-}
-setupHiDPICanvas();
-window.addEventListener('resize', setupHiDPICanvas);
-
-/*############################## TOAST & UI SEGEDEK ##############################*/
-
-function showToast(message, type = 'info') {
-    const container = document.getElementById('toastContainer');
-    if (!container) return;
-
-    // Maximum 3 darab toast lehet egyszerre a képernyőn
-    while (container.children.length >= 3) {
-        container.firstElementChild.remove();
-    }
-
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.textContent = message;
-    container.appendChild(toast);
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(8px)';
-        toast.style.transition = 'all 0.25s ease';
-        setTimeout(() => toast.remove(), 250);
-    }, 2800);
-}
-
-function setComboStatus(text, highlight = false) {
-    const pill = document.getElementById('comboIndicator');
-    if (!pill) return;
-    pill.textContent = text;
-    if (highlight) {
-        pill.style.background = 'rgba(16, 185, 129, 0.25)';
-        pill.style.borderColor = 'rgba(16, 185, 129, 0.55)';
-        pill.style.color = '#6ee7b7';
-    } else {
-        pill.style.background = 'rgba(59, 130, 246, 0.2)';
-        pill.style.borderColor = 'rgba(59, 130, 246, 0.4)';
-        pill.style.color = '#93c5fd';
-    }
-}
-
-function updateScoreUI(instant = false) {
-    const scoreEl = document.getElementById('score');
-    if (instant) {
-        displayedScore = pontSzam;
-        if (scoreEl) scoreEl.textContent = pontSzam;
-    }
-    const reqScore = document.getElementById('reqScore');
-    if (reqScore) {
-        reqScore.classList.toggle('met', pontSzam >= 1000);
-    }
-    if (pontSzam >= 500) checkAchievement('first_500');
-    if (pontSzam >= 1500) checkAchievement('score_1500');
-    if (pontSzam >= 5000) checkAchievement('score_5000');
-    if (pontSzam >= 10000) checkAchievement('score_10k');
-    if (pontSzam >= 25000) checkAchievement('score_25k');
-    if (pontSzam >= 50000) checkAchievement('score_50k');
-    const colorSelect = document.getElementById('colorSelect');
-    if (colorSelect && colorSelect.value === '5' && pontSzam >= 2000) checkAchievement('master_5_color');
-}
-
-/*############################## AUTH & TOPLISTA REGION ##############################*/
-
-let pendingScore = null;
-
-function setLeaderboardFeedback(msg, isError = true) {
-    const el = document.getElementById('leaderboardFeedback');
-    if (!el) return;
-    el.textContent = msg;
-    el.className = `feedback-msg ${isError ? 'error' : 'success'}`;
-}
-
-// Auth Modal Kezelés
-const authModal = document.getElementById('authModal');
-const openAuthModalBtn = document.getElementById('openAuthModalBtn');
-const closeAuthModalBtn = document.getElementById('closeAuthModalBtn');
-const tabLoginBtn = document.getElementById('tabLoginBtn');
-const tabRegisterBtn = document.getElementById('tabRegisterBtn');
-const authModalTitle = document.getElementById('authModalTitle');
-const displayNameField = document.getElementById('displayNameField');
-const authSubmitBtn = document.getElementById('authSubmitBtn');
-const authErrorMsg = document.getElementById('authErrorMsg');
-const authPendingNotice = document.getElementById('authPendingNotice');
-const pendingScoreVal = document.getElementById('pendingScoreVal');
-const loggedInUserBox = document.getElementById('loggedInUserBox');
-const currentUserNameLabel = document.getElementById('currentUserNameLabel');
-const logoutBtn = document.getElementById('logoutBtn');
-
+// ==================== AUTH MODAL KEZELÉS ====================
 let isRegisterMode = false;
 
 function openAuthModal(withPendingNotice = false) {
+    const authModal = document.getElementById('authModal');
+    const authErrorMsg = document.getElementById('authErrorMsg');
+    const authPendingNotice = document.getElementById('authPendingNotice');
+    const pendingScoreVal = document.getElementById('pendingScoreVal');
     if (!authModal) return;
     authModal.classList.remove('hidden');
     if (authErrorMsg) authErrorMsg.style.display = 'none';
-    
+
     if (withPendingNotice && pendingScore) {
         if (authPendingNotice) authPendingNotice.style.display = 'flex';
         if (pendingScoreVal) pendingScoreVal.textContent = pendingScore.score;
@@ -1265,87 +1152,41 @@ function openAuthModal(withPendingNotice = false) {
 }
 
 function closeAuthModal() {
+    const authModal = document.getElementById('authModal');
+    const authErrorMsg = document.getElementById('authErrorMsg');
     if (!authModal) return;
     authModal.classList.add('hidden');
     if (authErrorMsg) authErrorMsg.style.display = 'none';
 }
 
-if (openAuthModalBtn) {
-    openAuthModalBtn.addEventListener('click', () => {
-        setAuthMode(false);
-        openAuthModal(false);
-    });
-}
-
-if (closeAuthModalBtn) {
-    closeAuthModalBtn.addEventListener('click', closeAuthModal);
-}
-
-if (authModal) {
-    authModal.addEventListener('click', (e) => {
-        if (e.target === authModal) closeAuthModal();
-    });
-}
-
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && authModal && !authModal.classList.contains('hidden')) {
-        closeAuthModal();
-    }
-});
-
 function setAuthMode(register) {
     isRegisterMode = register;
+    const tabLoginBtn = document.getElementById('tabLoginBtn');
+    const tabRegisterBtn = document.getElementById('tabRegisterBtn');
+    const displayNameField = document.getElementById('displayNameField');
+    const authModalTitle = document.getElementById('authModalTitle');
+    const authSubmitBtn = document.getElementById('authSubmitBtn');
+    const forgotPwWrap = document.getElementById('forgotPasswordWrap');
+    const authErrorMsg = document.getElementById('authErrorMsg');
+
     if (tabLoginBtn) tabLoginBtn.classList.toggle('active', !register);
     if (tabRegisterBtn) tabRegisterBtn.classList.toggle('active', register);
     if (displayNameField) displayNameField.style.display = register ? 'flex' : 'none';
     if (authModalTitle) authModalTitle.textContent = register ? 'Új fiók regisztrációja' : 'Bejelentkezés';
     if (authSubmitBtn) authSubmitBtn.textContent = register ? 'Regisztráció és mentés' : 'Bejelentkezés';
-    const forgotPwWrap = document.getElementById('forgotPasswordWrap');
     if (forgotPwWrap) forgotPwWrap.style.display = register ? 'none' : 'flex';
     if (authErrorMsg) authErrorMsg.style.display = 'none';
 }
 
-if (tabLoginBtn) tabLoginBtn.addEventListener('click', () => setAuthMode(false));
-if (tabRegisterBtn) tabRegisterBtn.addEventListener('click', () => setAuthMode(true));
-
-// Elfelejtett jelszó eseménykezelő
-const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
-if (forgotPasswordBtn) {
-    forgotPasswordBtn.addEventListener('click', async () => {
-        const email = document.getElementById('authEmail')?.value.trim();
-        if (!email) {
-            showAuthError('Kérlek írd be az e-mail címed a fenti mezőbe az új jelszó kéréséhez!');
-            document.getElementById('authEmail')?.focus();
-            return;
-        }
-        forgotPasswordBtn.disabled = true;
-        forgotPasswordBtn.textContent = 'Küldés folyamatban...';
-        const res = await window.authService.resetPassword(email);
-        forgotPasswordBtn.disabled = false;
-        forgotPasswordBtn.textContent = 'Elfelejtetted a jelszavad?';
-        if (res.success) {
-            showToast(res.message, 'success');
-            if (authErrorMsg) {
-                authErrorMsg.textContent = res.message;
-                authErrorMsg.style.display = 'block';
-                authErrorMsg.style.color = '#38bdf8';
-                authErrorMsg.style.borderColor = 'rgba(56, 189, 248, 0.4)';
-                authErrorMsg.style.background = 'rgba(56, 189, 248, 0.12)';
-            }
-        } else {
-            showAuthError(res.error);
-        }
-    });
+function showAuthError(msg) {
+    const authErrorMsg = document.getElementById('authErrorMsg');
+    if (authErrorMsg) {
+        authErrorMsg.textContent = msg;
+        authErrorMsg.style.display = 'block';
+    }
 }
 
-// Jelszóváltoztatási Modal eseménykezelői
-const passwordChangeModal = document.getElementById('passwordChangeModal');
-const openChangePasswordModalBtn = document.getElementById('openChangePasswordModalBtn');
-const closeChangePasswordModalBtn = document.getElementById('closeChangePasswordModalBtn');
-const changePasswordForm = document.getElementById('changePasswordForm');
-const changePasswordErrorMsg = document.getElementById('changePasswordErrorMsg');
-const changePwEmailHint = document.getElementById('changePwEmailHint');
-
+// ==================== JELSZÓMÓDOSÍTÁS MODAL ====================
 function openChangePasswordModal() {
     const user = window.authService?.getCurrentUser();
     if (!user) {
@@ -1353,159 +1194,33 @@ function openChangePasswordModal() {
         openAuthModal(false);
         return;
     }
-    if (changePwEmailHint) changePwEmailHint.textContent = user.email;
-    if (changePasswordErrorMsg) changePasswordErrorMsg.style.display = 'none';
+    const changePwEmailHint = document.getElementById('changePwEmailHint');
+    const changePasswordErrorMsg = document.getElementById('changePasswordErrorMsg');
     const p1 = document.getElementById('newPasswordInput');
     const p2 = document.getElementById('confirmNewPasswordInput');
+    const modal = document.getElementById('passwordChangeModal');
+
+    if (changePwEmailHint) changePwEmailHint.textContent = user.email;
+    if (changePasswordErrorMsg) changePasswordErrorMsg.style.display = 'none';
     if (p1) p1.value = '';
     if (p2) p2.value = '';
-    if (passwordChangeModal) passwordChangeModal.classList.remove('hidden');
+    if (modal) modal.classList.remove('hidden');
 }
 
 function closeChangePasswordModal() {
-    if (passwordChangeModal) passwordChangeModal.classList.add('hidden');
-}
-
-if (openChangePasswordModalBtn) {
-    openChangePasswordModalBtn.addEventListener('click', openChangePasswordModal);
-}
-if (closeChangePasswordModalBtn) {
-    closeChangePasswordModalBtn.addEventListener('click', closeChangePasswordModal);
-}
-if (passwordChangeModal) {
-    passwordChangeModal.addEventListener('click', (e) => {
-        if (e.target === passwordChangeModal) closeChangePasswordModal();
-    });
-}
-
-if (changePasswordForm) {
-    changePasswordForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const p1 = document.getElementById('newPasswordInput')?.value;
-        const p2 = document.getElementById('confirmNewPasswordInput')?.value;
-
-        if (!p1 || p1.length < 6) {
-            showChangePwError('Az új jelszónak legalább 6 karakter hosszúnak kell lennie!');
-            return;
-        }
-        if (p1 !== p2) {
-            showChangePwError('A két megadott jelszó nem egyezik!');
-            return;
-        }
-
-        const submitBtn = document.getElementById('changePasswordSubmitBtn');
-        if (submitBtn) {
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Módosítás folyamatban...';
-        }
-
-        const res = await window.authService.updatePassword(p1);
-
-        if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Új jelszó mentése';
-        }
-
-        if (res.success) {
-            closeChangePasswordModal();
-            showToast('✅ A jelszavad sikeresen megváltozott!', 'success');
-        } else {
-            showChangePwError(res.error || 'Hiba történt a jelszómódosítás során.');
-        }
-    });
+    const modal = document.getElementById('passwordChangeModal');
+    if (modal) modal.classList.add('hidden');
 }
 
 function showChangePwError(msg) {
+    const changePasswordErrorMsg = document.getElementById('changePasswordErrorMsg');
     if (changePasswordErrorMsg) {
         changePasswordErrorMsg.textContent = msg;
         changePasswordErrorMsg.style.display = 'block';
     }
 }
 
-// Auth Form beküldése
-const authForm = document.getElementById('authForm');
-if (authForm) {
-    authForm.addEventListener('submit', async function (e) {
-        e.preventDefault();
-        const email = document.getElementById('authEmail')?.value.trim();
-        const password = document.getElementById('authPassword')?.value;
-        const displayName = document.getElementById('authDisplayName')?.value.trim();
-
-        if (!email || !password) {
-            showAuthError('Kérlek töltsd ki az e-mail és jelszó mezőket!');
-            return;
-        }
-
-        if (isRegisterMode && (!displayName || displayName.length < 3)) {
-            showAuthError('A játékosnévnek legalább 3 karakter hosszúnak kell lennie!');
-            return;
-        }
-
-        authSubmitBtn.disabled = true;
-        authSubmitBtn.textContent = 'Feldolgozás...';
-
-        let res;
-        if (isRegisterMode) {
-            res = await window.authService.register(email, password, displayName);
-        } else {
-            res = await window.authService.login(email, password);
-        }
-
-        authSubmitBtn.disabled = false;
-        authSubmitBtn.textContent = isRegisterMode ? 'Regisztráció és mentés' : 'Bejelentkezés';
-
-        if (!res.success) {
-            showAuthError(res.error || 'Hiba történt a művelet során.');
-            return;
-        }
-
-        // Sikeres bejelentkezés / regisztráció
-        closeAuthModal();
-        showToast(`Üdvözlünk, ${res.user.displayName}!`, 'success');
-
-        // Ha volt függőben lévő játékeredmény, azonnal elmentjük!
-        if (pendingScore) {
-            const scoreToSave = {
-                id: Date.now(),
-                name: res.user.displayName,
-                score: pendingScore.score,
-                color: pendingScore.color,
-                duration: pendingScore.duration,
-                timestamp: new Date().toISOString()
-            };
-            const saveRes = await toplistaHozzaadas(scoreToSave);
-            updatePlayerStatsRecord(res.user.displayName, scoreToSave.score, scoreToSave.color, scoreToSave.duration);
-            pendingScore = null;
-            showToast(`🎉 Eredményed (${scoreToSave.score} pont) mentve a ranglistára!`, 'success');
-            setLeaderboardFeedback('Eredményed sikeresen rögzítve a profiloddal!', false);
-            const overlaySaveBtn = document.getElementById('overlaySaveScoreBtn');
-            if (overlaySaveBtn) overlaySaveBtn.style.display = 'none';
-            await toplistaMegjelenites();
-        }
-    });
-}
-
-function showAuthError(msg) {
-    if (authErrorMsg) {
-        authErrorMsg.textContent = msg;
-        authErrorMsg.style.display = 'block';
-    }
-}
-
-if (logoutBtn) {
-    logoutBtn.addEventListener('click', async () => {
-        await window.authService.logout();
-        showToast('Sikeresen kijelentkeztél.', 'info');
-    });
-}
-
-// Figyeljük a bejelentkezett felhasználót
-if (window.authService) {
-    window.authService.onAuthStateChanged(user => {
-        updateAuthUI(user);
-    });
-}
-
+// ==================== AUTH UI ÁLLAPOT FRISSÍTÉSE ====================
 function updateAuthUI(user) {
     const openAuthBtn = document.getElementById('openAuthModalBtn');
     const myProfileBtn = document.getElementById('openMyProfileBtn');
@@ -1536,17 +1251,7 @@ function updateAuthUI(user) {
     }
 }
 
-// Felső fejléc saját profil gomb kattintás
-const openMyProfileBtn = document.getElementById('openMyProfileBtn');
-if (openMyProfileBtn) {
-    openMyProfileBtn.addEventListener('click', () => {
-        const currentUser = window.authService?.getCurrentUser();
-        if (currentUser && currentUser.displayName) {
-            openPlayerProfileModal(currentUser.displayName);
-        }
-    });
-}
-
+// ==================== RANGLISTA SERVICE & MEGJELENÍTÉS ====================
 async function toplistaHozzaadas(jatekosAdat) {
     if (window.leaderboardService) {
         return await window.leaderboardService.addScore(jatekosAdat);
@@ -1679,31 +1384,69 @@ async function toplistaMegjelenites() {
     });
 }
 
-if (window.leaderboardService) {
-    window.leaderboardService.onScoresChanged(() => {
-        toplistaMegjelenites();
-    });
+
+// ==================== MODULE: public/js/game.js ====================
+/* ================================================================
+   CRASHDOWN ARCADE - GAME ENGINE, CANVAS & CORE MECHANICS
+   ================================================================ */
+
+const canvas = document.getElementById('crashdownCanvas');
+const ctx = canvas.getContext('2d');
+
+let grid = [];
+let pontSzam = 0;
+let displayedScore = 0;
+let szinek = [];
+let kattOffset = false;
+let jatekFut = false;
+let vegeAJateknak = false;
+let remainingTime = 60;
+let MAX_TIME = 60;
+let timerInterval = null;
+let pendingRowTimeout = null;
+
+// Pontduplázó (5 mp Frenzy) állapot
+let isDoublePointsActive = false;
+let doublePointsRemainingTime = 0;
+let doublePointsInterval = null;
+const FRENZY_MAX_TIME = 5;
+
+// Időfagyasztó (4 mp) állapot
+let isFrozen = false;
+let freezeRemainingTime = 0;
+let freezeInterval = null;
+
+// Kombó-szorzó állapot
+let comboStreak = 0;
+let comboMultiplier = 1;
+let comboResetTimeout = null;
+
+// Vizuális effektek tárolói
+let particles = [];
+let floatingTexts = [];
+let shockwaves = [];
+let hoverCell = null;
+let hoverHighlightSet = new Set();
+let hoverPreviewText = '';
+let screenShake = 0;
+let lastFrameTime = performance.now();
+
+// Pálya újrakeverés állapotok
+let isShufflingBoard = false;
+const SHUFFLE_COOLDOWN_SEC = 10;
+let shuffleCooldownRemaining = 0;
+let shuffleCooldownInterval = null;
+let palyaUjratoltesFolyamatban = false;
+
+// HiDPI éles vászon inicializálás
+function setupHiDPICanvas() {
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = LOGICAL_SIZE * dpr;
+    canvas.height = LOGICAL_SIZE * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
-
-document.querySelectorAll('.filter-chip').forEach(btn => {
-    btn.addEventListener('click', function () {
-        const filterType = this.getAttribute('data-filter-type') || 'color';
-        const filterVal = this.getAttribute('data-filter');
-
-        if (filterType === 'color') {
-            document.querySelectorAll('#colorFilterGroup .filter-chip').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            currentLeaderboardColorFilter = filterVal;
-        } else if (filterType === 'time') {
-            document.querySelectorAll('#timeFilterGroup .filter-chip').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            currentLeaderboardTimeFilter = filterVal;
-        }
-        toplistaMegjelenites();
-    });
-});
-
-/*############################## ESEMÉNYKEZELŐK & VEZÉRLÉS ##############################*/
+setupHiDPICanvas();
+window.addEventListener('resize', setupHiDPICanvas);
 
 function createCell(color, offsetY = 0) {
     return {
@@ -1720,395 +1463,7 @@ function getSzinek(mennyit) {
     szinek = negyzetSzinek.slice(0, count);
 }
 
-function switchToMobileTab(targetId) {
-    document.querySelectorAll('.mobile-tab-btn').forEach(b => {
-        b.classList.toggle('active', b.getAttribute('data-target') === targetId);
-    });
-    document.querySelectorAll('.controls-panel, .game-stage, .leaderboard-panel').forEach(panel => {
-        panel.classList.toggle('active', panel.id === targetId);
-    });
-}
-
-function startMatch() {
-    switchToMobileTab('stagePanel');
-    if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-    }
-    if (pendingRowTimeout) {
-        clearTimeout(pendingRowTimeout);
-        pendingRowTimeout = null;
-    }
-
-    jatekInditasa();
-    timer();
-
-    const startBtn = document.getElementById('startGameButton');
-    if (startBtn) startBtn.disabled = true;
-
-    const overlay = document.getElementById('canvasOverlay');
-    if (overlay) overlay.classList.add('hidden');
-
-    const overlaySaveBtn = document.getElementById('overlaySaveScoreBtn');
-    if (overlaySaveBtn) overlaySaveBtn.style.display = 'none';
-
-    const timeUpMsg = document.getElementById('timeUpMessage');
-    if (timeUpMsg) timeUpMsg.style.display = 'none';
-
-    const toplistaBtn = document.getElementById('toplistaHozzaadas');
-    if (toplistaBtn) toplistaBtn.disabled = false;
-}
-
-/**
- * Visszaállítja a játékot az alaphelyzetbe (lobby állapot),
- * ahol szabadon választható a színek száma, és a játék csak a
- * "Játék indítása" gombra kattintva indul el.
- */
-function ujJatekInditasaFunc() {
-    switchToMobileTab('stagePanel');
-    if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-    }
-    if (pendingRowTimeout) {
-        clearTimeout(pendingRowTimeout);
-        pendingRowTimeout = null;
-    }
-
-    jatekFut = false;
-    vegeAJateknak = false;
-    kattOffset = false;
-    hoverHighlightSet.clear();
-    hoverPreviewText = '';
-    particles = [];
-    floatingTexts = [];
-    shockwaves = [];
-
-    pontSzam = 0;
-    updateScoreUI(true);
-
-    remainingTime = MAX_TIME;
-    refreshTimerText();
-
-    const szinValaszto = document.getElementById('colorSelect');
-    if (szinValaszto) szinValaszto.disabled = false;
-
-    const timeSelectEl = document.getElementById('timeSelect');
-    if (timeSelectEl) {
-        timeSelectEl.disabled = false;
-        MAX_TIME = parseInt(timeSelectEl.value, 10);
-        remainingTime = MAX_TIME;
-    } else {
-        remainingTime = MAX_TIME;
-    }
-    refreshTimerText();
-
-    const startBtn = document.getElementById('startGameButton');
-    if (startBtn) startBtn.disabled = false;
-
-    const timeUpMsg = document.getElementById('timeUpMessage');
-    if (timeUpMsg) timeUpMsg.style.display = 'none';
-
-    const overlay = document.getElementById('canvasOverlay');
-    const overlayTitle = document.getElementById('overlayTitle');
-    const overlaySubtitle = document.getElementById('overlaySubtitle');
-    const overlayBtn = document.getElementById('overlayStartBtn');
-    const overlaySaveBtn = document.getElementById('overlaySaveScoreBtn');
-    if (overlaySaveBtn) overlaySaveBtn.style.display = 'none';
-
-    if (overlay) {
-        overlay.classList.remove('hidden');
-        if (overlayTitle) overlayTitle.textContent = 'Crashdown';
-        if (overlaySubtitle) {
-            overlaySubtitle.textContent = 'Kattints vagy érints legalább 3 azonos színű blokkot a törléshez!';
-        }
-        if (overlayBtn) {
-            overlayBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M8 5v14l11-7z"/></svg><span>Játék indítása</span>';
-        }
-    }
-
-    canvas.style.cursor = 'pointer';
-    setComboStatus('Készen állsz?', false);
-    initPreviewBoard();
-    showToast('Alaphelyzet: válassz nehézséget és játékidőt, majd indítsd a játékot!', 'info');
-}
-
-document.getElementById('startGameButton').addEventListener('click', startMatch);
-document.getElementById('startNewGame').addEventListener('click', ujJatekInditasaFunc);
-
-const overlayStartBtn = document.getElementById('overlayStartBtn');
-if (overlayStartBtn) {
-    overlayStartBtn.addEventListener('click', startMatch);
-}
-
-const overlaySaveScoreBtn = document.getElementById('overlaySaveScoreBtn');
-if (overlaySaveScoreBtn) {
-    overlaySaveScoreBtn.addEventListener('click', () => {
-        openAuthModal(true);
-    });
-}
-
-const shuffleButton = document.getElementById('shuffleButton');
-if (shuffleButton) {
-    shuffleButton.addEventListener('click', executeBoardShuffle);
-}
-
-function updateShuffleButtonUI() {
-    const btn = document.getElementById('shuffleButton');
-    const badge = document.getElementById('shuffleCooldownBadge');
-    if (!btn || !badge) return;
-
-    if (!jatekFut || vegeAJateknak) {
-        btn.disabled = true;
-        badge.textContent = 'Kész';
-        return;
-    }
-
-    if (shuffleCooldownRemaining > 0) {
-        btn.disabled = true;
-        badge.textContent = `${shuffleCooldownRemaining}s`;
-    } else {
-        btn.disabled = false;
-        badge.textContent = 'Kész';
-    }
-}
-
-function startShuffleCooldown() {
-    shuffleCooldownRemaining = SHUFFLE_COOLDOWN_SEC;
-    updateShuffleButtonUI();
-    if (shuffleCooldownInterval) clearInterval(shuffleCooldownInterval);
-    shuffleCooldownInterval = setInterval(() => {
-        shuffleCooldownRemaining--;
-        if (shuffleCooldownRemaining <= 0) {
-            clearInterval(shuffleCooldownInterval);
-            shuffleCooldownInterval = null;
-            shuffleCooldownRemaining = 0;
-        }
-        updateShuffleButtonUI();
-    }, 1000);
-}
-
-function executeBoardShuffle() {
-    if (!jatekFut || vegeAJateknak || isShufflingBoard || shuffleCooldownRemaining > 0) return;
-
-    startShuffleCooldown();
-    regisztraljPowerupHasznalatot();
-
-    const btn = document.getElementById('shuffleButton');
-    if (btn) {
-        btn.classList.add('is-spinning');
-        setTimeout(() => btn.classList.remove('is-spinning'), 700);
-    }
-
-    isShufflingBoard = true;
-    playSound(doublerKatt);
-    screenShake = 3;
-
-    // Két egymást követő elegáns neon lökéshullám középről
-    shockwaves.push({
-        x: LOGICAL_SIZE / 2,
-        y: LOGICAL_SIZE / 2,
-        radius: 12,
-        maxRadius: LOGICAL_SIZE * 0.72,
-        color: '#818cf8',
-        alpha: 1
-    });
-
-    setTimeout(() => {
-        shockwaves.push({
-            x: LOGICAL_SIZE / 2,
-            y: LOGICAL_SIZE / 2,
-            radius: 10,
-            maxRadius: LOGICAL_SIZE * 0.5,
-            color: '#c084fc',
-            alpha: 0.9
-        });
-    }, 90);
-
-    const positions = [];
-    const colors = [];
-    for (let i = 0; i < sorok; i++) {
-        for (let j = 0; j < oszlopok; j++) {
-            const col = grid[i]?.[j]?.color;
-            if (col && col !== 'white') {
-                positions.push({ x: j, y: i });
-                colors.push(col);
-            }
-        }
-    }
-
-    // Fisher-Yates keverés
-    for (let k = colors.length - 1; k > 0; k--) {
-        const r = Math.floor(Math.random() * (k + 1));
-        [colors[k], colors[r]] = [colors[r], colors[k]];
-    }
-
-    // Középponttól kifelé terjedő kaszkádolt "Pop & Swirl" animáció
-    const centerX = (oszlopok - 1) / 2;
-    const centerY = (sorok - 1) / 2;
-
-    positions.forEach((pos, idx) => {
-        const cell = grid[pos.y][pos.x];
-        const dist = Math.hypot(pos.x - centerX, pos.y - centerY);
-        const delay = dist * 26; // Távolság alapú hullám késleltetés
-
-        setTimeout(() => {
-            // 1. Fázis: Összezsugorodás
-            cell.scale = 0.2;
-
-            setTimeout(() => {
-                // 2. Fázis: Színcsere + részecskeszikrák + ruganyos visszapattanás
-                cell.color = colors[idx];
-                cell.scale = 1.25;
-                spawnCellParticles(pos.x, pos.y, colors[idx], 3);
-            }, 100);
-        }, delay);
-    });
-
-    spawnFloatingText(LOGICAL_SIZE / 2, LOGICAL_SIZE / 2, '⟳ PÁLYA ÚJRAKEVERVE!', '#818cf8');
-    setComboStatus('⟳ Pálya újrakeverve! Keresd az új kombinációkat!', true);
-    checkAchievement('shuffle_master');
-
-    setTimeout(() => {
-        isShufflingBoard = false;
-        updateHoverPreview();
-        ellenorizdPalyaAllapot();
-    }, 450);
-}
-
-document.getElementById('colorSelect').addEventListener('change', function () {
-    localStorage.setItem('selectedColorCount', this.value);
-    getSzinek(this.value);
-    initPreviewBoard();
-    showToast(`Nehézség beállítva: ${this.value} szín`, 'info');
-});
-
-const timeSelectEl = document.getElementById('timeSelect');
-if (timeSelectEl) {
-    timeSelectEl.addEventListener('change', function () {
-        if (!jatekFut) {
-            MAX_TIME = parseInt(this.value, 10);
-            remainingTime = MAX_TIME;
-            refreshTimerText();
-            showToast(`Játékidő beállítva: ${this.options[this.selectedIndex].text}`, 'info');
-        }
-    });
-}
-
-const themeSelectEl = document.getElementById('themeSelect');
-if (themeSelectEl) {
-    themeSelectEl.addEventListener('change', function () {
-        applyTheme(this.value);
-    });
-}
-
-const openAchievementsBtn = document.getElementById('openAchievementsBtn');
-const closeAchievementsModalBtn = document.getElementById('closeAchievementsModalBtn');
-const achievementsModal = document.getElementById('achievementsModal');
-
-if (openAchievementsBtn) {
-    openAchievementsBtn.addEventListener('click', () => {
-        updateAchievementsUI();
-        if (achievementsModal) achievementsModal.classList.remove('hidden');
-    });
-}
-if (closeAchievementsModalBtn) {
-    closeAchievementsModalBtn.addEventListener('click', () => {
-        if (achievementsModal) achievementsModal.classList.add('hidden');
-    });
-}
-if (achievementsModal) {
-    achievementsModal.addEventListener('click', (e) => {
-        if (e.target === achievementsModal) {
-            achievementsModal.classList.add('hidden');
-        }
-    });
-}
-
-// Jelvény szűrőfülek eseménykezelése (lagg-mentes, azonnali osztályváltással)
-document.querySelectorAll('.ach-filter-btn').forEach(btn => {
-    btn.addEventListener('click', function () {
-        document.querySelectorAll('.ach-filter-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        currentAchievementFilter = this.getAttribute('data-filter') || 'all';
-        applyAchievementFilter(currentAchievementFilter);
-    });
-});
-
-// Játékos Profil Modal bezárás
-const closePlayerProfileModalBtn = document.getElementById('closePlayerProfileModalBtn');
-const playerProfileModal = document.getElementById('playerProfileModal');
-
-if (closePlayerProfileModalBtn) {
-    closePlayerProfileModalBtn.addEventListener('click', () => {
-        if (playerProfileModal) playerProfileModal.classList.add('hidden');
-    });
-}
-if (playerProfileModal) {
-    playerProfileModal.addEventListener('click', (e) => {
-        if (e.target === playerProfileModal) {
-            playerProfileModal.classList.add('hidden');
-        }
-    });
-}
-
-// Mobilos fül-váltó navigáció
-document.querySelectorAll('.mobile-tab-btn').forEach(btn => {
-    btn.addEventListener('click', function () {
-        switchToMobileTab(this.getAttribute('data-target'));
-    });
-});
-
-// Érintéskezelés mobiltelefonokra (késleltetés-mentes, pontos koordináták)
-function handleCanvasTouch(e) {
-    e.preventDefault();
-    if (!e.changedTouches || e.changedTouches.length === 0) return;
-    const touch = e.changedTouches[0];
-    handleClick({
-        clientX: touch.clientX,
-        clientY: touch.clientY
-    });
-}
-canvas.addEventListener('touchstart', handleCanvasTouch, { passive: false });
-
-// Billentyűparancsok (M = Némítás)
-document.addEventListener('keydown', function (e) {
-    if (document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
-    if (e.key === 'm' || e.key === 'M') {
-        toggleVolume();
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    const selectedValue = localStorage.getItem('selectedColorCount') || '3';
-    const selectEl = document.getElementById('colorSelect');
-    if (selectEl) selectEl.value = selectedValue;
-
-    const timeSelectEl = document.getElementById('timeSelect');
-    if (timeSelectEl) {
-        MAX_TIME = parseInt(timeSelectEl.value, 10) || 60;
-        remainingTime = MAX_TIME;
-        refreshTimerText();
-    }
-
-    applyTheme(currentTheme);
-    updateThemeSelectUI();
-    applyAudioSettings();
-    toplistaMegjelenites();
-    initPreviewBoard();
-    updateShuffleButtonUI();
-    updateAchievementsUI();
-    requestAnimationFrame(animationLoop);
-});
-
-/*############################## JATEK LOGIKA & POWERUPOK ##############################*/
-
-function pluszIdoPowerUp() {
-    remainingTime = Math.min(MAX_TIME + 30, remainingTime + 5);
-    regisztraljPowerupHasznalatot();
-    refreshTimerText();
-}
-
+// ==================== POWER-UP AKTIVÁLÓK ====================
 function aktivaldPontduplazot(seconds = 5) {
     isDoublePointsActive = true;
     doublePointsRemainingTime = seconds;
@@ -2116,25 +1471,20 @@ function aktivaldPontduplazot(seconds = 5) {
 
     const banner = document.getElementById('doublePointsBanner');
     const badge = document.getElementById('frenzyTimerBadge');
-    const bar = document.getElementById('frenzyProgressBar');
     const wrapper = document.getElementById('canvasWrapper');
 
     if (banner) banner.classList.remove('hidden');
     if (wrapper) wrapper.classList.add('frenzy-active');
     if (badge) badge.textContent = `${doublePointsRemainingTime.toFixed(1)}s`;
-    if (bar) bar.style.width = '100%';
 
     playSound(doublerKatt);
+    triggerHaptic('heavy');
     checkAchievement('frenzy_master');
 
     if (doublePointsInterval) clearInterval(doublePointsInterval);
     doublePointsInterval = setInterval(() => {
         doublePointsRemainingTime = Math.max(0, doublePointsRemainingTime - 0.1);
         if (badge) badge.textContent = `${doublePointsRemainingTime.toFixed(1)}s`;
-        if (bar) {
-            const pct = Math.max(0, Math.min(100, (doublePointsRemainingTime / FRENZY_MAX_TIME) * 100));
-            bar.style.width = `${pct}%`;
-        }
 
         if (doublePointsRemainingTime <= 0 || !jatekFut || vegeAJateknak) {
             deaktivaldPontduplazot();
@@ -2169,7 +1519,7 @@ function aktivaldFagyasztast(seconds = 4) {
     if (badge) badge.textContent = `${freezeRemainingTime.toFixed(1)}s`;
 
     playSound(timeEffekt);
-    triggerHaptic('freeze');
+    triggerHaptic('heavy');
     checkAchievement('freeze_time');
 
     if (freezeInterval) clearInterval(freezeInterval);
@@ -2194,6 +1544,12 @@ function deaktivaldFagyasztast() {
     const wrapper = document.getElementById('canvasWrapper');
     if (overlay) overlay.classList.add('hidden');
     if (wrapper) wrapper.classList.remove('freeze-active');
+}
+
+function pluszIdoPowerUp() {
+    regisztraljPowerupHasznalatot();
+    remainingTime += 5;
+    refreshTimerText();
 }
 
 function magnesPowerUp() {
@@ -2267,25 +1623,17 @@ function magnesPowerUp() {
     });
 
     spawnFloatingText(LOGICAL_SIZE / 2, LOGICAL_SIZE / 2, '🧲 MÁGNES VONZÁS!', '#f87171');
-    setComboStatus(`🧲 Szuper Mágnes: ${targetCount} db blokk egy óriási tömbbe rántva!`, true);
+    setComboStatus(`🧲 Szuper Mágnes: ${targetCount} db blokk egy tömbbe rántva!`, true);
 }
 
 function regisztraljKomboLepest() {
     comboStreak++;
     comboMultiplier = Math.min(5, 1 + Math.floor(comboStreak / 2));
 
-    if (comboMultiplier >= 2) {
-        checkAchievement('combo_x2');
-    }
-    if (comboMultiplier >= 3) {
-        checkAchievement('combo_x3');
-    }
-    if (comboMultiplier >= 4) {
-        checkAchievement('combo_x4');
-    }
-    if (comboMultiplier >= 5) {
-        checkAchievement('combo_x5');
-    }
+    if (comboMultiplier >= 2) checkAchievement('combo_x2');
+    if (comboMultiplier >= 3) checkAchievement('combo_x3');
+    if (comboMultiplier >= 4) checkAchievement('combo_x4');
+    if (comboMultiplier >= 5) checkAchievement('combo_x5');
 
     if (comboResetTimeout) clearTimeout(comboResetTimeout);
     comboResetTimeout = setTimeout(() => {
@@ -2310,9 +1658,6 @@ function updateComboUI() {
     }
 }
 
-/**
- * Számolja a táblán jelenleg lévő nem-üres színes blokkokat.
- */
 function szamolMaradtBlokk() {
     let count = 0;
     for (let i = 0; i < sorok; i++) {
@@ -2325,11 +1670,6 @@ function szamolMaradtBlokk() {
     return count;
 }
 
-/**
- * Ellenőrzi, hogy létezik-e még kattintható érvényes lépés:
- * 1. Van-e a táblán bármilyen power-up? (Mindegyik azonnal aktiválható)
- * 2. Van-e legalább egy 3 vagy több azonos színű szomszédos blokkból álló csoport?
- */
 function vanMegLepes() {
     if (!jatekFut || vegeAJateknak) return false;
 
@@ -2342,12 +1682,11 @@ function vanMegLepes() {
             if (!cell || cell.color === 'white') continue;
             blockCount++;
             if (powerUpColors.has(cell.color)) {
-                return true; // Van power-up, a játékos bármikor rákattinthat!
+                return true;
             }
         }
     }
 
-    // Ha kevesebb mint 3 blokk maradt és nincs power-up, nem lehet lépés
     if (blockCount < 3) return false;
 
     const visited = new Set();
@@ -2365,7 +1704,7 @@ function vanMegLepes() {
             }
 
             if (group.length >= 3) {
-                return true; // Találtunk érvényes 3+ kombinációt!
+                return true;
             }
         }
     }
@@ -2373,10 +1712,6 @@ function vanMegLepes() {
     return false;
 }
 
-/**
- * Véletlenszerű power-upok kiválasztása.
- * Az időbónusz (+5s) ritkább (csak 30% eséllyel kerül be a lehetséges készletbe).
- */
 function valasszVeletlenPowerUpok(db = 4) {
     const basePows = ['cyan', 'pink', '#f97316', 'darkgreen', '#14b8a6', '#6366f1', '#0284c7', '#e11d48'];
     const shuffled = [...basePows].sort(() => 0.5 - Math.random());
@@ -2386,9 +1721,6 @@ function valasszVeletlenPowerUpok(db = 4) {
     return shuffled.slice(0, db);
 }
 
-/**
- * Új tiszta tábla legördítése és friss power-upok elhelyezése
- */
 function ujPalyaLedobas() {
     if (!jatekFut || vegeAJateknak) return;
     const szinSelect = document.getElementById('colorSelect');
@@ -2398,12 +1730,10 @@ function ujPalyaLedobas() {
         grid[i] = [];
         for (let j = 0; j < oszlopok; j++) {
             const rc = szinek[Math.floor(Math.random() * szinek.length)];
-            // Látványos beugrás fentről (kaszkádolt késleltetéssel)
             grid[i][j] = createCell(rc, -(sorok - i) * 16 - (j % 2) * 8);
         }
     }
 
-    // 4 új véletlenszerű power-up lehelyezése
     const usedPositions = new Set();
     function placePowerUp(colorKey) {
         let px, py;
@@ -2421,17 +1751,11 @@ function ujPalyaLedobas() {
     updateHoverPreview();
 }
 
-/**
- * Pálya állapotának ellenőrzése minden lépés után:
- * - 0 blokk esetén: Tökéletes takarítás bónusz (+500p) & új pálya
- * - Nincs több lépés (Deadlock / Soft-lock) esetén: Dinamikus takarítási bónusz & új pálya
- */
 function ellenorizdPalyaAllapot() {
     if (!jatekFut || vegeAJateknak || palyaUjratoltesFolyamatban) return;
 
     const maradt = szamolMaradtBlokk();
 
-    // 1. eset: Teljesen letisztított pálya (0 blokk maradt)
     if (maradt === 0) {
         palyaUjratoltesFolyamatban = true;
         pontSzam += 500;
@@ -2458,7 +1782,6 @@ function ellenorizdPalyaAllapot() {
         return;
     }
 
-    // 2. eset: Soft-lock / Deadlock: van még blokk, de nincs érvényes lépés
     if (!vanMegLepes()) {
         palyaUjratoltesFolyamatban = true;
         let bonusz = 50;
@@ -2491,7 +1814,6 @@ function ellenorizdPalyaAllapot() {
         spawnFloatingText(LOGICAL_SIZE / 2, LOGICAL_SIZE / 2, `+${bonusz} BÓNUSZ!`, '#818cf8');
         setComboStatus(bonuszSzoveg, true);
 
-        // Maradék izolált blokkok látványos elporlasztása
         for (let i = 0; i < sorok; i++) {
             for (let j = 0; j < oszlopok; j++) {
                 if (grid[i]?.[j] && grid[i][j].color !== 'white') {
@@ -2507,11 +1829,6 @@ function ellenorizdPalyaAllapot() {
             palyaUjratoltesFolyamatban = false;
         }, 600);
     }
-}
-
-// Régi függvénykompatibilitás
-function ellenorizdPalyaTisztitas() {
-    ellenorizdPalyaAllapot();
 }
 
 function spawnCellParticles(col, row, color, count = 7) {
@@ -2570,7 +1887,6 @@ function handleClick(event) {
     }
 
     if (targetColor === 'cyan') {
-        // Pontduplázó power-up (5 mp Frenzy)
         spawnCellParticles(x, y, 'cyan', 16);
         grid[y][x].color = 'white';
         grid[y][x].marked = true;
@@ -2580,7 +1896,6 @@ function handleClick(event) {
         setComboStatus('⚡ 2× Pontduplázó: következő 5 mp-ben minden pontod duplázódik!', true);
         ellenorizdPalyaAllapot();
     } else if (targetColor === 'pink') {
-        // Cunami: teljes sor törlése
         regisztraljPowerupHasznalatot();
         playSound(sorEffekt);
         for (let j = 0; j < oszlopok; j++) {
@@ -2606,7 +1921,6 @@ function handleClick(event) {
         setComboStatus(`⇄ Teljes sor eltakarítva! (+${gained}p)`, true);
         ellenorizdPalyaAllapot();
     } else if (targetColor === '#f97316') {
-        // Oszloptörlő lézer: teljes oszlop törlése
         regisztraljPowerupHasznalatot();
         playSound(sorEffekt);
         for (let i = 0; i < sorok; i++) {
@@ -2632,7 +1946,6 @@ function handleClick(event) {
         setComboStatus(`⇅ Teljes oszlop kilőve! (+${gained}p)`, true);
         ellenorizdPalyaAllapot();
     } else if (targetColor === 'darkgreen') {
-        // 3x3 TNT robbantás
         regisztraljPowerupHasznalatot();
         playSound(tntKatt);
         triggerHaptic('heavy');
@@ -2654,7 +1967,6 @@ function handleClick(event) {
         setComboStatus(`💥 3×3-as TNT robbanás! (+${gained}p)`, true);
         ellenorizdPalyaAllapot();
     } else if (targetColor === '#14b8a6') {
-        // Szín-bomba: egy teljes szín összes blokkját eltakarítja
         regisztraljPowerupHasznalatot();
         playSound(tntKatt);
         triggerHaptic('medium');
@@ -2702,7 +2014,6 @@ function handleClick(event) {
         setComboStatus(`✦ Szín-bomba: ${wipedCount} blokk megsemmisítve! (+${earned}p)`, true);
         ellenorizdPalyaAllapot();
     } else if (targetColor === '#6366f1') {
-        // Pálya keverés: újrakeveri a blokkok színeit
         regisztraljPowerupHasznalatot();
         playSound(doublerKatt);
         triggerHaptic('medium');
@@ -2744,7 +2055,6 @@ function handleClick(event) {
         setComboStatus(`⟳ Pálya újrakeverve! (+${gained}p)`, true);
         ellenorizdPalyaAllapot();
     } else if (targetColor === '#581845') {
-        // +5 mp idő power-up
         spawnCellParticles(x, y, '#581845', 14);
         grid[y][x].color = 'white';
         grid[y][x].marked = true;
@@ -2757,7 +2067,6 @@ function handleClick(event) {
         setComboStatus('⌛ +5 másodperc extra idő!', true);
         ellenorizdPalyaAllapot();
     } else if (targetColor === '#0284c7') {
-        // Időfagyasztó Jégkocka power-up (❄)
         spawnCellParticles(x, y, '#0284c7', 16);
         grid[y][x].color = 'white';
         grid[y][x].marked = true;
@@ -2767,31 +2076,23 @@ function handleClick(event) {
         setComboStatus('❄ Időfagyasztó: 4 másodpercig nem telik az idő!', true);
         ellenorizdPalyaAllapot();
     } else if (targetColor === '#e11d48') {
-        // Szuper Mágnes power-up (🧲)
         spawnCellParticles(x, y, '#e11d48', 16);
         grid[y][x].color = 'white';
         grid[y][x].marked = true;
         magnesPowerUp();
         ellenorizdPalyaAllapot();
     } else {
-        // Normál színes négyzetek keresése (BFS)
         const torlendoNegyzetek = getTorlendoNegyzetek(x, y, targetColor);
         if (torlendoNegyzetek.length >= 3) {
             playSound(sikeresKatt);
             triggerHaptic('light');
             checkAchievement('first_match');
-            if (torlendoNegyzetek.length >= 8) {
-                checkAchievement('mega_clear');
-            }
-            if (torlendoNegyzetek.length >= 12) {
-                checkAchievement('hyper_clear');
-            }
+            if (torlendoNegyzetek.length >= 8) checkAchievement('mega_clear');
+            if (torlendoNegyzetek.length >= 12) checkAchievement('hyper_clear');
 
             recentSuccessfulClicks.push(Date.now());
             recentSuccessfulClicks = recentSuccessfulClicks.filter(t => Date.now() - t <= 10000);
-            if (recentSuccessfulClicks.length >= 8) {
-                checkAchievement('speed_demon');
-            }
+            if (recentSuccessfulClicks.length >= 8) checkAchievement('speed_demon');
             const mult = regisztraljKomboLepest();
 
             for (let i = 0; i < torlendoNegyzetek.length; i++) {
@@ -2826,7 +2127,6 @@ function handleClick(event) {
             }
             ellenorizdPalyaAllapot();
         } else {
-            // Kevés az érintkező négyzet -> enyhe vizuális visszajelzés
             grid[y][x].scale = 0.86;
             setComboStatus('Legalább 3 azonos színű blokk kell!', false);
         }
@@ -2883,14 +2183,8 @@ function getTorlendoNegyzetek(x, y, color) {
     return talaltNegyzetekTomb;
 }
 
-/**
- * Azonnali, versenyhelyzet-mentes oszlop-újrarendezés:
- * A logikai rácsot szinkron frissítjük, a leeső blokkoknak pedig negatív
- * vizuális offsetY-t adunk, amit a requestAnimationFrame loop vajpuhán a helyére ejt.
- */
 function gridUjraRendezes() {
     for (let j = 0; j < oszlopok; j++) {
-        // Megjelölt cellák ürítése
         for (let i = sorok - 1; i >= 0; i--) {
             if (grid[i][j].marked) {
                 grid[i][j].color = 'white';
@@ -2900,7 +2194,6 @@ function gridUjraRendezes() {
             }
         }
 
-        // Nem üres cellák tömörítése alulra
         let writeRow = sorok - 1;
         for (let readRow = sorok - 1; readRow >= 0; readRow--) {
             if (grid[readRow][j].color !== 'white') {
@@ -2922,8 +2215,6 @@ function gridUjraRendezes() {
     }
 }
 
-/*############################## HOVER ELŐNÉZET ##############################*/
-
 function updateHoverPreview() {
     hoverHighlightSet.clear();
     hoverPreviewText = '';
@@ -2939,14 +2230,10 @@ function updateHoverPreview() {
         hoverHighlightSet.add(`${x}:${y}`);
         hoverPreviewText = '2× Duplázó';
     } else if (c === 'pink') {
-        for (let j = 0; j < oszlopok; j++) {
-            hoverHighlightSet.add(`${j}:${y}`);
-        }
+        for (let j = 0; j < oszlopok; j++) hoverHighlightSet.add(`${j}:${y}`);
         hoverPreviewText = 'Sor törlés (+100)';
     } else if (c === '#f97316') {
-        for (let i = 0; i < sorok; i++) {
-            hoverHighlightSet.add(`${x}:${i}`);
-        }
+        for (let i = 0; i < sorok; i++) hoverHighlightSet.add(`${x}:${i}`);
         hoverPreviewText = 'Oszlop törlés (+100)';
     } else if (c === 'darkgreen') {
         for (let i = Math.max(0, y - 1); i <= Math.min(sorok - 1, y + 1); i++) {
@@ -2979,29 +2266,6 @@ function updateHoverPreview() {
     }
 }
 
-canvas.addEventListener('mousemove', function (e) {
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = LOGICAL_SIZE / rect.width;
-    const scaleY = LOGICAL_SIZE / rect.height;
-    const x = Math.floor((e.clientX - rect.left) * scaleX / negyzetMeret);
-    const y = Math.floor((e.clientY - rect.top) * scaleY / negyzetMeret);
-
-    if (!hoverCell || hoverCell.x !== x || hoverCell.y !== y) {
-        hoverCell = { x, y };
-        updateHoverPreview();
-    }
-});
-
-canvas.addEventListener('mouseleave', function () {
-    hoverCell = null;
-    hoverHighlightSet.clear();
-    hoverPreviewText = '';
-});
-
-canvas.addEventListener('click', handleClick);
-
-/*############################## RENDERELÉS & 60FPS ANIMÁCIÓ ##############################*/
-
 function drawRoundedRect(x, y, w, h, r) {
     ctx.beginPath();
     ctx.moveTo(x + r, y);
@@ -3019,14 +2283,12 @@ function drawRoundedRect(x, y, w, h, r) {
 function drawGrid() {
     ctx.save();
 
-    // Képernyőrázkódás (TNT robbanásnál és effekteknél)
     if (screenShake > 0.2) {
         const dx = (Math.random() - 0.5) * screenShake;
         const dy = (Math.random() - 0.5) * screenShake;
         ctx.translate(dx, dy);
     }
 
-    // Sötét háttérrács kirajzolása (dinamikus háttér Frenzy és Freeze alatt)
     let bgFill = '#0d1017';
     let slotFill = '#151a24';
     if (isDoublePointsActive) {
@@ -3051,7 +2313,6 @@ function drawGrid() {
         }
     }
 
-    // Blokkok kirajzolása (plasztikus 3D arcade csempék)
     for (let i = 0; i < sorok; i++) {
         if (!grid[i]) continue;
         for (let j = 0; j < oszlopok; j++) {
@@ -3072,7 +2333,6 @@ function drawGrid() {
 
             ctx.save();
 
-            // Blokk alap kitöltése
             const grad = ctx.createLinearGradient(x, y, x, y + size);
             grad.addColorStop(0, style.top);
             grad.addColorStop(1, style.bottom);
@@ -3081,7 +2341,7 @@ function drawGrid() {
             drawRoundedRect(x, y, size, size, 7);
             ctx.fill();
 
-            // Finom 3D plasztikus élfény (taktilis arcade csempe hatás)
+            // 3D élfény
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.28)';
             ctx.lineWidth = 1.5;
             ctx.beginPath();
@@ -3091,7 +2351,7 @@ function drawGrid() {
             ctx.lineTo(x + size - 5, y + 2);
             ctx.stroke();
 
-            // Alsó és jobb belső árnyék
+            // Árnyék
             ctx.strokeStyle = 'rgba(0, 0, 0, 0.25)';
             ctx.lineWidth = 1.5;
             ctx.beginPath();
@@ -3101,7 +2361,6 @@ function drawGrid() {
             ctx.lineTo(x + 5, y + size - 2);
             ctx.stroke();
 
-            // Külső keret és kijelölés
             if (isHighlighted) {
                 ctx.lineWidth = 2.5;
                 ctx.strokeStyle = '#ffffff';
@@ -3114,7 +2373,6 @@ function drawGrid() {
                 ctx.stroke();
             }
 
-            // Power-up címke kirajzolása
             if (style.label) {
                 ctx.save();
                 ctx.fillStyle = '#ffffff';
@@ -3159,7 +2417,6 @@ function drawGrid() {
         }
     }
 
-    // Lökéshullámok kirajzolása
     for (let i = 0; i < shockwaves.length; i++) {
         const sw = shockwaves[i];
         ctx.save();
@@ -3172,7 +2429,6 @@ function drawGrid() {
         ctx.restore();
     }
 
-    // Részecskék (particles) kirajzolása
     for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
         ctx.save();
@@ -3184,7 +2440,6 @@ function drawGrid() {
         ctx.restore();
     }
 
-    // Hover előnézeti címke
     if (hoverCell && hoverPreviewText && hoverHighlightSet.size > 0) {
         const hx = Math.min(LOGICAL_SIZE - 42, Math.max(42, hoverCell.x * negyzetMeret + negyzetMeret / 2));
         const hy = Math.max(22, hoverCell.y * negyzetMeret - 6);
@@ -3204,7 +2459,6 @@ function drawGrid() {
         ctx.restore();
     }
 
-    // Lebegő pontszám feliratok
     for (let i = 0; i < floatingTexts.length; i++) {
         const ft = floatingTexts[i];
         ctx.save();
@@ -3226,9 +2480,6 @@ function animationLoop(now) {
     const dt = Math.min(0.05, (now - lastFrameTime) / 1000);
     lastFrameTime = now;
 
-    // Ha bármilyen párbeszédablak (modal) nyitva van VAGY a kezdő/végső canvasOverlay látható,
-    // és nincsenek futó részecskék/robbanások, felfüggesztjük a canvas felesleges folyamatos újrarajzolását,
-    // ezzel 100% GPU/CPU kapacitást adva a Google Chrome és egyéb böngészőknek a tökéletesen sima 60-120 FPS-hez!
     const isAnyModalOpen = !!document.querySelector('.modal-backdrop:not(.hidden)');
     const isOverlayVisible = !document.getElementById('canvasOverlay')?.classList.contains('hidden');
     const hasActiveFx = (particles && particles.length > 0) || (floatingTexts && floatingTexts.length > 0) || (shockwaves && shockwaves.length > 0) || screenShake > 0.1 || isShufflingBoard;
@@ -3238,7 +2489,6 @@ function animationLoop(now) {
         return;
     }
 
-    // Pontszám animált pörgetése
     if (displayedScore !== pontSzam) {
         const diff = pontSzam - displayedScore;
         const step = Math.ceil(Math.abs(diff) * 0.25);
@@ -3247,12 +2497,10 @@ function animationLoop(now) {
         if (scoreEl) scoreEl.textContent = displayedScore;
     }
 
-    // Képernyőrázkódás csillapítása
     if (screenShake > 0) {
         screenShake = Math.max(0, screenShake - 35 * dt);
     }
 
-    // Cellák fizikai mozgása (zuhanás és emelkedés)
     for (let i = 0; i < sorok; i++) {
         if (!grid[i]) continue;
         for (let j = 0; j < oszlopok; j++) {
@@ -3279,18 +2527,16 @@ function animationLoop(now) {
         }
     }
 
-    // Részecskék frissítése
     for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
         p.x += p.vx * dt;
         p.y += p.vy * dt;
-        p.vy += 480 * dt; // gravitáció
+        p.vy += 480 * dt;
         p.life -= dt;
         p.alpha = Math.max(0, p.life / 0.5);
         if (p.life <= 0) particles.splice(i, 1);
     }
 
-    // Lökéshullámok frissítése
     for (let i = shockwaves.length - 1; i >= 0; i--) {
         const sw = shockwaves[i];
         sw.radius += (sw.maxRadius - sw.radius) * 10 * dt + 120 * dt;
@@ -3300,7 +2546,6 @@ function animationLoop(now) {
         }
     }
 
-    // Lebegő szövegek frissítése
     for (let i = floatingTexts.length - 1; i >= 0; i--) {
         const ft = floatingTexts[i];
         ft.y += ft.vy * dt;
@@ -3313,10 +2558,9 @@ function animationLoop(now) {
     requestAnimationFrame(animationLoop);
 }
 
-/*############################## JATEK INDITASA & IDOZITO ##############################*/
-
+// ==================== JÁTÉK ÉLETCIKLUS & INDÍTÁS ====================
 function initPreviewBoard() {
-    getSzinek(document.getElementById('colorSelect').value);
+    getSzinek(document.getElementById('colorSelect')?.value || '3');
     grid = [];
     for (let i = 0; i < sorok; i++) {
         grid[i] = [];
@@ -3340,18 +2584,16 @@ function jatekInditasa() {
     updateScoreUI(true);
     setComboStatus('Keresd a 3+ azonos színű blokkot!', false);
 
-    getSzinek(document.getElementById('colorSelect').value);
+    getSzinek(document.getElementById('colorSelect')?.value || '3');
 
     for (let i = 0; i < sorok; i++) {
         grid[i] = [];
         for (let j = 0; j < oszlopok; j++) {
             const randomColor = szinek[Math.floor(Math.random() * szinek.length)];
-            // Beugró animáció felülről a játék indulásakor
             grid[i][j] = createCell(randomColor, -(sorok - i) * 18);
         }
     }
 
-    // Kezdő power-upok elhelyezése garantáltan különböző pozíciókra
     const usedPositions = new Set();
     function placePowerUp(colorKey) {
         let px, py;
@@ -3417,22 +2659,20 @@ function refreshTimerText() {
 
 function timer() {
     const lejartAzIdo = document.getElementById('timeUpMessage');
-    const toplistaMegjelenitesDiv = document.getElementById('appear-leaderboard');
     const szinValaszto = document.getElementById('colorSelect');
     const timeSelectEl = document.getElementById('timeSelect');
 
-    szinValaszto.disabled = true;
+    if (szinValaszto) szinValaszto.disabled = true;
     if (timeSelectEl) {
         timeSelectEl.disabled = true;
-        MAX_TIME = parseInt(timeSelectEl.value, 10);
+        MAX_TIME = parseInt(timeSelectEl.value, 10) || 60;
     }
     remainingTime = MAX_TIME;
     refreshTimerText();
 
     timerInterval = setInterval(function () {
-        if (isFrozen) {
-            return; // Időfagyasztó alatt nem számlálunk le!
-        }
+        if (isFrozen) return;
+
         remainingTime--;
         refreshTimerText();
 
@@ -3468,10 +2708,8 @@ function timer() {
                 if (currentUser) {
                     if (overlaySaveBtn) overlaySaveBtn.style.display = 'none';
                     const colorVal = szinValaszto ? szinValaszto.value : '3';
-                    // Rögzítjük a meccset a játékos előzményeiben (utolsó 10 meccs)
                     updatePlayerStatsRecord(currentUser.displayName, pontSzam, colorVal, MAX_TIME);
 
-                    // Automatikus mentés a ranglistára (kizárólag ha jobb az eddigi rekordjánál ebben a módban!)
                     toplistaHozzaadas({
                         name: currentUser.displayName,
                         score: pontSzam,
@@ -3516,7 +2754,7 @@ function timer() {
                 }
             }
 
-            szinValaszto.disabled = false;
+            if (szinValaszto) szinValaszto.disabled = false;
             if (timeSelectEl) timeSelectEl.disabled = false;
             const startBtn = document.getElementById('startGameButton');
             if (startBtn) startBtn.disabled = false;
@@ -3526,3 +2764,597 @@ function timer() {
         }
     }, 1000);
 }
+
+function startMatch() {
+    switchToMobileTab('stagePanel', true);
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+    if (pendingRowTimeout) {
+        clearTimeout(pendingRowTimeout);
+        pendingRowTimeout = null;
+    }
+
+    jatekInditasa();
+    timer();
+
+    const startBtn = document.getElementById('startGameButton');
+    if (startBtn) startBtn.disabled = true;
+
+    const overlay = document.getElementById('canvasOverlay');
+    if (overlay) overlay.classList.add('hidden');
+}
+
+function ujJatekInditasaFunc() {
+    switchToMobileTab('stagePanel', true);
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+    if (pendingRowTimeout) {
+        clearTimeout(pendingRowTimeout);
+        pendingRowTimeout = null;
+    }
+
+    jatekFut = false;
+    vegeAJateknak = false;
+    kattOffset = false;
+    hoverHighlightSet.clear();
+    hoverPreviewText = '';
+    particles = [];
+    floatingTexts = [];
+    shockwaves = [];
+
+    pontSzam = 0;
+    updateScoreUI(true);
+
+    remainingTime = MAX_TIME;
+    refreshTimerText();
+
+    const szinValaszto = document.getElementById('colorSelect');
+    if (szinValaszto) szinValaszto.disabled = false;
+    const timeSelectEl = document.getElementById('timeSelect');
+    if (timeSelectEl) timeSelectEl.disabled = false;
+    const startBtn = document.getElementById('startGameButton');
+    if (startBtn) startBtn.disabled = false;
+
+    deaktivaldPontduplazot();
+    deaktivaldFagyasztast();
+    if (shuffleCooldownInterval) {
+        clearInterval(shuffleCooldownInterval);
+        shuffleCooldownInterval = null;
+    }
+    shuffleCooldownRemaining = 0;
+    updateShuffleButtonUI();
+
+    initPreviewBoard();
+
+    const overlay = document.getElementById('canvasOverlay');
+    const overlayTitle = document.getElementById('overlayTitle');
+    const overlaySubtitle = document.getElementById('overlaySubtitle');
+    const overlayBtn = document.getElementById('overlayStartBtn');
+    const overlaySaveBtn = document.getElementById('overlaySaveScoreBtn');
+    const timeUpMsg = document.getElementById('timeUpMessage');
+
+    if (overlay) overlay.classList.remove('hidden');
+    if (overlayTitle) overlayTitle.textContent = 'Crashdown';
+    if (overlaySubtitle) overlaySubtitle.textContent = 'Kattints vagy érints legalább 3 azonos színű szomszédos blokkot a törléshez!';
+    if (overlaySaveBtn) overlaySaveBtn.style.display = 'none';
+    if (timeUpMsg) timeUpMsg.style.display = 'none';
+    if (overlayBtn) {
+        overlayBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M8 5v14l11-7z"/></svg><span>Játék indítása</span>';
+    }
+
+    setComboStatus('Készen állsz?', false);
+    showToast('Alaphelyzet: válassz nehézséget és játékidőt, majd indítsd a játékot!', 'info');
+}
+
+// ==================== PÁLYA ÚJRAKEVERÉS (SHUFFLE) ====================
+function updateShuffleButtonUI() {
+    const btn = document.getElementById('shuffleButton');
+    const badge = document.getElementById('shuffleCooldownBadge');
+    if (!btn || !badge) return;
+
+    if (!jatekFut || vegeAJateknak) {
+        btn.disabled = true;
+        badge.textContent = 'Kész';
+        return;
+    }
+
+    if (shuffleCooldownRemaining > 0) {
+        btn.disabled = true;
+        badge.textContent = `${shuffleCooldownRemaining}s`;
+    } else {
+        btn.disabled = false;
+        badge.textContent = 'Kész';
+    }
+}
+
+function startShuffleCooldown() {
+    shuffleCooldownRemaining = SHUFFLE_COOLDOWN_SEC;
+    updateShuffleButtonUI();
+    if (shuffleCooldownInterval) clearInterval(shuffleCooldownInterval);
+    shuffleCooldownInterval = setInterval(() => {
+        shuffleCooldownRemaining--;
+        if (shuffleCooldownRemaining <= 0) {
+            clearInterval(shuffleCooldownInterval);
+            shuffleCooldownInterval = null;
+            shuffleCooldownRemaining = 0;
+        }
+        updateShuffleButtonUI();
+    }, 1000);
+}
+
+function executeBoardShuffle() {
+    if (!jatekFut || vegeAJateknak || isShufflingBoard || shuffleCooldownRemaining > 0) return;
+
+    startShuffleCooldown();
+    regisztraljPowerupHasznalatot();
+
+    const btn = document.getElementById('shuffleButton');
+    if (btn) {
+        btn.classList.add('is-spinning');
+        setTimeout(() => btn.classList.remove('is-spinning'), 700);
+    }
+
+    isShufflingBoard = true;
+    playSound(doublerKatt);
+    screenShake = 3;
+
+    shockwaves.push({
+        x: LOGICAL_SIZE / 2,
+        y: LOGICAL_SIZE / 2,
+        radius: 12,
+        maxRadius: LOGICAL_SIZE * 0.72,
+        color: '#818cf8',
+        alpha: 1
+    });
+
+    const positions = [];
+    const colors = [];
+    for (let i = 0; i < sorok; i++) {
+        for (let j = 0; j < oszlopok; j++) {
+            const col = grid[i]?.[j]?.color;
+            if (col && col !== 'white') {
+                positions.push({ x: j, y: i });
+                colors.push(col);
+            }
+        }
+    }
+
+    for (let k = colors.length - 1; k > 0; k--) {
+        const r = Math.floor(Math.random() * (k + 1));
+        [colors[k], colors[r]] = [colors[r], colors[k]];
+    }
+
+    const centerX = (oszlopok - 1) / 2;
+    const centerY = (sorok - 1) / 2;
+
+    positions.forEach((pos, idx) => {
+        const cell = grid[pos.y][pos.x];
+        const dist = Math.hypot(pos.x - centerX, pos.y - centerY);
+        const delay = dist * 26;
+
+        setTimeout(() => {
+            cell.scale = 0.2;
+            setTimeout(() => {
+                cell.color = colors[idx];
+                cell.scale = 1.25;
+                spawnCellParticles(pos.x, pos.y, colors[idx], 3);
+            }, 100);
+        }, delay);
+    });
+
+    spawnFloatingText(LOGICAL_SIZE / 2, LOGICAL_SIZE / 2, '⟳ PÁLYA ÚJRAKEVERVE!', '#818cf8');
+    setComboStatus('⟳ Pálya újrakeverve! Keresd az új kombinációkat!', true);
+    checkAchievement('shuffle_master');
+
+    setTimeout(() => {
+        isShufflingBoard = false;
+        updateHoverPreview();
+        ellenorizdPalyaAllapot();
+    }, 450);
+}
+
+// Canvas egér és kattintás események
+canvas.addEventListener('mousemove', function (e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = LOGICAL_SIZE / rect.width;
+    const scaleY = LOGICAL_SIZE / rect.height;
+    const x = Math.floor((e.clientX - rect.left) * scaleX / negyzetMeret);
+    const y = Math.floor((e.clientY - rect.top) * scaleY / negyzetMeret);
+
+    if (!hoverCell || hoverCell.x !== x || hoverCell.y !== y) {
+        hoverCell = { x, y };
+        updateHoverPreview();
+    }
+});
+
+canvas.addEventListener('mouseleave', function () {
+    hoverCell = null;
+    hoverHighlightSet.clear();
+    hoverPreviewText = '';
+});
+
+canvas.addEventListener('click', handleClick);
+
+
+// ==================== MODULE: public/js/main.js ====================
+/* ================================================================
+   CRASHDOWN ARCADE - MAIN APPLICATION BOOTSTRAP & EVENT LISTENERS
+   ================================================================ */
+
+// Teljes adatbázis & tároló nullázás egyszeri lefutása (Reset to 0)
+(function resetAllDataToZero() {
+    const RESET_FLAG = 'crashdown_reset_zero_v2026_complete';
+    if (!localStorage.getItem(RESET_FLAG)) {
+        console.warn('Crashdown adatbázis és tároló teljes nullázása...');
+        try {
+            localStorage.removeItem('toplista');
+            localStorage.removeItem('crashdown_player_profiles');
+            localStorage.removeItem('crashdown_achievements');
+            localStorage.removeItem('crashdown_chosen_title');
+            localStorage.removeItem('crashdown_chosen_avatar');
+            localStorage.removeItem('crashdown_users');
+            localStorage.removeItem('crashdown_current_user');
+            localStorage.setItem(RESET_FLAG, 'true');
+        } catch (e) {}
+
+        setTimeout(() => {
+            if (window.leaderboardService && typeof window.leaderboardService.resetLeaderboard === 'function') {
+                window.leaderboardService.resetLeaderboard().catch(() => {});
+            }
+        }, 1200);
+    }
+})();
+
+// Fő gombok bekötése
+document.getElementById('startGameButton')?.addEventListener('click', startMatch);
+document.getElementById('startNewGame')?.addEventListener('click', ujJatekInditasaFunc);
+
+const overlayStartBtn = document.getElementById('overlayStartBtn');
+if (overlayStartBtn) {
+    overlayStartBtn.addEventListener('click', startMatch);
+}
+
+const overlaySaveScoreBtn = document.getElementById('overlaySaveScoreBtn');
+if (overlaySaveScoreBtn) {
+    overlaySaveScoreBtn.addEventListener('click', () => {
+        openAuthModal(true);
+    });
+}
+
+const shuffleButton = document.getElementById('shuffleButton');
+if (shuffleButton) {
+    shuffleButton.addEventListener('click', executeBoardShuffle);
+}
+
+// Nehézség (színek száma) választó
+const colorSelect = document.getElementById('colorSelect');
+if (colorSelect) {
+    const savedColors = localStorage.getItem('selectedColorCount');
+    if (savedColors) colorSelect.value = savedColors;
+
+    colorSelect.addEventListener('change', function () {
+        localStorage.setItem('selectedColorCount', this.value);
+        getSzinek(this.value);
+        if (!jatekFut && !vegeAJateknak) {
+            initPreviewBoard();
+        }
+        showToast(`Nehézség beállítva: ${this.value} szín`, 'info');
+    });
+}
+
+// Játékidő választó
+const timeSelect = document.getElementById('timeSelect');
+if (timeSelect) {
+    const savedTime = localStorage.getItem('selectedGameTime');
+    if (savedTime) timeSelect.value = savedTime;
+
+    timeSelect.addEventListener('change', function () {
+        localStorage.setItem('selectedGameTime', this.value);
+        MAX_TIME = parseInt(this.value, 10);
+        remainingTime = MAX_TIME;
+        refreshTimerText();
+        showToast(`Játékidő beállítva: ${this.options[this.selectedIndex].text}`, 'info');
+    });
+}
+
+// Téma választó
+const themeSelectEl = document.getElementById('themeSelect');
+if (themeSelectEl) {
+    themeSelectEl.addEventListener('change', function () {
+        applyTheme(this.value);
+    });
+}
+
+// Jelvények / Eredmények Modal eseménykezelői
+const openAchievementsBtn = document.getElementById('openAchievementsBtn');
+const closeAchievementsModalBtn = document.getElementById('closeAchievementsModalBtn');
+const achievementsModal = document.getElementById('achievementsModal');
+
+function openAchievementsModal() {
+    updateAchievementsUI();
+    if (achievementsModal) achievementsModal.classList.remove('hidden');
+}
+
+function closeAchievementsModal() {
+    if (achievementsModal) achievementsModal.classList.add('hidden');
+}
+
+if (openAchievementsBtn) openAchievementsBtn.addEventListener('click', openAchievementsModal);
+if (closeAchievementsModalBtn) closeAchievementsModalBtn.addEventListener('click', closeAchievementsModal);
+if (achievementsModal) {
+    achievementsModal.addEventListener('click', (e) => {
+        if (e.target === achievementsModal) closeAchievementsModal();
+    });
+}
+
+// Jelvény kategória szűrő gombok
+document.querySelectorAll('.ach-filter-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+        document.querySelectorAll('.ach-filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        applyAchievementFilter(this.getAttribute('data-filter'));
+    });
+});
+
+// Profil Modal bezárás
+const closePlayerProfileModalBtn = document.getElementById('closePlayerProfileModalBtn');
+const playerProfileModal = document.getElementById('playerProfileModal');
+
+function closePlayerProfileModal() {
+    if (playerProfileModal) playerProfileModal.classList.add('hidden');
+}
+
+if (closePlayerProfileModalBtn) closePlayerProfileModalBtn.addEventListener('click', closePlayerProfileModal);
+if (playerProfileModal) {
+    playerProfileModal.addEventListener('click', (e) => {
+        if (e.target === playerProfileModal) closePlayerProfileModal();
+    });
+}
+
+// Felső fejléc saját profil gomb kattintás
+const openMyProfileBtn = document.getElementById('openMyProfileBtn');
+if (openMyProfileBtn) {
+    openMyProfileBtn.addEventListener('click', () => {
+        const currentUser = window.authService?.getCurrentUser();
+        if (currentUser && currentUser.displayName) {
+            openPlayerProfileModal(currentUser.displayName);
+        }
+    });
+}
+
+// Auth modal eseménykezelők
+const openAuthModalBtn = document.getElementById('openAuthModalBtn');
+const closeAuthModalBtn = document.getElementById('closeAuthModalBtn');
+const authModal = document.getElementById('authModal');
+const tabLoginBtn = document.getElementById('tabLoginBtn');
+const tabRegisterBtn = document.getElementById('tabRegisterBtn');
+const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
+const authForm = document.getElementById('authForm');
+const logoutBtn = document.getElementById('logoutBtn');
+
+if (openAuthModalBtn) {
+    openAuthModalBtn.addEventListener('click', () => {
+        setAuthMode(false);
+        openAuthModal(false);
+    });
+}
+
+if (closeAuthModalBtn) closeAuthModalBtn.addEventListener('click', closeAuthModal);
+if (authModal) {
+    authModal.addEventListener('click', (e) => {
+        if (e.target === authModal) closeAuthModal();
+    });
+}
+
+if (tabLoginBtn) tabLoginBtn.addEventListener('click', () => setAuthMode(false));
+if (tabRegisterBtn) tabRegisterBtn.addEventListener('click', () => setAuthMode(true));
+
+if (forgotPasswordBtn) {
+    forgotPasswordBtn.addEventListener('click', async () => {
+        const email = document.getElementById('authEmail')?.value.trim();
+        if (!email) {
+            showAuthError('Kérlek írd be az e-mail címed a fenti mezőbe az új jelszó kéréséhez!');
+            document.getElementById('authEmail')?.focus();
+            return;
+        }
+        forgotPasswordBtn.disabled = true;
+        forgotPasswordBtn.textContent = 'Küldés folyamatban...';
+        const res = await window.authService.resetPassword(email);
+        forgotPasswordBtn.disabled = false;
+        forgotPasswordBtn.textContent = 'Elfelejtetted a jelszavad?';
+        if (res.success) {
+            showToast(res.message, 'success');
+            const authErrorMsg = document.getElementById('authErrorMsg');
+            if (authErrorMsg) {
+                authErrorMsg.textContent = res.message;
+                authErrorMsg.style.display = 'block';
+                authErrorMsg.style.color = '#38bdf8';
+                authErrorMsg.style.borderColor = 'rgba(56, 189, 248, 0.4)';
+                authErrorMsg.style.background = 'rgba(56, 189, 248, 0.12)';
+            }
+        } else {
+            showAuthError(res.error);
+        }
+    });
+}
+
+if (authForm) {
+    authForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const email = document.getElementById('authEmail')?.value.trim();
+        const password = document.getElementById('authPassword')?.value;
+        const displayName = document.getElementById('authDisplayName')?.value.trim();
+        const authSubmitBtn = document.getElementById('authSubmitBtn');
+
+        if (!email || !password) {
+            showAuthError('Kérlek töltsd ki az e-mail és jelszó mezőket!');
+            return;
+        }
+
+        if (isRegisterMode && (!displayName || displayName.length < 3)) {
+            showAuthError('A játékosnévnek legalább 3 karakter hosszúnak kell lennie!');
+            return;
+        }
+
+        if (authSubmitBtn) {
+            authSubmitBtn.disabled = true;
+            authSubmitBtn.textContent = 'Feldolgozás...';
+        }
+
+        let res;
+        if (isRegisterMode) {
+            res = await window.authService.register(email, password, displayName);
+        } else {
+            res = await window.authService.login(email, password);
+        }
+
+        if (authSubmitBtn) {
+            authSubmitBtn.disabled = false;
+            authSubmitBtn.textContent = isRegisterMode ? 'Regisztráció és mentés' : 'Bejelentkezés';
+        }
+
+        if (!res.success) {
+            showAuthError(res.error || 'Hiba történt a művelet során.');
+            return;
+        }
+
+        closeAuthModal();
+        showToast(`Üdvözlünk, ${res.user.displayName}!`, 'success');
+
+        if (pendingScore) {
+            const scoreToSave = {
+                id: Date.now(),
+                name: res.user.displayName,
+                score: pendingScore.score,
+                color: pendingScore.color,
+                duration: pendingScore.duration,
+                timestamp: new Date().toISOString()
+            };
+            await toplistaHozzaadas(scoreToSave);
+            updatePlayerStatsRecord(res.user.displayName, scoreToSave.score, scoreToSave.color, scoreToSave.duration);
+            pendingScore = null;
+            showToast(`🎉 Eredményed (${scoreToSave.score} pont) mentve a ranglistára!`, 'success');
+            const overlaySaveBtn = document.getElementById('overlaySaveScoreBtn');
+            if (overlaySaveBtn) overlaySaveBtn.style.display = 'none';
+            await toplistaMegjelenites();
+        }
+    });
+}
+
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
+        await window.authService.logout();
+        showToast('Sikeresen kijelentkeztél.', 'info');
+    });
+}
+
+// Jelszóváltás modal eseménykezelők
+const openChangePasswordModalBtn = document.getElementById('openChangePasswordModalBtn');
+const closeChangePasswordModalBtn = document.getElementById('closeChangePasswordModalBtn');
+const changePasswordForm = document.getElementById('changePasswordForm');
+
+if (openChangePasswordModalBtn) openChangePasswordModalBtn.addEventListener('click', openChangePasswordModal);
+if (closeChangePasswordModalBtn) closeChangePasswordModalBtn.addEventListener('click', closeChangePasswordModal);
+
+if (changePasswordForm) {
+    changePasswordForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const p1 = document.getElementById('newPasswordInput')?.value;
+        const p2 = document.getElementById('confirmNewPasswordInput')?.value;
+
+        if (!p1 || p1.length < 6) {
+            showChangePwError('Az új jelszónak legalább 6 karakter hosszúnak kell lennie!');
+            return;
+        }
+        if (p1 !== p2) {
+            showChangePwError('A két megadott jelszó nem egyezik!');
+            return;
+        }
+
+        const submitBtn = document.getElementById('changePasswordSubmitBtn');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Módosítás folyamatban...';
+        }
+
+        const res = await window.authService.updatePassword(p1);
+
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Új jelszó mentése';
+        }
+
+        if (res.success) {
+            closeChangePasswordModal();
+            showToast('✅ A jelszavad sikeresen megváltozott!', 'success');
+        } else {
+            showChangePwError(res.error || 'Hiba történt a jelszómódosítás során.');
+        }
+    });
+}
+
+// Ranglista szűrő chip események
+document.querySelectorAll('.filter-chip').forEach(btn => {
+    btn.addEventListener('click', function () {
+        const filterType = this.getAttribute('data-filter-type') || 'color';
+        const filterVal = this.getAttribute('data-filter');
+
+        if (filterType === 'color') {
+            document.querySelectorAll('#colorFilterGroup .filter-chip').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentLeaderboardColorFilter = filterVal;
+        } else if (filterType === 'time') {
+            document.querySelectorAll('#timeFilterGroup .filter-chip').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentLeaderboardTimeFilter = filterVal;
+        }
+        toplistaMegjelenites();
+    });
+});
+
+// Mobil navigációs tabok
+document.querySelectorAll('.mobile-tab-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+        switchToMobileTab(this.getAttribute('data-target'), true);
+    });
+});
+
+// Escape billentyű az összes modálhoz
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeAuthModal();
+        closeChangePasswordModal();
+        closeAchievementsModal();
+        closePlayerProfileModal();
+    }
+});
+
+// Firebase Auth figyelő
+if (window.authService) {
+    window.authService.onAuthStateChanged(user => {
+        updateAuthUI(user);
+    });
+}
+
+if (window.leaderboardService) {
+    window.leaderboardService.onScoresChanged(() => {
+        toplistaMegjelenites();
+    });
+}
+
+// Alkalmazás indítása és inicializálása
+document.addEventListener('DOMContentLoaded', () => {
+    applyTheme(currentTheme);
+    updateThemeSelectUI();
+    applyAudioSettings();
+    initAudioListeners();
+    toplistaMegjelenites();
+    initPreviewBoard();
+    updateShuffleButtonUI();
+    updateAchievementsUI();
+    requestAnimationFrame(animationLoop);
+});

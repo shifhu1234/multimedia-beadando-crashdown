@@ -13,7 +13,7 @@
       href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css?v=3.0" />
+    <link rel="stylesheet" href="style.css?v=3.1" />
 
     <!-- Firebase SDK (Compat - automatikus integráció) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -355,6 +355,11 @@
           </div>
         </div>
 
+        <!-- Információs sáv (Desktopon HUD és Canvas között, Mobilon a pálya alatt) -->
+        <div id="comboIndicatorWrap" class="combo-indicator-wrap">
+          <span id="comboIndicator" class="combo-pill">Készen állsz?</span>
+        </div>
+
         <div class="canvas-wrapper" id="canvasWrapper">
           <canvas id="crashdownCanvas" width="440" height="440"></canvas>
           <div id="canvasOverlay" class="canvas-overlay">
@@ -402,9 +407,6 @@
         </div>
 
         <div class="stage-actions">
-          <div id="comboIndicatorWrap" class="combo-indicator-wrap">
-            <span id="comboIndicator" class="combo-pill">Készen állsz?</span>
-          </div>
           <button
             id="shuffleButton"
             class="btn btn-shuffle"
@@ -828,6 +830,12 @@
 
     <div id="toastContainer" class="toast-container"></div>
 
-    <script src="script.js?v=3.0"></script>
+    <!-- Modularizált JavaScript modulok a villámgyors futásért és tiszta átláthatóságért -->
+    <script src="js/config.js?v=3.1"></script>
+    <script src="js/audio.js?v=3.1"></script>
+    <script src="js/achievements.js?v=3.1"></script>
+    <script src="js/ui.js?v=3.1"></script>
+    <script src="js/game.js?v=3.1"></script>
+    <script src="js/main.js?v=3.1"></script>
   </body>
 </html>
