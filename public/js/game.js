@@ -342,16 +342,14 @@ function valasszVeletlenPowerUpok(db = 4) {
         return shuffled.slice(0, 9);
     }
 
-    // 3. Időhajsza mód: +5s extra idő és 2× Duplázó fókusz
+    // 3. Időhajsza mód: csakis fagyasztó power-up és pontduplázó kis mennyiségben
     if (mode === 'time_rush') {
-        const timePows = ['#581845', '#581845', 'cyan', 'cyan', '#0284c7', '#6366f1', '#f97316'];
-        return timePows.sort(() => 0.5 - Math.random()).slice(0, 6);
+        return ['#0284c7', 'cyan', 'cyan'];
     }
 
-    // 4. Robbanás Mánia: TNT, Színbomba és Szuper Mágnes túlsúly
+    // 4. Robbanás Mánia: kizárólag TNT spawnoljon, semmilyen más power-up!
     if (mode === 'bomb_frenzy') {
-        const bombPows = ['darkgreen', 'darkgreen', 'darkgreen', '#14b8a6', '#14b8a6', '#e11d48', '#e11d48', '#f97316'];
-        return bombPows.sort(() => 0.5 - Math.random()).slice(0, 8);
+        return ['darkgreen', 'darkgreen', 'darkgreen', 'darkgreen', 'darkgreen'];
     }
 
     // 5. Normál mód (Klasszikus kiegyensúlyozott)
@@ -1353,7 +1351,7 @@ function timer() {
                 if (currentUser) {
                     if (overlaySaveBtn) overlaySaveBtn.style.display = 'none';
                     const colorVal = szinValaszto ? szinValaszto.value : '3';
-                    updatePlayerStatsRecord(currentUser.displayName, pontSzam, colorVal, MAX_TIME);
+                    updatePlayerStatsRecord(currentUser.displayName, pontSzam, colorVal, MAX_TIME, modVal);
 
                     toplistaHozzaadas({
                         name: currentUser.displayName,

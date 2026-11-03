@@ -56,9 +56,6 @@ if (colorSelect) {
     colorSelect.addEventListener('change', function () {
         localStorage.setItem('selectedColorCount', this.value);
         getSzinek(this.value);
-        if (!jatekFut && !vegeAJateknak) {
-            initPreviewBoard();
-        }
         showToast(`Nehézség beállítva: ${this.value} szín`, 'info');
     });
 }
@@ -248,11 +245,12 @@ if (authForm) {
                 name: res.user.displayName,
                 score: pendingScore.score,
                 color: pendingScore.color,
+                modifier: pendingScore.modifier || 'normal',
                 duration: pendingScore.duration,
                 timestamp: new Date().toISOString()
             };
             await toplistaHozzaadas(scoreToSave);
-            updatePlayerStatsRecord(res.user.displayName, scoreToSave.score, scoreToSave.color, scoreToSave.duration);
+            updatePlayerStatsRecord(res.user.displayName, scoreToSave.score, scoreToSave.color, scoreToSave.duration, scoreToSave.modifier);
             pendingScore = null;
             showToast(`🎉 Eredményed (${scoreToSave.score} pont) mentve a ranglistára!`, 'success');
             const overlaySaveBtn = document.getElementById('overlaySaveScoreBtn');

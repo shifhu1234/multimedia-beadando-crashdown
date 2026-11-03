@@ -360,8 +360,7 @@ async function openPlayerProfileModal(username) {
                     rewardRows.push(`<div class="reward-line"><span>Profilkép</span> <span class="reward-sym">${linkedAv.symbol}</span></div>`);
                 }
                 if (linkedTitle) {
-                    const titleSym = linkedTitle.name.split(' ')[0] || '🎖️';
-                    rewardRows.push(`<div class="reward-line"><span>Rangcím</span> <span class="reward-sym">${titleSym}</span></div>`);
+                    rewardRows.push(`<div class="reward-line"><span>Rangcím:</span> <span class="reward-sym">${linkedTitle.name}</span></div>`);
                 }
                 if (linkedTheme) {
                     rewardRows.push(`<div class="reward-line"><span>Téma</span> <span class="reward-sym">${linkedTheme.name}</span></div>`);
@@ -420,10 +419,12 @@ async function openPlayerProfileModal(username) {
             historyListEl.innerHTML = history.map(item => {
                 const dateObj = item.timestamp ? new Date(item.timestamp) : new Date();
                 const dateStr = dateObj.toLocaleDateString('hu-HU', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                const modKey = item.modifier || 'normal';
+                const modBadge = (typeof GAME_MODIFIERS !== 'undefined' && GAME_MODIFIERS[modKey]?.badge) ? GAME_MODIFIERS[modKey].badge : 'Normál';
                 return `
                     <div class="profile-history-item">
                         <div class="history-left">
-                            <span class="history-mode-tag">${item.color} szín • ${item.duration}s</span>
+                            <span class="history-mode-tag">${item.color} sz • ${modBadge} • ${item.duration}s</span>
                             <span class="history-date">${dateStr}</span>
                         </div>
                         <div class="history-right">
@@ -670,11 +671,10 @@ async function toplistaMegjelenites() {
         } catch (e) {}
 
         const rawName = String(elem.name || 'Játékos');
-        const dispName = rawName.length > 13 ? rawName.slice(0, 12) + '...' : rawName;
 
         const nameSpan = document.createElement('span');
         nameSpan.className = 'lb-name';
-        nameSpan.textContent = dispName;
+        nameSpan.textContent = rawName;
         nameSpan.title = rawName;
         leftDiv.appendChild(nameSpan);
 
@@ -689,8 +689,7 @@ async function toplistaMegjelenites() {
         colorTag.className = 'lb-color-tag';
         const modKey = elem.modifier || 'normal';
         const modBadge = (typeof GAME_MODIFIERS !== 'undefined' && GAME_MODIFIERS[modKey]?.badge) ? GAME_MODIFIERS[modKey].badge : 'Normál';
-        const durText = elem.duration ? `${elem.duration}s` : '';
-        colorTag.textContent = `${elem.color} sz • ${modBadge} • ${durText}`;
+        colorTag.textContent = modBadge;
 
         rightDiv.appendChild(scoreSpan);
         rightDiv.appendChild(colorTag);

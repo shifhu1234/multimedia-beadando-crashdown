@@ -404,7 +404,7 @@ function applyAchievementFilter(filter) {
 }
 
 // Játékos profil statisztika frissítése és tárolása
-function updatePlayerStatsRecord(username, score, colorCount, durationSeconds) {
+function updatePlayerStatsRecord(username, score, colorCount, durationSeconds, modifier) {
     if (!username) return;
     try {
         const key = 'crashdown_player_profiles';
@@ -440,6 +440,7 @@ function updatePlayerStatsRecord(username, score, colorCount, durationSeconds) {
             p.history.unshift({
                 score: score,
                 color: cKey,
+                modifier: modifier || 'normal',
                 duration: parseInt(durationSeconds, 10) || 120,
                 timestamp: new Date().toISOString()
             });
