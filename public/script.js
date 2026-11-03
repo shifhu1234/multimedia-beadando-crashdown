@@ -912,6 +912,12 @@ window.addEventListener('resize', setupHiDPICanvas);
 function showToast(message, type = 'info') {
     const container = document.getElementById('toastContainer');
     if (!container) return;
+
+    // Maximum 5 darab toast lehet egyszerre, elkerülve a képernyő telespammelését
+    while (container.children.length >= 5) {
+        container.firstElementChild.remove();
+    }
+
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     toast.textContent = message;
@@ -1244,17 +1250,23 @@ if (window.authService) {
 }
 
 function updateAuthUI(user) {
+    const openAuthBtn = document.getElementById('openAuthModalBtn');
+    const myProfileBtn = document.getElementById('openMyProfileBtn');
+    const changePwBtn = document.getElementById('openChangePasswordModalBtn');
+    const logoutBtnEl = document.getElementById('logoutBtn');
+    const nameLabel = document.getElementById('currentUserNameLabel');
+    const avatarDot = document.getElementById('userAvatarDot');
+
     if (user) {
-        if (openAuthModalBtn) openAuthModalBtn.style.display = 'none';
-        if (loggedInUserBox) loggedInUserBox.style.display = 'inline-flex';
-        if (currentUserNameLabel) currentUserNameLabel.textContent = user.displayName;
-        
+        if (openAuthBtn) openAuthBtn.style.display = 'none';
+        if (myProfileBtn) myProfileBtn.style.display = 'inline-flex';
+        if (changePwBtn) changePwBtn.style.display = 'inline-flex';
+        if (logoutBtnEl) logoutBtnEl.style.display = 'inline-flex';
+
+        if (nameLabel) nameLabel.textContent = user.displayName;
         try {
             const myStats = getPlayerProfileStats(user.displayName);
-            const userAvatarDot = document.getElementById('userAvatarDot');
-            if (userAvatarDot) {
-                userAvatarDot.textContent = myStats?.activeAvatar?.symbol || '👤';
-            }
+            if (avatarDot) avatarDot.textContent = myStats?.activeAvatar?.symbol || '👤';
         } catch (e) {}
 
         // Játék végi mentési gombok állapota
@@ -1265,8 +1277,10 @@ function updateAuthUI(user) {
         if (saveWithLoginModalBtn) saveWithLoginModalBtn.style.display = 'none';
         if (saveUserNameHint) saveUserNameHint.textContent = user.displayName;
     } else {
-        if (openAuthModalBtn) openAuthModalBtn.style.display = 'inline-flex';
-        if (loggedInUserBox) loggedInUserBox.style.display = 'none';
+        if (openAuthBtn) openAuthBtn.style.display = 'inline-flex';
+        if (myProfileBtn) myProfileBtn.style.display = 'none';
+        if (changePwBtn) changePwBtn.style.display = 'none';
+        if (logoutBtnEl) logoutBtnEl.style.display = 'none';
 
         const saveAsLoggedInBtn = document.getElementById('saveAsLoggedInBtn');
         const saveWithLoginModalBtn = document.getElementById('saveWithLoginModalBtn');
@@ -1409,25 +1423,16 @@ async function toplistaMegjelenites() {
                 avatarSpan.title = `Profilkép: ${pStats.activeAvatar.name}`;
                 leftDiv.appendChild(avatarSpan);
             }
+        } catch (e) {}
 
-            const nameSpan = document.createElement('span');
-            nameSpan.className = 'lb-name';
-            nameSpan.textContent = elem.name;
-            leftDiv.appendChild(nameSpan);
+        const rawName = String(elem.name || 'Játékos');
+        const dispName = rawName.length > 13 ? rawName.slice(0, 12) + '...' : rawName;
 
-            if (pStats && pStats.activeTitle) {
-                const titleBadge = document.createElement('span');
-                titleBadge.className = 'lb-title-badge';
-                titleBadge.textContent = `${pStats.activeTitle.name}`;
-                titleBadge.title = `Rangcím: ${pStats.activeTitle.name} (${pStats.activeTitle.desc})`;
-                leftDiv.appendChild(titleBadge);
-            }
-        } catch (e) {
-            const nameSpan = document.createElement('span');
-            nameSpan.className = 'lb-name';
-            nameSpan.textContent = elem.name;
-            leftDiv.appendChild(nameSpan);
-        }
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'lb-name';
+        nameSpan.textContent = dispName;
+        nameSpan.title = rawName;
+        leftDiv.appendChild(nameSpan);
 
         const rightDiv = document.createElement('div');
         rightDiv.className = 'lb-right';
@@ -2971,12 +2976,14 @@ function animationLoop(now) {
     const dt = Math.min(0.05, (now - lastFrameTime) / 1000);
     lastFrameTime = now;
 
-    // Ha bármilyen párbeszédablak (modal) nyitva van és a játék nem fut vagy nincsenek aktív effektek,
-    // felfüggesztjük a canvas folyamatos újrarajzolását, biztosítva a sima, lagg-mentes 60-120 FPS-t
+    // Ha bármilyen párbeszédablak (modal) nyitva van VAGY a kezdő/végső canvasOverlay látható,
+    // és nincsenek futó részecskék/robbanások, felfüggesztjük a canvas felesleges folyamatos újrarajzolását,
+    // ezzel 100% GPU/CPU kapacitást adva a Google Chrome és egyéb böngészőknek a tökéletesen sima 60-120 FPS-hez!
     const isAnyModalOpen = !!document.querySelector('.modal-backdrop:not(.hidden)');
+    const isOverlayVisible = !document.getElementById('canvasOverlay')?.classList.contains('hidden');
     const hasActiveFx = (particles && particles.length > 0) || (floatingTexts && floatingTexts.length > 0) || (shockwaves && shockwaves.length > 0) || screenShake > 0.1 || isShufflingBoard;
 
-    if (isAnyModalOpen && !jatekFut && !hasActiveFx) {
+    if ((isAnyModalOpen || (isOverlayVisible && !jatekFut)) && !hasActiveFx) {
         requestAnimationFrame(animationLoop);
         return;
     }

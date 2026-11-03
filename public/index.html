@@ -25,7 +25,7 @@
     <!-- Felső Felhasználói Sáv & Mobilos Navigáció -->
     <header class="top-nav-bar">
       <div class="user-profile-bar" id="userProfileBar">
-        <button id="openAuthModalBtn" class="btn-auth-trigger">
+        <button id="openAuthModalBtn" class="top-nav-btn btn-auth-trigger">
           <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
             <path
               d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
@@ -33,28 +33,35 @@
           </svg>
           <span>Bejelentkezés / Regisztráció</span>
         </button>
-        <button id="openAchievementsBtn" class="btn-achievements-trigger" title="Mérföldkövek és jelvények">
+
+        <button id="openAchievementsBtn" class="top-nav-btn btn-achievements-trigger" title="Mérföldkövek és jelvények">
           <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
             <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/>
           </svg>
           <span>Jelvények (<span id="unlockedAchievementsCount">0</span>/<span id="totalAchievementsCount">24</span>)</span>
         </button>
-        <div id="loggedInUserBox" class="logged-in-box" style="display: none">
-          <button id="openMyProfileBtn" class="btn-user-profile-badge" title="Kattints a saját profilod és rangod megtekintéséhez">
-            <span id="userAvatarDot" class="user-avatar-symbol">👤</span>
-            <span id="currentUserNameLabel" class="current-user-name">Játékos</span>
-          </button>
-          <button
-            id="openChangePasswordModalBtn"
-            class="btn-profile-link"
-            title="Jelszó módosítása"
-          >
-            Jelszóváltás
-          </button>
-          <button id="logoutBtn" class="btn-logout-link" title="Kijelentkezés">
-            Kilépés
-          </button>
-        </div>
+
+        <!-- Különálló doboz: Profil & Név -->
+        <button id="openMyProfileBtn" class="top-nav-btn btn-user-box" style="display: none;" title="Kattints a saját profilod és rangod megtekintéséhez">
+          <span id="userAvatarDot" class="user-avatar-symbol">👤</span>
+          <span id="currentUserNameLabel" class="current-user-name">Játékos</span>
+        </button>
+
+        <!-- Különálló doboz: Jelszóváltás -->
+        <button id="openChangePasswordModalBtn" class="top-nav-btn btn-change-pw-box" style="display: none;" title="Jelszó módosítása">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15">
+            <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+          </svg>
+          <span>Jelszóváltás</span>
+        </button>
+
+        <!-- Különálló doboz: Kilépés -->
+        <button id="logoutBtn" class="top-nav-btn btn-logout-box" style="display: none;" title="Kijelentkezés">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15">
+            <path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
+          </svg>
+          <span>Kilépés</span>
+        </button>
       </div>
 
       <!-- Mobilos fülek -->
