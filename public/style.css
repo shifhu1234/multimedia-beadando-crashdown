@@ -339,6 +339,23 @@ select:disabled {
 
 .btn-block {
     width: 100%;
+    white-space: normal;
+    height: auto;
+    min-height: 40px;
+    padding: 8px 12px;
+    line-height: 1.25;
+    text-align: center;
+}
+
+#overlaySaveScoreBtn,
+#saveWithLoginModalBtn,
+#saveAsLoggedInBtn {
+    white-space: normal;
+    height: auto;
+    min-height: 42px;
+    padding: 8px 14px;
+    line-height: 1.25;
+    text-align: center;
 }
 
 .btn-icon { flex-shrink: 0; }
@@ -1249,88 +1266,222 @@ select:disabled {
     font-size: 0.84rem;
 }
 
-/* 2× Frenzy pontduplázó sáv */
-.frenzy-banner {
-    width: 100%;
-    background: linear-gradient(90deg, #0284c7 0%, #38bdf8 50%, #0ea5e9 100%);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    border-radius: var(--radius-md);
-    padding: 6px 12px;
-    display: flex;
+/* Abszolút pozícionált 2× Frenzy és Fagyasztás lebegő pill-ek (0 layout shift!) */
+.frenzy-canvas-pill,
+.freeze-canvas-pill {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    pointer-events: none;
+    display: inline-flex;
     align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 4px 18px rgba(56, 189, 248, 0.5);
-    animation: frenzyPulse 1.2s infinite alternate;
-    transition: all 0.25s ease;
-    margin-bottom: 6px;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    animation: pillFloat 1.2s infinite alternate ease-in-out;
 }
 
-.frenzy-banner.hidden {
+.frenzy-canvas-pill.hidden,
+.freeze-canvas-pill.hidden {
     display: none !important;
 }
 
-@keyframes frenzyPulse {
-    from { box-shadow: 0 4px 12px rgba(56, 189, 248, 0.4); }
-    to { box-shadow: 0 4px 24px rgba(56, 189, 248, 0.85); }
+@keyframes pillFloat {
+    from { transform: translateX(-50%) translateY(0); }
+    to { transform: translateX(-50%) translateY(-3px); }
 }
 
-.frenzy-left {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+.frenzy-canvas-pill {
+    background: linear-gradient(135deg, rgba(2, 132, 199, 0.95), rgba(56, 189, 248, 0.95));
+    border: 1px solid rgba(255, 255, 255, 0.6);
     color: #ffffff;
-    font-weight: 900;
-    font-size: 0.84rem;
-    letter-spacing: 0.02em;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 25px rgba(56, 189, 248, 0.7);
 }
 
-.frenzy-icon {
-    font-size: 1.05rem;
-    animation: iconShake 0.4s infinite alternate;
+.frenzy-pill-title,
+.freeze-title {
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
-@keyframes iconShake {
-    from { transform: scale(1); }
-    to { transform: scale(1.2); }
-}
-
-.frenzy-right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.frenzy-badge {
+.frenzy-pill-badge,
+.freeze-pill-badge {
     background: rgba(0, 0, 0, 0.35);
-    color: #ffffff;
+    padding: 2px 7px;
+    border-radius: 999px;
     font-family: var(--font-mono);
     font-weight: 800;
-    font-size: 0.78rem;
-    padding: 2px 8px;
-    border-radius: 999px;
-    min-width: 44px;
-    text-align: center;
+    font-size: 0.75rem;
 }
 
-.frenzy-track {
-    width: 60px;
-    height: 6px;
-    background: rgba(0, 0, 0, 0.25);
-    border-radius: 999px;
-    overflow: hidden;
-}
-
-.frenzy-bar {
-    width: 100%;
-    height: 100%;
-    background: #ffffff;
-    transition: width 0.1s linear;
+.freeze-canvas-pill {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.95), rgba(165, 243, 252, 0.95));
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    color: #082f49;
+    box-shadow: 0 0 25px rgba(165, 243, 252, 0.8);
 }
 
 .canvas-wrapper.frenzy-active {
-    box-shadow: 0 0 25px rgba(56, 189, 248, 0.6), inset 0 0 15px rgba(56, 189, 248, 0.3);
-    border-color: rgba(56, 189, 248, 0.8);
+    box-shadow: 0 0 30px rgba(56, 189, 248, 0.7), inset 0 0 20px rgba(56, 189, 248, 0.35) !important;
+    border-color: rgba(56, 189, 248, 0.9) !important;
+}
+
+.canvas-wrapper.freeze-active {
+    box-shadow: 0 0 35px rgba(165, 243, 252, 0.8), inset 0 0 25px rgba(165, 243, 252, 0.45) !important;
+    border-color: #a5f3fc !important;
+}
+
+/* Badge színek */
+.badge-blue { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); }
+.badge-red { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+
+/* Jelvények gomb és modal */
+.btn-achievements-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(251, 191, 36, 0.12);
+    border: 1px solid rgba(251, 191, 36, 0.35);
+    color: #fbbf24;
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.btn-achievements-trigger:hover {
+    background: rgba(251, 191, 36, 0.25);
+    color: #ffffff;
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.3);
+}
+
+.achievements-modal-card {
+    max-width: 460px;
+    max-height: 85vh;
+}
+
+.achievements-scroll-area {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 55vh;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.achievement-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-subtle);
+    transition: all 0.2s ease;
+}
+
+.achievement-card.unlocked {
+    background: linear-gradient(90deg, rgba(251, 191, 36, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border-color: rgba(251, 191, 36, 0.4);
+}
+
+.achievement-icon-wrap {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    flex-shrink: 0;
+}
+
+.achievement-card.unlocked .achievement-icon-wrap {
+    background: rgba(251, 191, 36, 0.2);
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.3);
+}
+
+.achievement-card.locked {
+    opacity: 0.55;
+    filter: grayscale(0.7);
+}
+
+.achievement-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.achievement-info strong {
+    font-size: 0.88rem;
+    color: #ffffff;
+}
+
+.achievement-info small {
+    font-size: 0.74rem;
+    color: var(--text-secondary);
+}
+
+.achievement-status {
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 999px;
+}
+
+.achievement-card.unlocked .achievement-status {
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+.achievement-card.locked .achievement-status {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-muted);
+}
+
+/* Kombó szorzó badge stílusok a HUD-ban */
+.combo-pill.combo-x2 { background: rgba(56, 189, 248, 0.25); border-color: #38bdf8; color: #38bdf8; }
+.combo-pill.combo-x3 { background: rgba(168, 85, 247, 0.25); border-color: #a855f7; color: #c084fc; }
+.combo-pill.combo-x4 { background: rgba(249, 115, 22, 0.25); border-color: #f97316; color: #fb923c; }
+.combo-pill.combo-x5 { background: rgba(239, 68, 68, 0.3); border-color: #ef4444; color: #f87171; box-shadow: 0 0 12px rgba(239, 68, 68, 0.5); }
+
+/* ==================== TÉMÁK (THEMES) ==================== */
+body.theme-candy {
+    --bg-base: #1f1b2e;
+    --bg-surface: #2d2640;
+    --bg-panel: #262038;
+    --border-subtle: rgba(255, 182, 193, 0.18);
+    --color-blue: #f472b6;
+    --color-blue-dark: #db2777;
+}
+
+body.theme-retro {
+    --bg-base: #0f1a14;
+    --bg-surface: #17271e;
+    --bg-panel: #13211a;
+    --border-subtle: rgba(74, 222, 128, 0.22);
+    --color-blue: #22c55e;
+    --color-blue-dark: #15803d;
+}
+
+body.theme-space {
+    --bg-base: #080a14;
+    --bg-surface: #101528;
+    --bg-panel: #0d1222;
+    --border-subtle: rgba(147, 197, 253, 0.16);
+    --color-blue: #6366f1;
+    --color-blue-dark: #4338ca;
 }
 
 /* Toast Értesítések */

@@ -33,6 +33,12 @@
           </svg>
           <span>Bejelentkezés / Regisztráció</span>
         </button>
+        <button id="openAchievementsBtn" class="btn-achievements-trigger" title="Mérföldkövek és jelvények">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/>
+          </svg>
+          <span>Jelvények (<span id="unlockedAchievementsCount">0</span>/8)</span>
+        </button>
         <div id="loggedInUserBox" class="logged-in-box" style="display: none">
           <span class="user-avatar-dot"></span>
           <span id="currentUserNameLabel" class="current-user-name"
@@ -125,6 +131,18 @@
                 </select>
               </div>
             </div>
+
+            <div class="select-field">
+              <label for="themeSelect" class="control-label">Téma / Skin</label>
+              <div class="select-wrapper">
+                <select id="themeSelect">
+                  <option value="cyber" selected>Neon Cyber (Alap)</option>
+                  <option value="candy">Candy Pop (Pasztell)</option>
+                  <option value="retro">Retro Arcade (80s)</option>
+                  <option value="space">Deep Space (Kozmosz)</option>
+                </select>
+              </div>
+            </div>
           </div>
 
           <div class="button-stack">
@@ -209,6 +227,20 @@
                 <small>+5 mp extra játékidőt ad</small>
               </div>
             </li>
+            <li>
+              <span class="legend-badge badge-blue">❄</span>
+              <div>
+                <strong>Időfagyasztó Jégkocka</strong>
+                <small>Megállítja a visszaszámlálót 4 másodpercre</small>
+              </div>
+            </li>
+            <li>
+              <span class="legend-badge badge-red">🧲</span>
+              <div>
+                <strong>Szuper Mágnes</strong>
+                <small>Összeránt egy teljes színt egy tömbbe</small>
+              </div>
+            </li>
           </ul>
         </div>
 
@@ -264,21 +296,21 @@
           </div>
         </div>
 
-        <!-- Pontduplázó Frenzy állapotjelző sáv -->
-        <div id="doublePointsBanner" class="frenzy-banner hidden">
-          <div class="frenzy-left">
+        <div class="canvas-wrapper" id="canvasWrapper">
+          <!-- Abszolút pozícionált, layout-shift mentes 2× Frenzy lebegő badge -->
+          <div id="doublePointsBanner" class="frenzy-canvas-pill hidden">
             <span class="frenzy-icon">⚡</span>
             <span class="frenzy-title">2× PONTDUPLÁZÓ</span>
+            <span id="frenzyTimerBadge" class="frenzy-pill-badge">5.0s</span>
           </div>
-          <div class="frenzy-right">
-            <span id="frenzyTimerBadge" class="frenzy-badge">5.0s</span>
-            <div class="frenzy-track">
-              <div id="frenzyProgressBar" class="frenzy-bar"></div>
-            </div>
-          </div>
-        </div>
 
-        <div class="canvas-wrapper" id="canvasWrapper">
+          <!-- Abszolút pozícionált jégkocka fagyasztás overlay -->
+          <div id="freezeOverlay" class="freeze-canvas-pill hidden">
+            <span class="freeze-icon">❄</span>
+            <span class="freeze-title">IDŐ MEGÁLLÍTVA!</span>
+            <span id="freezeTimerBadge" class="freeze-pill-badge">4.0s</span>
+          </div>
+
           <canvas id="crashdownCanvas" width="440" height="440"></canvas>
           <div id="canvasOverlay" class="canvas-overlay">
             <div class="overlay-card">
@@ -570,6 +602,22 @@
             Új jelszó mentése
           </button>
         </form>
+      </div>
+    </div>
+
+    <!-- ==================== MÉRFÖLDKÖVEK & JELVÉNYEK MODAL ==================== -->
+    <div id="achievementsModal" class="modal-backdrop hidden">
+      <div class="auth-modal-card achievements-modal-card">
+        <div class="auth-modal-header">
+          <div>
+            <h3>Mérföldkövek & Jelvények</h3>
+            <span class="auth-hint-text">Feloldva: <strong id="achievementsSummaryCount" style="color: #fbbf24;">0</strong> / 8</span>
+          </div>
+          <button id="closeAchievementsModalBtn" class="modal-close-x" title="Bezárás">&times;</button>
+        </div>
+        <div class="achievements-scroll-area" id="achievementsList">
+          <!-- Dinamikusan renderelve script.js-ből -->
+        </div>
       </div>
     </div>
 

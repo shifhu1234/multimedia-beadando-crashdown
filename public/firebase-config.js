@@ -281,16 +281,52 @@ class AuthService {
         return { success: true };
     }
 
+    getResetCooldownRemaining(email) {
+        if (!email) return 0;
+        const key = 'crashdown_pwd_reset_' + btoa(email.toLowerCase()).replace(/=/g, '');
+        const lastTime = parseInt(localStorage.getItem(key) || '0', 10);
+        const now = Date.now();
+        const diff = now - lastTime;
+        const cooldownMs = 5 * 60 * 1000; // 5 perc (300 000 ms)
+        if (diff < cooldownMs) {
+            return Math.ceil((cooldownMs - diff) / 1000);
+        }
+        return 0;
+    }
+
+    setResetCooldown(email) {
+        if (!email) return;
+        const key = 'crashdown_pwd_reset_' + btoa(email.toLowerCase()).replace(/=/g, '');
+        localStorage.setItem(key, String(Date.now()));
+    }
+
     async resetPassword(email) {
         if (!email) {
             return { success: false, error: 'Kérjük, add meg az e-mail címed!' };
         }
+
+        const remainingSec = this.getResetCooldownRemaining(email);
+        if (remainingSec > 0) {
+            const min = Math.floor(remainingSec / 60);
+            const sec = remainingSec % 60;
+            const timeStr = min > 0 ? `${min} perc ${sec} mp` : `${sec} másodperc`;
+            return {
+                success: false,
+                error: `Biztonsági korlátozás: Jelszó-visszaállítás 5 percenként egyszer kérhető! Várj még ${timeStr}-et.`
+            };
+        }
+
         if (this.auth) {
             try {
                 await this.auth.sendPasswordResetEmail(email);
-                return { success: true, message: 'A jelszóvisszaállító linket elküldtük az e-mail címedre!' };
+                this.setResetCooldown(email);
+                return { success: true, message: 'A jelszóvisszaállító linket elküldtük az e-mail címedre! (5 perc múlva kérhetsz újat)' };
             } catch (err) {
                 console.error('Jelszóvisszaállítási hiba:', err.code, err.message);
+                if (err.code === 'auth/too-many-requests') {
+                    this.setResetCooldown(email);
+                    return { success: false, error: 'Túl sok kérés érkezett! Kérjük, várj 5 percet az újabb kérés előtt.' };
+                }
                 if (err.code === 'auth/user-not-found') {
                     return { success: false, error: 'Nem található fiók ezzel az e-mail címmel!' };
                 }
