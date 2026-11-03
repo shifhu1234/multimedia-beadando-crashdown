@@ -13,7 +13,7 @@
       href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css?v=3.2" />
+    <link rel="stylesheet" href="style.css?v=3.3" />
 
     <!-- Firebase SDK (Compat - automatikus integráció) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -173,7 +173,7 @@
             </div>
 
             <div class="select-field">
-              <label for="themeSelect" class="control-label">Téma / Skin</label>
+              <label for="themeSelect" class="control-label">Téma</label>
               <div class="select-wrapper">
                 <select id="themeSelect">
                   <option value="retro" selected>Retro Arcade</option>
@@ -334,7 +334,7 @@
             </div>
           </div>
 
-          <!-- Aktív power-up effektek a HUD közepén: 0 layout shift, nem tolja el a pályát és a keverést -->
+          <!-- Aktív power-up effektek & Információs sáv a HUD közepén (0 layout shift, nem takar és nem tolja el a keverést) -->
           <div id="activeBuffsBar" class="hud-center-buffs">
             <div id="doublePointsBanner" class="buff-pill buff-frenzy hidden">
               <span class="buff-icon">⚡</span>
@@ -347,17 +347,16 @@
               <span class="buff-title">IDŐSTOP</span>
               <span id="freezeTimerBadge" class="buff-timer">4.0s</span>
             </div>
+
+            <div id="comboIndicatorWrap" class="combo-indicator-wrap">
+              <span id="comboIndicator" class="combo-pill">Készen állsz?</span>
+            </div>
           </div>
 
           <div class="stat-box score-box">
             <span class="stat-label">Pontszám</span>
             <h2><span id="score">0</span></h2>
           </div>
-        </div>
-
-        <!-- Információs sáv (Desktopon HUD és Canvas között, Mobilon a pálya alatt) -->
-        <div id="comboIndicatorWrap" class="combo-indicator-wrap">
-          <span id="comboIndicator" class="combo-pill">Készen állsz?</span>
         </div>
 
         <div class="canvas-wrapper" id="canvasWrapper">
@@ -445,22 +444,88 @@
           <div class="filter-row">
             <span class="filter-row-label">Színek:</span>
             <div class="filter-chip-group" id="colorFilterGroup">
-              <button class="filter-chip active" data-filter-type="color" data-filter="all">Mind</button>
-              <button class="filter-chip" data-filter-type="color" data-filter="2">2 szín</button>
-              <button class="filter-chip" data-filter-type="color" data-filter="3">3 szín</button>
-              <button class="filter-chip" data-filter-type="color" data-filter="4">4 szín</button>
-              <button class="filter-chip" data-filter-type="color" data-filter="5">5 szín</button>
+              <button
+                class="filter-chip active"
+                data-filter-type="color"
+                data-filter="all"
+              >
+                Mind
+              </button>
+              <button
+                class="filter-chip"
+                data-filter-type="color"
+                data-filter="2"
+              >
+                2 szín
+              </button>
+              <button
+                class="filter-chip"
+                data-filter-type="color"
+                data-filter="3"
+              >
+                3 szín
+              </button>
+              <button
+                class="filter-chip"
+                data-filter-type="color"
+                data-filter="4"
+              >
+                4 szín
+              </button>
+              <button
+                class="filter-chip"
+                data-filter-type="color"
+                data-filter="5"
+              >
+                5 szín
+              </button>
             </div>
           </div>
           <div class="filter-row">
             <span class="filter-row-label">Idő:</span>
             <div class="filter-chip-group" id="timeFilterGroup">
-              <button class="filter-chip active" data-filter-type="time" data-filter="all">Mind</button>
-              <button class="filter-chip" data-filter-type="time" data-filter="30">30s</button>
-              <button class="filter-chip" data-filter-type="time" data-filter="60">1p</button>
-              <button class="filter-chip" data-filter-type="time" data-filter="90">90s</button>
-              <button class="filter-chip" data-filter-type="time" data-filter="120">2p</button>
-              <button class="filter-chip" data-filter-type="time" data-filter="180">3p</button>
+              <button
+                class="filter-chip active"
+                data-filter-type="time"
+                data-filter="all"
+              >
+                Mind
+              </button>
+              <button
+                class="filter-chip"
+                data-filter-type="time"
+                data-filter="30"
+              >
+                30s
+              </button>
+              <button
+                class="filter-chip"
+                data-filter-type="time"
+                data-filter="60"
+              >
+                1p
+              </button>
+              <button
+                class="filter-chip"
+                data-filter-type="time"
+                data-filter="90"
+              >
+                90s
+              </button>
+              <button
+                class="filter-chip"
+                data-filter-type="time"
+                data-filter="120"
+              >
+                2p
+              </button>
+              <button
+                class="filter-chip"
+                data-filter-type="time"
+                data-filter="180"
+              >
+                3p
+              </button>
             </div>
           </div>
         </div>
@@ -831,11 +896,11 @@
     <div id="toastContainer" class="toast-container"></div>
 
     <!-- Modularizált JavaScript modulok a villámgyors futásért és tiszta átláthatóságért -->
-    <script src="js/config.js?v=3.2"></script>
-    <script src="js/audio.js?v=3.2"></script>
-    <script src="js/achievements.js?v=3.2"></script>
-    <script src="js/ui.js?v=3.2"></script>
-    <script src="js/game.js?v=3.2"></script>
-    <script src="js/main.js?v=3.2"></script>
+    <script src="js/config.js?v=3.3"></script>
+    <script src="js/audio.js?v=3.3"></script>
+    <script src="js/achievements.js?v=3.3"></script>
+    <script src="js/ui.js?v=3.3"></script>
+    <script src="js/game.js?v=3.3"></script>
+    <script src="js/main.js?v=3.3"></script>
   </body>
 </html>

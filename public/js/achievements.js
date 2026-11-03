@@ -354,6 +354,17 @@ function updateAchievementsUI() {
     listContainer.innerHTML = ACHIEVEMENTS.map(ach => {
         const isUnlocked = unlockedSet.has(ach.id);
         const shouldHide = (currentAchievementFilter === 'unlocked' && !isUnlocked) || (currentAchievementFilter === 'locked' && isUnlocked);
+        
+        const linkedAv = (typeof PROFILE_AVATARS !== 'undefined') ? PROFILE_AVATARS.find(av => av.achId === ach.id) : null;
+        const linkedTitle = (typeof PROFILE_TITLES !== 'undefined') ? PROFILE_TITLES.find(t => t.achId === ach.id) : null;
+        const linkedTheme = (typeof THEMES_CATALOG !== 'undefined') ? THEMES_CATALOG.find(th => th.achId === ach.id) : null;
+        
+        const rewList = [];
+        if (linkedAv) rewList.push(`Profilkép ${linkedAv.symbol}`);
+        if (linkedTitle) rewList.push(`Rangcím ${linkedTitle.name.split(' ')[0] || ''}`);
+        if (linkedTheme) rewList.push(`Téma: ${linkedTheme.name}`);
+        const rewardSnippet = rewList.length > 0 ? `<div class="ach-card-reward-tag">🎁 Jutalmak: ${rewList.join(', ')}</div>` : '';
+
         return `
             <div class="achievement-card ${isUnlocked ? 'unlocked' : 'locked'} ${shouldHide ? 'card-filtered-out' : ''}" data-ach-id="${ach.id}" data-unlocked="${isUnlocked ? '1' : '0'}">
                 <div class="ach-card-header">
@@ -363,6 +374,7 @@ function updateAchievementsUI() {
                 <div class="achievement-info">
                     <strong>${ach.title}</strong>
                     <small>${ach.desc}</small>
+                    ${rewardSnippet}
                 </div>
             </div>
         `;

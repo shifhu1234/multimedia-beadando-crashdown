@@ -348,11 +348,33 @@ async function openPlayerProfileModal(username) {
 
             item.addEventListener('mouseenter', () => {
                 const unlocked = achSet.has(a.id);
-                let rewardText = '';
-                const linkedAv = PROFILE_AVATARS.find(av => av.achId === a.id);
-                const linkedTitle = PROFILE_TITLES.find(t => t.achId === a.id);
-                if (linkedAv) rewardText += `🖼️ Profilkép jutalom: ${linkedAv.symbol} ${linkedAv.name} `;
-                if (linkedTitle) rewardText += `🎖️ Rangcím: ${linkedTitle.name}`;
+                
+                // Kapcsolódó jutalmak felkutatása (profilkép, rangcím, téma)
+                const linkedAv = (typeof PROFILE_AVATARS !== 'undefined') ? PROFILE_AVATARS.find(av => av.achId === a.id) : null;
+                const linkedTitle = (typeof PROFILE_TITLES !== 'undefined') ? PROFILE_TITLES.find(t => t.achId === a.id) : null;
+                const linkedTheme = (typeof THEMES_CATALOG !== 'undefined') ? THEMES_CATALOG.find(th => th.achId === a.id) : null;
+
+                const rewardRows = [];
+                if (linkedAv) {
+                    rewardRows.push(`<div class="reward-line"><span>Profilkép</span> <span class="reward-sym">${linkedAv.symbol}</span></div>`);
+                }
+                if (linkedTitle) {
+                    const titleSym = linkedTitle.name.split(' ')[0] || '🎖️';
+                    rewardRows.push(`<div class="reward-line"><span>Rangcím</span> <span class="reward-sym">${titleSym}</span></div>`);
+                }
+                if (linkedTheme) {
+                    rewardRows.push(`<div class="reward-line"><span>Téma</span> <span class="reward-sym">${linkedTheme.name}</span></div>`);
+                }
+
+                let rewardHtml = '';
+                if (rewardRows.length > 0) {
+                    rewardHtml = `
+                        <div class="b-tooltip-reward">
+                            <div class="reward-heading">Jutalmak:</div>
+                            ${rewardRows.join('')}
+                        </div>
+                    `;
+                }
 
                 floatingTip.innerHTML = `
                     <div class="b-tooltip-header">
@@ -360,15 +382,15 @@ async function openPlayerProfileModal(username) {
                         <span class="b-tooltip-status ${unlocked ? 'unlocked' : 'locked'}">${unlocked ? 'Megszerezve ✓' : '🔒 Zárolva'}</span>
                     </div>
                     <p class="b-tooltip-desc">${a.desc}</p>
-                    ${rewardText ? `<div class="b-tooltip-reward">${rewardText}</div>` : ''}
+                    ${rewardHtml}
                 `;
 
                 const rect = item.getBoundingClientRect();
-                const tipWidth = 230;
+                const tipWidth = 240;
                 let tipLeft = rect.left + (rect.width / 2) - (tipWidth / 2);
                 tipLeft = Math.max(12, Math.min(window.innerWidth - tipWidth - 12, tipLeft));
 
-                let tipTop = rect.top - 74;
+                let tipTop = rect.top - (rewardRows.length > 0 ? 94 : 72);
                 if (tipTop < 10) {
                     tipTop = rect.bottom + 8;
                 }

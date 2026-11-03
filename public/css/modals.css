@@ -383,6 +383,18 @@
     line-height: 1.35;
 }
 
+.ach-card-reward-tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #fbbf24;
+    background: rgba(251, 191, 36, 0.12);
+    border: 1px solid rgba(251, 191, 36, 0.25);
+    border-radius: 6px;
+    padding: 2px 7px;
+    margin-top: 4px;
+    width: fit-content;
+}
+
 /* ==================== JÁTÉKOS PROFIL MODAL ==================== */
 .player-profile-modal-card {
     max-width: 580px;
@@ -692,11 +704,33 @@
 
 .b-tooltip-reward {
     margin-top: 6px;
-    padding-top: 4px;
-    border-top: 1px dashed rgba(255, 255, 255, 0.15);
-    font-size: 0.68rem;
+    padding-top: 5px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.2);
+    font-size: 0.72rem;
+    line-height: 1.4;
+    color: #e2e8f0;
+}
+
+.b-tooltip-reward .reward-heading {
     color: #fbbf24;
-    font-weight: 700;
+    font-weight: 800;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 3px;
+}
+
+.b-tooltip-reward .reward-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+    color: var(--text-secondary);
+}
+
+.b-tooltip-reward .reward-line .reward-sym {
+    color: #ffffff;
+    font-weight: 800;
 }
 
 /* ==================== AVATAR VÁLASZTÓ RÁCS ==================== */
