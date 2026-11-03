@@ -281,6 +281,61 @@ class AuthService {
         return { success: true };
     }
 
+    async resetPassword(email) {
+        if (!email) {
+            return { success: false, error: 'Kérjük, add meg az e-mail címed!' };
+        }
+        if (this.auth) {
+            try {
+                await this.auth.sendPasswordResetEmail(email);
+                return { success: true, message: 'A jelszóvisszaállító linket elküldtük az e-mail címedre!' };
+            } catch (err) {
+                console.error('Jelszóvisszaállítási hiba:', err.code, err.message);
+                if (err.code === 'auth/user-not-found') {
+                    return { success: false, error: 'Nem található fiók ezzel az e-mail címmel!' };
+                }
+                if (err.code === 'auth/invalid-email') {
+                    return { success: false, error: 'Érvénytelen e-mail formátum!' };
+                }
+                return { success: false, error: err.message || 'Hiba a visszaállító levél küldésekor.' };
+            }
+        }
+        return { success: false, error: 'A jelszóvisszaállítás csak online Firebase kapcsolattal érhető el.' };
+    }
+
+    async updatePassword(newPassword) {
+        if (!newPassword || newPassword.length < 6) {
+            return { success: false, error: 'Az új jelszónak legalább 6 karakter hosszúnak kell lennie!' };
+        }
+        if (this.auth && this.auth.currentUser) {
+            try {
+                await this.auth.currentUser.updatePassword(newPassword);
+                return { success: true, message: 'A jelszavad sikeresen megváltozott!' };
+            } catch (err) {
+                console.error('Jelszómódosítási hiba:', err.code, err.message);
+                if (err.code === 'auth/requires-recent-login') {
+                    return { success: false, error: 'Biztonsági okokból jelentkezz be újra a jelszómódosítás előtt!' };
+                }
+                if (err.code === 'auth/weak-password') {
+                    return { success: false, error: 'A jelszó túl egyszerű, válassz erősebb jelszót!' };
+                }
+                return { success: false, error: err.message || 'Nem sikerült megváltoztatni a jelszót.' };
+            }
+        }
+
+        if (this.currentUser && this.currentUser.email) {
+            let users = JSON.parse(localStorage.getItem('crashdown_local_users') || '[]');
+            const idx = users.findIndex(u => u.email.toLowerCase() === this.currentUser.email.toLowerCase());
+            if (idx !== -1) {
+                users[idx].password = newPassword;
+                localStorage.setItem('crashdown_local_users', JSON.stringify(users));
+                return { success: true, message: 'A jelszavad sikeresen megváltozott!' };
+            }
+        }
+
+        return { success: false, error: 'Nincs bejelentkezett felhasználó!' };
+    }
+
     getCurrentUser() {
         return this.currentUser;
     }

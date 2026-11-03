@@ -111,7 +111,7 @@ const COLOR_STYLES = {
     'darkgreen': { top: '#4ade80', bottom: '#15803d', border: '#bbf7d0', label: 'TNT' },
     '#14b8a6':   { top: '#2dd4bf', bottom: '#0f766e', border: '#99f6e4', label: '✦' },
     '#6366f1':   { top: '#818cf8', bottom: '#4338ca', border: '#c7d2fe', label: '⟳' },
-    '#581845':   { top: '#c084fc', bottom: '#6b21a8', border: '#e9d5ff', label: '+15s' }
+    '#581845':   { top: '#c084fc', bottom: '#6b21a8', border: '#e9d5ff', label: '+5s' }
 };
 
 let grid = [];
@@ -126,6 +126,12 @@ let MAX_TIME = 120;
 let timerInterval = null;
 let pendingRowTimeout = null;
 let currentLeaderboardFilter = 'all';
+
+// Pontduplázó (5 mp Frenzy) állapot
+let isDoublePointsActive = false;
+let doublePointsRemainingTime = 0;
+let doublePointsInterval = null;
+const FRENZY_MAX_TIME = 5;
 
 // Vizuális effektek tárolói
 let particles = [];
@@ -275,11 +281,127 @@ function setAuthMode(register) {
     if (displayNameField) displayNameField.style.display = register ? 'flex' : 'none';
     if (authModalTitle) authModalTitle.textContent = register ? 'Új fiók regisztrációja' : 'Bejelentkezés';
     if (authSubmitBtn) authSubmitBtn.textContent = register ? 'Regisztráció és mentés' : 'Bejelentkezés';
+    const forgotPwWrap = document.getElementById('forgotPasswordWrap');
+    if (forgotPwWrap) forgotPwWrap.style.display = register ? 'none' : 'flex';
     if (authErrorMsg) authErrorMsg.style.display = 'none';
 }
 
 if (tabLoginBtn) tabLoginBtn.addEventListener('click', () => setAuthMode(false));
 if (tabRegisterBtn) tabRegisterBtn.addEventListener('click', () => setAuthMode(true));
+
+// Elfelejtett jelszó eseménykezelő
+const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
+if (forgotPasswordBtn) {
+    forgotPasswordBtn.addEventListener('click', async () => {
+        const email = document.getElementById('authEmail')?.value.trim();
+        if (!email) {
+            showAuthError('Kérlek írd be az e-mail címed a fenti mezőbe az új jelszó kéréséhez!');
+            document.getElementById('authEmail')?.focus();
+            return;
+        }
+        forgotPasswordBtn.disabled = true;
+        forgotPasswordBtn.textContent = 'Küldés folyamatban...';
+        const res = await window.authService.resetPassword(email);
+        forgotPasswordBtn.disabled = false;
+        forgotPasswordBtn.textContent = 'Elfelejtetted a jelszavad?';
+        if (res.success) {
+            showToast(res.message, 'success');
+            if (authErrorMsg) {
+                authErrorMsg.textContent = res.message;
+                authErrorMsg.style.display = 'block';
+                authErrorMsg.style.color = '#38bdf8';
+                authErrorMsg.style.borderColor = 'rgba(56, 189, 248, 0.4)';
+                authErrorMsg.style.background = 'rgba(56, 189, 248, 0.12)';
+            }
+        } else {
+            showAuthError(res.error);
+        }
+    });
+}
+
+// Jelszóváltoztatási Modal eseménykezelői
+const passwordChangeModal = document.getElementById('passwordChangeModal');
+const openChangePasswordModalBtn = document.getElementById('openChangePasswordModalBtn');
+const closeChangePasswordModalBtn = document.getElementById('closeChangePasswordModalBtn');
+const changePasswordForm = document.getElementById('changePasswordForm');
+const changePasswordErrorMsg = document.getElementById('changePasswordErrorMsg');
+const changePwEmailHint = document.getElementById('changePwEmailHint');
+
+function openChangePasswordModal() {
+    const user = window.authService?.getCurrentUser();
+    if (!user) {
+        showToast('Kérjük, előbb jelentkezz be a jelszavad megváltoztatásához!', 'info');
+        openAuthModal(false);
+        return;
+    }
+    if (changePwEmailHint) changePwEmailHint.textContent = user.email;
+    if (changePasswordErrorMsg) changePasswordErrorMsg.style.display = 'none';
+    const p1 = document.getElementById('newPasswordInput');
+    const p2 = document.getElementById('confirmNewPasswordInput');
+    if (p1) p1.value = '';
+    if (p2) p2.value = '';
+    if (passwordChangeModal) passwordChangeModal.classList.remove('hidden');
+}
+
+function closeChangePasswordModal() {
+    if (passwordChangeModal) passwordChangeModal.classList.add('hidden');
+}
+
+if (openChangePasswordModalBtn) {
+    openChangePasswordModalBtn.addEventListener('click', openChangePasswordModal);
+}
+if (closeChangePasswordModalBtn) {
+    closeChangePasswordModalBtn.addEventListener('click', closeChangePasswordModal);
+}
+if (passwordChangeModal) {
+    passwordChangeModal.addEventListener('click', (e) => {
+        if (e.target === passwordChangeModal) closeChangePasswordModal();
+    });
+}
+
+if (changePasswordForm) {
+    changePasswordForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const p1 = document.getElementById('newPasswordInput')?.value;
+        const p2 = document.getElementById('confirmNewPasswordInput')?.value;
+
+        if (!p1 || p1.length < 6) {
+            showChangePwError('Az új jelszónak legalább 6 karakter hosszúnak kell lennie!');
+            return;
+        }
+        if (p1 !== p2) {
+            showChangePwError('A két megadott jelszó nem egyezik!');
+            return;
+        }
+
+        const submitBtn = document.getElementById('changePasswordSubmitBtn');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Módosítás folyamatban...';
+        }
+
+        const res = await window.authService.updatePassword(p1);
+
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Új jelszó mentése';
+        }
+
+        if (res.success) {
+            closeChangePasswordModal();
+            showToast('✅ A jelszavad sikeresen megváltozott!', 'success');
+        } else {
+            showChangePwError(res.error || 'Hiba történt a jelszómódosítás során.');
+        }
+    });
+}
+
+function showChangePwError(msg) {
+    if (changePasswordErrorMsg) {
+        changePasswordErrorMsg.textContent = msg;
+        changePasswordErrorMsg.style.display = 'block';
+    }
+}
 
 // Auth Form beküldése
 const authForm = document.getElementById('authForm');
@@ -869,8 +991,53 @@ document.addEventListener('DOMContentLoaded', function () {
 /*############################## JATEK LOGIKA & POWERUPOK ##############################*/
 
 function pluszIdoPowerUp() {
-    remainingTime = Math.min(MAX_TIME + 30, remainingTime + 15);
+    remainingTime = Math.min(MAX_TIME + 30, remainingTime + 5);
     refreshTimerText();
+}
+
+function aktivaldPontduplazot(seconds = 5) {
+    isDoublePointsActive = true;
+    doublePointsRemainingTime = seconds;
+
+    const banner = document.getElementById('doublePointsBanner');
+    const badge = document.getElementById('frenzyTimerBadge');
+    const bar = document.getElementById('frenzyProgressBar');
+    const wrapper = document.getElementById('canvasWrapper');
+
+    if (banner) banner.classList.remove('hidden');
+    if (wrapper) wrapper.classList.add('frenzy-active');
+    if (badge) badge.textContent = `${doublePointsRemainingTime.toFixed(1)}s`;
+    if (bar) bar.style.width = '100%';
+
+    showToast('⚡ 2× PONTDUPLÁZÓ AKTÍV 5 MÁSODPERCIG!', 'success');
+    playSound(doublerKatt);
+
+    if (doublePointsInterval) clearInterval(doublePointsInterval);
+    doublePointsInterval = setInterval(() => {
+        doublePointsRemainingTime = Math.max(0, doublePointsRemainingTime - 0.1);
+        if (badge) badge.textContent = `${doublePointsRemainingTime.toFixed(1)}s`;
+        if (bar) {
+            const pct = Math.max(0, Math.min(100, (doublePointsRemainingTime / FRENZY_MAX_TIME) * 100));
+            bar.style.width = `${pct}%`;
+        }
+
+        if (doublePointsRemainingTime <= 0 || !jatekFut || vegeAJateknak) {
+            deaktivaldPontduplazot();
+        }
+    }, 100);
+}
+
+function deaktivaldPontduplazot() {
+    isDoublePointsActive = false;
+    doublePointsRemainingTime = 0;
+    if (doublePointsInterval) {
+        clearInterval(doublePointsInterval);
+        doublePointsInterval = null;
+    }
+    const banner = document.getElementById('doublePointsBanner');
+    const wrapper = document.getElementById('canvasWrapper');
+    if (banner) banner.classList.add('hidden');
+    if (wrapper) wrapper.classList.remove('frenzy-active');
 }
 
 /**
@@ -937,6 +1104,19 @@ function vanMegLepes() {
 }
 
 /**
+ * Véletlenszerű power-upok kiválasztása.
+ * Az időbónusz (+5s) ritkább (csak 30% eséllyel kerül be a lehetséges készletbe).
+ */
+function valasszVeletlenPowerUpok(db = 4) {
+    const basePows = ['cyan', 'pink', '#f97316', 'darkgreen', '#14b8a6', '#6366f1'];
+    const shuffled = [...basePows].sort(() => 0.5 - Math.random());
+    if (Math.random() < 0.3) {
+        shuffled[Math.floor(Math.random() * shuffled.length)] = '#581845';
+    }
+    return shuffled.slice(0, db);
+}
+
+/**
  * Új tiszta tábla legördítése és friss power-upok elhelyezése
  */
 function ujPalyaLedobas() {
@@ -965,8 +1145,7 @@ function ujPalyaLedobas() {
         grid[py][px].color = colorKey;
     }
 
-    const powerUpTypes = ['cyan', 'pink', '#f97316', 'darkgreen', '#14b8a6', '#6366f1', '#581845'];
-    const shuffledPows = powerUpTypes.sort(() => 0.5 - Math.random()).slice(0, 4);
+    const shuffledPows = valasszVeletlenPowerUpok(4);
     shuffledPows.forEach(pow => placePowerUp(pow));
 
     updateHoverPreview();
@@ -1121,17 +1300,15 @@ function handleClick(event) {
     }
 
     if (targetColor === 'cyan') {
-        // Pontduplázó power-up
+        // Pontduplázó power-up (5 mp Frenzy)
         spawnCellParticles(x, y, 'cyan', 16);
         grid[y][x].color = 'white';
         grid[y][x].marked = true;
-        playSound(doublerKatt);
         gridUjraRendezes();
-        pontSzam = pontSzam > 0 ? pontSzam * 2 : 100;
-        updateScoreUI();
-        spawnFloatingText(x, y, '2× PONT! 💵', '#22d3ee');
-        setComboStatus('💵 Pontszám megduplázva!', true);
-        ellenorizdPalyaTisztitas();
+        aktivaldPontduplazot(5);
+        spawnFloatingText(x, y, '2× FRENZY (5 mp)!', '#38bdf8');
+        setComboStatus('⚡ 2× Pontduplázó: következő 5 mp-ben minden pontod duplázódik!', true);
+        ellenorizdPalyaAllapot();
     } else if (targetColor === 'pink') {
         // Cunami: teljes sor törlése
         playSound(sorEffekt);
@@ -1150,12 +1327,13 @@ function handleClick(event) {
             color: '#f472b6',
             alpha: 0.9
         });
-        pontSzam += 100;
+        const gained = 100 * (isDoublePointsActive ? 2 : 1);
+        pontSzam += gained;
         updateScoreUI();
         gridUjraRendezes();
-        spawnFloatingText(x, y, '⇄ CUNAMI +100', '#f472b6');
-        setComboStatus('⇄ Teljes sor eltakarítva! (+100p)', true);
-        ellenorizdPalyaTisztitas();
+        spawnFloatingText(x, y, isDoublePointsActive ? `⇄ CUNAMI +${gained} (2×)` : `⇄ CUNAMI +${gained}`, '#f472b6');
+        setComboStatus(`⇄ Teljes sor eltakarítva! (+${gained}p)`, true);
+        ellenorizdPalyaAllapot();
     } else if (targetColor === '#f97316') {
         // Oszloptörlő lézer: teljes oszlop törlése
         playSound(sorEffekt);
@@ -1174,12 +1352,13 @@ function handleClick(event) {
             color: '#f97316',
             alpha: 0.95
         });
-        pontSzam += 100;
+        const gained = 100 * (isDoublePointsActive ? 2 : 1);
+        pontSzam += gained;
         updateScoreUI();
         gridUjraRendezes();
-        spawnFloatingText(x, y, '⇅ OSZLOP +100', '#f97316');
-        setComboStatus('⇅ Teljes oszlop kilőve! (+100p)', true);
-        ellenorizdPalyaTisztitas();
+        spawnFloatingText(x, y, isDoublePointsActive ? `⇅ OSZLOP +${gained} (2×)` : `⇅ OSZLOP +${gained}`, '#f97316');
+        setComboStatus(`⇅ Teljes oszlop kilőve! (+${gained}p)`, true);
+        ellenorizdPalyaAllapot();
     } else if (targetColor === 'darkgreen') {
         // 3x3 TNT robbantás
         playSound(tntKatt);
@@ -1193,11 +1372,12 @@ function handleClick(event) {
             color: '#4ade80',
             alpha: 0.95
         });
-        pontSzam += 90;
+        const gained = 90 * (isDoublePointsActive ? 2 : 1);
+        pontSzam += gained;
         updateScoreUI();
-        spawnFloatingText(x, y, 'TNT BUMM +90', '#4ade80');
-        setComboStatus('💥 3×3-as TNT robbanás! (+90p)', true);
-        ellenorizdPalyaTisztitas();
+        spawnFloatingText(x, y, isDoublePointsActive ? `TNT BUMM +${gained} (2×)` : `TNT BUMM +${gained}`, '#4ade80');
+        setComboStatus(`💥 3×3-as TNT robbanás! (+${gained}p)`, true);
+        ellenorizdPalyaAllapot();
     } else if (targetColor === '#14b8a6') {
         // Szín-bomba: egy teljes szín összes blokkját eltakarítja
         playSound(tntKatt);
@@ -1235,13 +1415,14 @@ function handleClick(event) {
             color: '#14b8a6',
             alpha: 0.95
         });
-        const earned = Math.max(50, wipedCount * 15);
+        const baseEarned = Math.max(50, wipedCount * 15);
+        const earned = baseEarned * (isDoublePointsActive ? 2 : 1);
         pontSzam += earned;
         updateScoreUI();
         gridUjraRendezes();
-        spawnFloatingText(x, y, `✦ BOMB +${earned}`, '#14b8a6');
+        spawnFloatingText(x, y, isDoublePointsActive ? `✦ BOMB +${earned} (2×)` : `✦ BOMB +${earned}`, '#14b8a6');
         setComboStatus(`✦ Szín-bomba: ${wipedCount} blokk megsemmisítve! (+${earned}p)`, true);
-        ellenorizdPalyaTisztitas();
+        ellenorizdPalyaAllapot();
     } else if (targetColor === '#6366f1') {
         // Pálya keverés: újrakeveri a blokkok színeit
         playSound(doublerKatt);
@@ -1274,23 +1455,24 @@ function handleClick(event) {
             color: '#818cf8',
             alpha: 0.9
         });
-        pontSzam += 50;
+        const gained = 50 * (isDoublePointsActive ? 2 : 1);
+        pontSzam += gained;
         updateScoreUI();
         gridUjraRendezes();
-        spawnFloatingText(x, y, '⟳ KEVERÉS +50', '#818cf8');
-        setComboStatus('⟳ Pálya újrakeverve! (+50p)', true);
-        ellenorizdPalyaTisztitas();
+        spawnFloatingText(x, y, isDoublePointsActive ? `⟳ KEVERÉS +${gained} (2×)` : `⟳ KEVERÉS +${gained}`, '#818cf8');
+        setComboStatus(`⟳ Pálya újrakeverve! (+${gained}p)`, true);
+        ellenorizdPalyaAllapot();
     } else if (targetColor === '#581845') {
-        // +15 mp idő power-up
+        // +5 mp idő power-up
         spawnCellParticles(x, y, '#581845', 14);
         grid[y][x].color = 'white';
         grid[y][x].marked = true;
         playSound(timeEffekt);
         gridUjraRendezes();
         pluszIdoPowerUp();
-        spawnFloatingText(x, y, '+15 MP!', '#c084fc');
-        setComboStatus('⌛ +15 másodperc extra idő!', true);
-        ellenorizdPalyaTisztitas();
+        spawnFloatingText(x, y, '+5 MP!', '#c084fc');
+        setComboStatus('⌛ +5 másodperc extra idő!', true);
+        ellenorizdPalyaAllapot();
     } else {
         // Normál színes négyzetek keresése (BFS)
         const torlendoNegyzetek = getTorlendoNegyzetek(x, y, targetColor);
@@ -1301,19 +1483,21 @@ function handleClick(event) {
                 spawnCellParticles(cellPos.x, cellPos.y, targetColor, 5);
                 grid[cellPos.y][cellPos.x].marked = true;
             }
-            const gained = torlendoNegyzetek.length * 10;
+            const baseGained = torlendoNegyzetek.length * 10;
+            const gained = baseGained * (isDoublePointsActive ? 2 : 1);
             pontSzam += gained;
             updateScoreUI();
             gridUjraRendezes();
 
             const style = COLOR_STYLES[targetColor];
-            spawnFloatingText(x, y, `+${gained}`, style ? style.top : '#fff');
+            const textCol = isDoublePointsActive ? '#38bdf8' : (style ? style.top : '#fff');
+            spawnFloatingText(x, y, isDoublePointsActive ? `+${gained} (2×)` : `+${gained}`, textCol);
             if (torlendoNegyzetek.length >= 7) {
                 setComboStatus(`🔥 Óriási kombó! ${torlendoNegyzetek.length} blokk (+${gained}p)`, true);
             } else {
                 setComboStatus(`${torlendoNegyzetek.length} blokk törölve (+${gained}p)`, false);
             }
-            ellenorizdPalyaTisztitas();
+            ellenorizdPalyaAllapot();
         } else {
             // Kevés az érintkező négyzet -> enyhe vizuális visszajelzés
             grid[y][x].scale = 0.86;
@@ -1452,7 +1636,7 @@ function updateHoverPreview() {
         hoverPreviewText = 'Pálya keverés (+50)';
     } else if (c === '#581845') {
         hoverHighlightSet.add(`${x}:${y}`);
-        hoverPreviewText = '+15 mp extra idő';
+        hoverPreviewText = '+5 mp extra idő';
     } else {
         const group = getTorlendoNegyzetek(x, y, c);
         if (group.length >= 3) {
@@ -1615,9 +1799,9 @@ function drawGrid() {
                 } else if (style.label === '⟳') {
                     ctx.font = '800 20px system-ui, sans-serif';
                     ctx.fillText('⟳', x + size / 2, y + size / 2);
-                } else if (style.label === '+15s') {
+                } else if (style.label === '+5s') {
                     ctx.font = '800 12px "JetBrains Mono", monospace';
-                    ctx.fillText('+15s', x + size / 2, y + size / 2 + 1);
+                    ctx.fillText('+5s', x + size / 2, y + size / 2 + 1);
                 }
                 ctx.restore();
             }
@@ -1818,11 +2002,10 @@ function jatekInditasa() {
         grid[py][px].color = colorKey;
     }
 
-    const powerUpTypes = ['cyan', 'pink', '#f97316', 'darkgreen', '#14b8a6', '#6366f1', '#581845'];
-    // Véletlenszerűen kiválasztunk 5 különböző power-upot és lehelyezzük
-    const shuffledPows = powerUpTypes.sort(() => 0.5 - Math.random()).slice(0, 5);
+    const shuffledPows = valasszVeletlenPowerUpok(5);
     shuffledPows.forEach(pow => placePowerUp(pow));
 
+    deaktivaldPontduplazot();
     canvas.style.cursor = 'pointer';
 
     if (shuffleCooldownInterval) {
@@ -1893,6 +2076,7 @@ function timer() {
             timerInterval = null;
             jatekFut = false;
             vegeAJateknak = true;
+            deaktivaldPontduplazot();
             if (shuffleCooldownInterval) {
                 clearInterval(shuffleCooldownInterval);
                 shuffleCooldownInterval = null;

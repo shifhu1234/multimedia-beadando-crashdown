@@ -109,6 +109,23 @@ html, body {
     color: #ffffff;
 }
 
+.btn-profile-link {
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    color: #38bdf8;
+    font-size: 0.74rem;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    padding: 3px 8px;
+    transition: all 0.15s ease;
+}
+
+.btn-profile-link:hover {
+    background: rgba(56, 189, 248, 0.25);
+    color: #ffffff;
+}
+
 .btn-logout-link {
     background: none;
     border: none;
@@ -1194,6 +1211,126 @@ select:disabled {
     padding: 6px 8px;
     border-radius: 6px;
     border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Elfelejtett jelszó gomb */
+.auth-sub-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: -4px;
+}
+
+.link-btn-subtle {
+    background: none;
+    border: none;
+    color: var(--color-cyan);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+    transition: opacity 0.15s ease;
+}
+
+.link-btn-subtle:hover {
+    opacity: 0.8;
+}
+
+/* Mentés gomb szövegtúlcsordulás fix */
+#saveWithLoginModalBtn,
+#saveAsLoggedInBtn {
+    white-space: normal;
+    word-break: normal;
+    height: auto;
+    min-height: 42px;
+    padding: 8px 12px;
+    line-height: 1.35;
+    text-align: center;
+    font-size: 0.84rem;
+}
+
+/* 2× Frenzy pontduplázó sáv */
+.frenzy-banner {
+    width: 100%;
+    background: linear-gradient(90deg, #0284c7 0%, #38bdf8 50%, #0ea5e9 100%);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: var(--radius-md);
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 18px rgba(56, 189, 248, 0.5);
+    animation: frenzyPulse 1.2s infinite alternate;
+    transition: all 0.25s ease;
+    margin-bottom: 6px;
+}
+
+.frenzy-banner.hidden {
+    display: none !important;
+}
+
+@keyframes frenzyPulse {
+    from { box-shadow: 0 4px 12px rgba(56, 189, 248, 0.4); }
+    to { box-shadow: 0 4px 24px rgba(56, 189, 248, 0.85); }
+}
+
+.frenzy-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #ffffff;
+    font-weight: 900;
+    font-size: 0.84rem;
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.frenzy-icon {
+    font-size: 1.05rem;
+    animation: iconShake 0.4s infinite alternate;
+}
+
+@keyframes iconShake {
+    from { transform: scale(1); }
+    to { transform: scale(1.2); }
+}
+
+.frenzy-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.frenzy-badge {
+    background: rgba(0, 0, 0, 0.35);
+    color: #ffffff;
+    font-family: var(--font-mono);
+    font-weight: 800;
+    font-size: 0.78rem;
+    padding: 2px 8px;
+    border-radius: 999px;
+    min-width: 44px;
+    text-align: center;
+}
+
+.frenzy-track {
+    width: 60px;
+    height: 6px;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.frenzy-bar {
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    transition: width 0.1s linear;
+}
+
+.canvas-wrapper.frenzy-active {
+    box-shadow: 0 0 25px rgba(56, 189, 248, 0.6), inset 0 0 15px rgba(56, 189, 248, 0.3);
+    border-color: rgba(56, 189, 248, 0.8);
 }
 
 /* Toast Értesítések */
