@@ -34,31 +34,64 @@
           <span>Bejelentkezés / Regisztráció</span>
         </button>
 
-        <button id="openAchievementsBtn" class="top-nav-btn btn-achievements-trigger" title="Mérföldkövek és jelvények">
+        <button
+          id="openAchievementsBtn"
+          class="top-nav-btn btn-achievements-trigger"
+          style="display: none"
+          title="Mérföldkövek és jelvények"
+        >
           <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/>
+            <path
+              d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"
+            />
           </svg>
-          <span>Jelvények (<span id="unlockedAchievementsCount">0</span>/<span id="totalAchievementsCount">24</span>)</span>
+          <span
+            >Jelvények (<span id="unlockedAchievementsCount">0</span>/<span
+              id="totalAchievementsCount"
+              >24</span
+            >)</span
+          >
         </button>
 
         <!-- Különálló doboz: Profil & Név -->
-        <button id="openMyProfileBtn" class="top-nav-btn btn-user-box" style="display: none;" title="Kattints a saját profilod és rangod megtekintéséhez">
+        <button
+          id="openMyProfileBtn"
+          class="top-nav-btn btn-user-box"
+          style="display: none"
+          title="Kattints a saját profilod és rangod megtekintéséhez"
+        >
           <span id="userAvatarDot" class="user-avatar-symbol">👤</span>
-          <span id="currentUserNameLabel" class="current-user-name">Játékos</span>
+          <span id="currentUserNameLabel" class="current-user-name"
+            >Játékos</span
+          >
         </button>
 
         <!-- Különálló doboz: Jelszóváltás -->
-        <button id="openChangePasswordModalBtn" class="top-nav-btn btn-change-pw-box" style="display: none;" title="Jelszó módosítása">
+        <button
+          id="openChangePasswordModalBtn"
+          class="top-nav-btn btn-change-pw-box"
+          style="display: none"
+          title="Jelszó módosítása"
+        >
           <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15">
-            <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+            <path
+              d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
+            />
           </svg>
           <span>Jelszóváltás</span>
         </button>
 
         <!-- Különálló doboz: Kilépés -->
-        <button id="logoutBtn" class="top-nav-btn btn-logout-box" style="display: none;" title="Kijelentkezés">
+        <button
+          id="logoutBtn"
+          class="top-nav-btn btn-logout-box"
+          style="display: none"
+          title="Kijelentkezés"
+        >
           <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15">
-            <path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
+            <path
+              d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
+            />
           </svg>
           <span>Kilépés</span>
         </button>
@@ -143,10 +176,10 @@
               <label for="themeSelect" class="control-label">Téma / Skin</label>
               <div class="select-wrapper">
                 <select id="themeSelect">
-                  <option value="cyber" selected>Neon Cyber (Alap)</option>
-                  <option value="candy">Candy Pop (Pasztell)</option>
-                  <option value="retro">Retro Arcade (80s)</option>
-                  <option value="space">Deep Space (Kozmosz)</option>
+                  <option value="cyber" selected>Neon Cyber</option>
+                  <option value="candy">Candy Pop</option>
+                  <option value="retro">Retro Arcade</option>
+                  <option value="space">Deep Space</option>
                 </select>
               </div>
             </div>
@@ -314,7 +347,6 @@
           <div class="stat-box score-box">
             <span class="stat-label">Pontszám</span>
             <h2><span id="score">0</span></h2>
-            <span id="comboIndicator" class="combo-pill">Készen állsz?</span>
           </div>
         </div>
 
@@ -330,6 +362,24 @@
               <p id="timeUpMessage">Lejárt az idő!</p>
 
               <div class="overlay-action-stack">
+                <button
+                  id="overlaySaveScoreBtn"
+                  class="btn btn-accent btn-lg"
+                  style="display: none"
+                  title="Jelentkezz be az eredményed mentéséhez"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    width="18"
+                    height="18"
+                  >
+                    <path
+                      d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"
+                    />
+                  </svg>
+                  <span>Eredmény mentése (Bejelentkezés)</span>
+                </button>
                 <button id="overlayStartBtn" class="btn btn-primary btn-lg">
                   <svg
                     viewBox="0 0 24 24"
@@ -347,6 +397,9 @@
         </div>
 
         <div class="stage-actions">
+          <div id="comboIndicatorWrap" class="combo-indicator-wrap">
+            <span id="comboIndicator" class="combo-pill">Készen állsz?</span>
+          </div>
           <button
             id="shuffleButton"
             class="btn btn-shuffle"
@@ -568,20 +621,45 @@
           <div>
             <h3>🏆 Mérföldkövek & Jelvények</h3>
             <div class="ach-progress-wrap">
-              <span class="auth-hint-text">Feloldva: <strong id="achievementsSummaryCount" style="color: #fbbf24;">0</strong> / <strong id="achievementsTotalSummaryCount">18</strong> (<span id="achievementsPercent">0%</span>)</span>
+              <span class="auth-hint-text"
+                >Feloldva:
+                <strong id="achievementsSummaryCount" style="color: #fbbf24"
+                  >0</strong
+                >
+                / <strong id="achievementsTotalSummaryCount">18</strong> (<span
+                  id="achievementsPercent"
+                  >0%</span
+                >)</span
+              >
               <div class="ach-progress-track">
-                <div id="achievementsProgressFill" class="ach-progress-fill" style="width: 0%;"></div>
+                <div
+                  id="achievementsProgressFill"
+                  class="ach-progress-fill"
+                  style="width: 0%"
+                ></div>
               </div>
             </div>
           </div>
-          <button id="closeAchievementsModalBtn" class="modal-close-x" title="Bezárás">&times;</button>
+          <button
+            id="closeAchievementsModalBtn"
+            class="modal-close-x"
+            title="Bezárás"
+          >
+            &times;
+          </button>
         </div>
 
         <!-- Szűrőfülek -->
         <div class="achievements-filter-bar">
-          <button class="ach-filter-btn active" data-filter="all">Mind (<span id="achFilterAllCount">18</span>)</button>
-          <button class="ach-filter-btn" data-filter="unlocked">Feloldva (<span id="achFilterUnlockedCount">0</span>)</button>
-          <button class="ach-filter-btn" data-filter="locked">Zárolva (<span id="achFilterLockedCount">18</span>)</button>
+          <button class="ach-filter-btn active" data-filter="all">
+            Mind (<span id="achFilterAllCount">18</span>)
+          </button>
+          <button class="ach-filter-btn" data-filter="unlocked">
+            Feloldva (<span id="achFilterUnlockedCount">0</span>)
+          </button>
+          <button class="ach-filter-btn" data-filter="locked">
+            Zárolva (<span id="achFilterLockedCount">18</span>)
+          </button>
         </div>
 
         <!-- Nem-görgős / tágas Kártyás Rács -->
@@ -600,12 +678,25 @@
             <div class="profile-title-container">
               <h3 id="profilePlayerName">Játékos Neve</h3>
               <div class="profile-title-row">
-                <span id="profilePlayerTitle" class="profile-player-badge">Crashdown Játékos</span>
-                <select id="profileTitleSelect" class="profile-title-select" style="display: none;" title="Válassz a megszerzett rangcímeid közül"></select>
+                <span id="profilePlayerTitle" class="profile-player-badge"
+                  >Crashdown Játékos</span
+                >
+                <select
+                  id="profileTitleSelect"
+                  class="profile-title-select"
+                  style="display: none"
+                  title="Válassz a megszerzett rangcímeid közül"
+                ></select>
               </div>
             </div>
           </div>
-          <button id="closePlayerProfileModalBtn" class="modal-close-x" title="Bezárás">&times;</button>
+          <button
+            id="closePlayerProfileModalBtn"
+            class="modal-close-x"
+            title="Bezárás"
+          >
+            &times;
+          </button>
         </div>
 
         <div class="profile-content-area">
@@ -615,7 +706,9 @@
               <span class="profile-stat-icon">🏆</span>
               <div class="profile-stat-data">
                 <span class="profile-stat-label">Legjobb pont</span>
-                <strong id="profileBestScore" class="profile-stat-val">0</strong>
+                <strong id="profileBestScore" class="profile-stat-val"
+                  >0</strong
+                >
               </div>
             </div>
 
@@ -623,7 +716,9 @@
               <span class="profile-stat-icon">🎮</span>
               <div class="profile-stat-data">
                 <span class="profile-stat-label">Lejátszott meccs</span>
-                <strong id="profileTotalMatches" class="profile-stat-val">0</strong>
+                <strong id="profileTotalMatches" class="profile-stat-val"
+                  >0</strong
+                >
               </div>
             </div>
 
@@ -631,7 +726,9 @@
               <span class="profile-stat-icon">⏱️</span>
               <div class="profile-stat-data">
                 <span class="profile-stat-label">Összes játékidő</span>
-                <strong id="profileTotalTime" class="profile-stat-val">0 perc</strong>
+                <strong id="profileTotalTime" class="profile-stat-val"
+                  >0 perc</strong
+                >
               </div>
             </div>
 
@@ -639,16 +736,24 @@
               <span class="profile-stat-icon">🎖️</span>
               <div class="profile-stat-data">
                 <span class="profile-stat-label">Jelvények</span>
-                <strong id="profileAchievementsCount" class="profile-stat-val">0 / 24</strong>
+                <strong id="profileAchievementsCount" class="profile-stat-val"
+                  >0 / 24</strong
+                >
               </div>
             </div>
           </div>
 
           <!-- Profilkép választó részleg (Saját profilnál feloldott avatárok) -->
-          <div id="profileAvatarSection" class="profile-section" style="display: none;">
+          <div
+            id="profileAvatarSection"
+            class="profile-section"
+            style="display: none"
+          >
             <div class="profile-section-header">
               <h4 class="profile-section-title">🖼️ Profilkép választása</h4>
-              <span class="auth-hint-text">Mérföldkövekkel kinyitható szimbólumok</span>
+              <span class="auth-hint-text"
+                >Mérföldkövekkel kinyitható szimbólumok</span
+              >
             </div>
             <div id="profileAvatarGrid" class="profile-avatar-grid">
               <!-- Dinamikusan renderelve script.js-ből -->
@@ -657,7 +762,9 @@
 
           <!-- Játékmódok szerinti lebontás -->
           <div class="profile-section">
-            <h4 class="profile-section-title">📊 Teljesítmény Színmódok szerint</h4>
+            <h4 class="profile-section-title">
+              📊 Teljesítmény Színmódok szerint
+            </h4>
             <div id="profileModesBreakdown" class="profile-modes-list">
               <!-- Dinamikusan renderelve script.js-ből -->
             </div>
@@ -677,8 +784,12 @@
           <!-- Legutóbbi 10 meccs előzményei (Match History) -->
           <div class="profile-section">
             <div class="profile-section-header">
-              <h4 class="profile-section-title">📜 Legutóbbi Játékok (Előzmények)</h4>
-              <span id="profileHistorySummary" class="auth-hint-text">Utolsó 10 meccs</span>
+              <h4 class="profile-section-title">
+                📜 Legutóbbi Játékok (Előzmények)
+              </h4>
+              <span id="profileHistorySummary" class="auth-hint-text"
+                >Utolsó 10 meccs</span
+              >
             </div>
             <div id="profileHistoryList" class="profile-history-list">
               <!-- Dinamikusan feltöltve script.js-ből -->
@@ -689,7 +800,10 @@
     </div>
 
     <!-- Lebegő intelligens tooltip a jelvényekhez (nem vágódik le az ablak szélén) -->
-    <div id="profileBadgeFloatingTooltip" class="profile-floating-tooltip"></div>
+    <div
+      id="profileBadgeFloatingTooltip"
+      class="profile-floating-tooltip"
+    ></div>
 
     <div id="toastContainer" class="toast-container"></div>
 

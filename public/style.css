@@ -681,22 +681,32 @@ select:disabled {
     white-space: nowrap;
 }
 
+.combo-indicator-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
 .combo-pill {
-    font-size: 0.68rem;
-    height: 18px;
-    line-height: 16px;
-    padding: 0 8px;
-    border-radius: 4px;
-    background: #202738;
+    font-size: 0.75rem;
+    height: 24px;
+    line-height: 22px;
+    padding: 0 14px;
+    border-radius: 999px;
+    background: #171d2b;
     border: 1px solid var(--border-subtle);
     color: #cbd5e1;
-    font-weight: 600;
+    font-weight: 700;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 100%;
-    display: inline-block;
-    flex-shrink: 0;
+    max-width: 95%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
 /* Canvas Keret */
@@ -806,7 +816,8 @@ select:disabled {
 .stage-actions {
     width: 100%;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
     gap: 8px;
 }
 
@@ -2331,9 +2342,50 @@ body.theme-space {
 
     .hud-bar {
         width: 100%;
-        height: 82px;
-        min-height: 82px;
-        padding: 8px 12px;
+        height: 72px;
+        min-height: 72px;
+        grid-template-columns: 100px 1fr 100px;
+        gap: 4px;
+        padding: 6px 8px;
+    }
+
+    .hud-bar .stat-box {
+        height: 56px;
+    }
+
+    #timerDisplay {
+        font-size: 1.45rem;
+    }
+
+    .score-box h2 {
+        font-size: 1.45rem;
+    }
+
+    .stat-label {
+        font-size: 0.6rem;
+        letter-spacing: 0.5px;
+    }
+
+    .buff-pill {
+        width: 122px;
+        min-width: 122px;
+        max-width: 122px;
+        height: 22px;
+        padding: 1px 6px;
+    }
+
+    .buff-icon {
+        font-size: 0.72rem;
+    }
+
+    .buff-title {
+        font-size: 0.58rem;
+    }
+
+    .buff-timer {
+        font-size: 0.62rem;
+        min-width: 26px;
+        padding: 0 4px;
     }
 
     .canvas-wrapper {

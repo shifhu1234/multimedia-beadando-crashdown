@@ -980,8 +980,8 @@ function showToast(message, type = 'info') {
     const container = document.getElementById('toastContainer');
     if (!container) return;
 
-    // Maximum 5 darab toast lehet egyszerre, elkerülve a képernyő telespammelését
-    while (container.children.length >= 5) {
+    // Maximum 3 darab toast lehet egyszerre a képernyőn
+    while (container.children.length >= 3) {
         container.firstElementChild.remove();
     }
 
@@ -1323,9 +1323,11 @@ function updateAuthUI(user) {
     const logoutBtnEl = document.getElementById('logoutBtn');
     const nameLabel = document.getElementById('currentUserNameLabel');
     const avatarDot = document.getElementById('userAvatarDot');
+    const openAchievementsBtn = document.getElementById('openAchievementsBtn');
 
     if (user) {
         if (openAuthBtn) openAuthBtn.style.display = 'none';
+        if (openAchievementsBtn) openAchievementsBtn.style.display = 'inline-flex';
         if (myProfileBtn) myProfileBtn.style.display = 'inline-flex';
         if (changePwBtn) changePwBtn.style.display = 'inline-flex';
         if (logoutBtnEl) logoutBtnEl.style.display = 'inline-flex';
@@ -1335,24 +1337,12 @@ function updateAuthUI(user) {
             const myStats = getPlayerProfileStats(user.displayName);
             if (avatarDot) avatarDot.textContent = myStats?.activeAvatar?.symbol || '👤';
         } catch (e) {}
-
-        // Játék végi mentési gombok állapota
-        const saveAsLoggedInBtn = document.getElementById('saveAsLoggedInBtn');
-        const saveWithLoginModalBtn = document.getElementById('saveWithLoginModalBtn');
-        const saveUserNameHint = document.getElementById('saveUserNameHint');
-        if (saveAsLoggedInBtn) saveAsLoggedInBtn.style.display = 'block';
-        if (saveWithLoginModalBtn) saveWithLoginModalBtn.style.display = 'none';
-        if (saveUserNameHint) saveUserNameHint.textContent = user.displayName;
     } else {
         if (openAuthBtn) openAuthBtn.style.display = 'inline-flex';
+        if (openAchievementsBtn) openAchievementsBtn.style.display = 'none';
         if (myProfileBtn) myProfileBtn.style.display = 'none';
         if (changePwBtn) changePwBtn.style.display = 'none';
         if (logoutBtnEl) logoutBtnEl.style.display = 'none';
-
-        const saveAsLoggedInBtn = document.getElementById('saveAsLoggedInBtn');
-        const saveWithLoginModalBtn = document.getElementById('saveWithLoginModalBtn');
-        if (saveAsLoggedInBtn) saveAsLoggedInBtn.style.display = 'none';
-        if (saveWithLoginModalBtn) saveWithLoginModalBtn.style.display = 'block';
     }
 }
 
@@ -1547,6 +1537,9 @@ function startMatch() {
     const overlay = document.getElementById('canvasOverlay');
     if (overlay) overlay.classList.add('hidden');
 
+    const overlaySaveBtn = document.getElementById('overlaySaveScoreBtn');
+    if (overlaySaveBtn) overlaySaveBtn.style.display = 'none';
+
     const timeUpMsg = document.getElementById('timeUpMessage');
     if (timeUpMsg) timeUpMsg.style.display = 'none';
 
@@ -1607,6 +1600,8 @@ function ujJatekInditasaFunc() {
     const overlayTitle = document.getElementById('overlayTitle');
     const overlaySubtitle = document.getElementById('overlaySubtitle');
     const overlayBtn = document.getElementById('overlayStartBtn');
+    const overlaySaveBtn = document.getElementById('overlaySaveScoreBtn');
+    if (overlaySaveBtn) overlaySaveBtn.style.display = 'none';
 
     if (overlay) {
         overlay.classList.remove('hidden');
@@ -1631,6 +1626,13 @@ document.getElementById('startNewGame').addEventListener('click', ujJatekInditas
 const overlayStartBtn = document.getElementById('overlayStartBtn');
 if (overlayStartBtn) {
     overlayStartBtn.addEventListener('click', startMatch);
+}
+
+const overlaySaveScoreBtn = document.getElementById('overlaySaveScoreBtn');
+if (overlaySaveScoreBtn) {
+    overlaySaveScoreBtn.addEventListener('click', () => {
+        openAuthModal(true);
+    });
 }
 
 const shuffleButton = document.getElementById('shuffleButton');
@@ -1751,7 +1753,6 @@ function executeBoardShuffle() {
 
     spawnFloatingText(LOGICAL_SIZE / 2, LOGICAL_SIZE / 2, '⟳ PÁLYA ÚJRAKEVERVE!', '#818cf8');
     setComboStatus('⟳ Pálya újrakeverve! Keresd az új kombinációkat!', true);
-    showToast('⟳ Pálya újrakeverve (10 mp újratöltődés)', 'info');
     checkAchievement('shuffle_master');
 
     setTimeout(() => {
@@ -1910,7 +1911,6 @@ function aktivaldPontduplazot(seconds = 5) {
     if (badge) badge.textContent = `${doublePointsRemainingTime.toFixed(1)}s`;
     if (bar) bar.style.width = '100%';
 
-    showToast('⚡ 2× PONTDUPLÁZÓ AKTÍV 5 MÁSODPERCIG!', 'success');
     playSound(doublerKatt);
     checkAchievement('frenzy_master');
 
@@ -1956,7 +1956,6 @@ function aktivaldFagyasztast(seconds = 4) {
 
     playSound(timeEffekt);
     triggerHaptic('freeze');
-    showToast('❄ IDŐ MEGÁLLÍTVA 4 MÁSODPERCRE!', 'info');
     checkAchievement('freeze_time');
 
     if (freezeInterval) clearInterval(freezeInterval);
@@ -2054,7 +2053,6 @@ function magnesPowerUp() {
 
     spawnFloatingText(LOGICAL_SIZE / 2, LOGICAL_SIZE / 2, '🧲 MÁGNES VONZÁS!', '#f87171');
     setComboStatus(`🧲 Szuper Mágnes: ${targetCount} db blokk egy óriási tömbbe rántva!`, true);
-    showToast(`🧲 Szuper Mágnes: ${targetCount} db azonos színű blokk összevonzva!`, 'info');
 }
 
 function regisztraljKomboLepest() {
@@ -3245,7 +3243,9 @@ function timer() {
                 overlay.classList.remove('hidden');
                 if (overlayTitle) overlayTitle.textContent = `Végső pontszám: ${pontSzam} p`;
 
+                const overlaySaveBtn = document.getElementById('overlaySaveScoreBtn');
                 if (currentUser) {
+                    if (overlaySaveBtn) overlaySaveBtn.style.display = 'none';
                     const colorVal = szinValaszto ? szinValaszto.value : '3';
                     // Rögzítjük a meccset a játékos előzményeiben (utolsó 10 meccs)
                     updatePlayerStatsRecord(currentUser.displayName, pontSzam, colorVal, MAX_TIME);
@@ -3276,8 +3276,16 @@ function timer() {
                         toplistaMegjelenites();
                     });
                 } else {
+                    const colorVal = szinValaszto ? szinValaszto.value : '3';
+                    pendingScore = {
+                        score: pontSzam,
+                        color: colorVal,
+                        duration: MAX_TIME,
+                        timestamp: new Date().toISOString()
+                    };
+                    if (overlaySaveBtn) overlaySaveBtn.style.display = 'inline-flex';
                     if (overlaySubtitle) {
-                        overlaySubtitle.textContent = `Elért pontszám: ${pontSzam} pont. Jelentkezz be vagy regisztrálj, hogy az egyéni rekordjaid és a legutóbbi 10 meccsed automatikusan elmentésre kerüljön!`;
+                        overlaySubtitle.textContent = `Elért pontszám: ${pontSzam} pont. Jelentkezz be vagy regisztrálj az eredmény elmentéséhez!`;
                     }
                     showToast(`Játék vége! Pontszám: ${pontSzam} p`, 'info');
                 }

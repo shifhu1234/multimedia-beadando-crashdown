@@ -394,6 +394,14 @@ class LeaderboardService {
                 }
                 this.db = firebase.database();
                 this.isOnline = true;
+                
+                // Kapcsolati állapot valós idejű követése
+                this.db.ref('.info/connected').on('value', (snap) => {
+                    this.isOnline = snap.val() === true;
+                    const cached = JSON.parse(localStorage.getItem('toplista') || '[]');
+                    this.notifySubscribers(cached);
+                });
+
                 this.listenForUpdates();
                 console.log('Firebase Realtime Database sikeresen csatlakoztatva.');
             }
@@ -404,22 +412,22 @@ class LeaderboardService {
     }
 
     listenForUpdates() {
-        if (!this.isOnline || !this.db) return;
+        if (!this.db) return;
         try {
             const scoresRef = this.db.ref('leaderboard');
-            scoresRef.orderByChild('score').limitToLast(100).on('value', (snapshot) => {
+            scoresRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 const list = [];
                 if (data) {
                     Object.keys(data).forEach(key => {
                         list.push({ ...data[key], firebaseKey: key });
                     });
-                    list.sort((a, b) => b.score - a.score);
+                    list.sort((a, b) => (parseInt(b.score, 10) || 0) - (parseInt(a.score, 10) || 0));
                 }
                 localStorage.setItem('toplista', JSON.stringify(list));
                 this.notifySubscribers(list);
             }, (error) => {
-                console.warn('Firebase olvasási hiba:', error);
+                console.warn('Firebase valós idejű olvasási hiba:', error);
             });
         } catch (err) {
             console.warn('Firebase figyelő hiba:', err);
@@ -437,16 +445,16 @@ class LeaderboardService {
     }
 
     async getScores() {
-        if (this.isOnline && this.db) {
+        if (this.db) {
             try {
-                const snapshot = await this.db.ref('leaderboard').orderByChild('score').limitToLast(100).once('value');
+                const snapshot = await this.db.ref('leaderboard').once('value');
                 const data = snapshot.val();
                 const list = [];
                 if (data) {
                     Object.keys(data).forEach(key => {
                         list.push({ ...data[key], firebaseKey: key });
                     });
-                    list.sort((a, b) => b.score - a.score);
+                    list.sort((a, b) => (parseInt(b.score, 10) || 0) - (parseInt(a.score, 10) || 0));
                 }
                 localStorage.setItem('toplista', JSON.stringify(list));
                 return list;
