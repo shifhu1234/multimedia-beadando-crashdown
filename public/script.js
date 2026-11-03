@@ -137,6 +137,14 @@ let hoverPreviewText = '';
 let screenShake = 0;
 let lastFrameTime = performance.now();
 
+// Pálya forgatás és újrakeverés állapotok
+let boardRotationAngle = 0;
+let isShufflingBoard = false;
+const SHUFFLE_COOLDOWN_SEC = 10;
+let shuffleCooldownRemaining = 0;
+let shuffleCooldownInterval = null;
+let palyaUjratoltesFolyamatban = false;
+
 function setupHiDPICanvas() {
     const dpr = window.devicePixelRatio || 1;
     canvas.width = LOGICAL_SIZE * dpr;
@@ -664,6 +672,103 @@ if (overlayStartBtn) {
     overlayStartBtn.addEventListener('click', startMatch);
 }
 
+const shuffleButton = document.getElementById('shuffleButton');
+if (shuffleButton) {
+    shuffleButton.addEventListener('click', executeBoardShuffle);
+}
+
+function updateShuffleButtonUI() {
+    const btn = document.getElementById('shuffleButton');
+    const badge = document.getElementById('shuffleCooldownBadge');
+    if (!btn || !badge) return;
+
+    if (!jatekFut || vegeAJateknak) {
+        btn.disabled = true;
+        badge.textContent = 'Kész';
+        return;
+    }
+
+    if (shuffleCooldownRemaining > 0) {
+        btn.disabled = true;
+        badge.textContent = `${shuffleCooldownRemaining}s`;
+    } else {
+        btn.disabled = false;
+        badge.textContent = 'Kész';
+    }
+}
+
+function startShuffleCooldown() {
+    shuffleCooldownRemaining = SHUFFLE_COOLDOWN_SEC;
+    updateShuffleButtonUI();
+    if (shuffleCooldownInterval) clearInterval(shuffleCooldownInterval);
+    shuffleCooldownInterval = setInterval(() => {
+        shuffleCooldownRemaining--;
+        if (shuffleCooldownRemaining <= 0) {
+            clearInterval(shuffleCooldownInterval);
+            shuffleCooldownInterval = null;
+            shuffleCooldownRemaining = 0;
+        }
+        updateShuffleButtonUI();
+    }, 1000);
+}
+
+function executeBoardShuffle() {
+    if (!jatekFut || vegeAJateknak || isShufflingBoard || shuffleCooldownRemaining > 0) return;
+
+    startShuffleCooldown();
+
+    const btn = document.getElementById('shuffleButton');
+    if (btn) {
+        btn.classList.add('is-spinning');
+        setTimeout(() => btn.classList.remove('is-spinning'), 700);
+    }
+
+    isShufflingBoard = true;
+    boardRotationAngle = 0.01;
+    playSound(doublerKatt);
+
+    shockwaves.push({
+        x: LOGICAL_SIZE / 2,
+        y: LOGICAL_SIZE / 2,
+        radius: 12,
+        maxRadius: LOGICAL_SIZE * 0.7,
+        color: '#818cf8',
+        alpha: 1
+    });
+
+    const positions = [];
+    const colors = [];
+    for (let i = 0; i < sorok; i++) {
+        for (let j = 0; j < oszlopok; j++) {
+            const col = grid[i]?.[j]?.color;
+            if (col && col !== 'white') {
+                positions.push({ x: j, y: i });
+                colors.push(col);
+                spawnCellParticles(j, i, col, 2);
+            }
+        }
+    }
+
+    for (let k = colors.length - 1; k > 0; k--) {
+        const r = Math.floor(Math.random() * (k + 1));
+        [colors[k], colors[r]] = [colors[r], colors[k]];
+    }
+
+    positions.forEach((pos, idx) => {
+        grid[pos.y][pos.x].color = colors[idx];
+        grid[pos.y][pos.x].scale = 1.22;
+    });
+
+    spawnFloatingText(LOGICAL_SIZE / 2, LOGICAL_SIZE / 2, '⟳ PÁLYA ÚJRAKEVERVE!', '#818cf8');
+    setComboStatus('⟳ Pálya újrakeverve! Keresd az új kombinációkat!', true);
+    showToast('⟳ Pálya újrakeverve (10 mp újratöltődés)', 'info');
+
+    setTimeout(() => {
+        updateHoverPreview();
+        ellenorizdPalyaAllapot();
+    }, 400);
+}
+
 document.getElementById('colorSelect').addEventListener('change', function () {
     localStorage.setItem('selectedColorCount', this.value);
     getSzinek(this.value);
@@ -728,6 +833,7 @@ document.addEventListener('DOMContentLoaded', function () {
     applyAudioSettings();
     toplistaMegjelenites();
     initPreviewBoard();
+    updateShuffleButtonUI();
     requestAnimationFrame(animationLoop);
 });
 
@@ -739,43 +845,195 @@ function pluszIdoPowerUp() {
 }
 
 /**
- * Pálya letisztításának ellenőrzése:
- * Ha minden színes blokk elfogyott a tábláról, bónusz pontot ad és újratölti a pályát!
+ * Számolja a táblán jelenleg lévő nem-üres színes blokkokat.
  */
-function ellenorizdPalyaTisztitas() {
-    let maradtBlokk = false;
+function szamolMaradtBlokk() {
+    let count = 0;
     for (let i = 0; i < sorok; i++) {
         for (let j = 0; j < oszlopok; j++) {
-            if (grid[i] && grid[i][j] && grid[i][j].color !== 'white') {
-                maradtBlokk = true;
-                break;
+            if (grid[i]?.[j] && grid[i][j].color !== 'white') {
+                count++;
             }
         }
-        if (maradtBlokk) break;
+    }
+    return count;
+}
+
+/**
+ * Ellenőrzi, hogy létezik-e még kattintható érvényes lépés:
+ * 1. Van-e a táblán bármilyen power-up? (Mindegyik azonnal aktiválható)
+ * 2. Van-e legalább egy 3 vagy több azonos színű szomszédos blokkból álló csoport?
+ */
+function vanMegLepes() {
+    if (!jatekFut || vegeAJateknak) return false;
+
+    const powerUpColors = new Set(['cyan', 'pink', '#f97316', 'darkgreen', '#14b8a6', '#6366f1', '#581845']);
+    let blockCount = 0;
+
+    for (let i = 0; i < sorok; i++) {
+        for (let j = 0; j < oszlopok; j++) {
+            const cell = grid[i]?.[j];
+            if (!cell || cell.color === 'white') continue;
+            blockCount++;
+            if (powerUpColors.has(cell.color)) {
+                return true; // Van power-up, a játékos bármikor rákattinthat!
+            }
+        }
     }
 
-    if (!maradtBlokk && jatekFut && !vegeAJateknak) {
+    // Ha kevesebb mint 3 blokk maradt és nincs power-up, nem lehet lépés
+    if (blockCount < 3) return false;
+
+    const visited = new Set();
+    for (let i = 0; i < sorok; i++) {
+        for (let j = 0; j < oszlopok; j++) {
+            const key = `${j}:${i}`;
+            if (visited.has(key)) continue;
+
+            const col = grid[i]?.[j]?.color;
+            if (!col || col === 'white') continue;
+
+            const group = getTorlendoNegyzetek(j, i, col);
+            for (let g = 0; g < group.length; g++) {
+                visited.add(`${group[g].x}:${group[g].y}`);
+            }
+
+            if (group.length >= 3) {
+                return true; // Találtunk érvényes 3+ kombinációt!
+            }
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Új tiszta tábla legördítése és friss power-upok elhelyezése
+ */
+function ujPalyaLedobas() {
+    if (!jatekFut || vegeAJateknak) return;
+    const szinSelect = document.getElementById('colorSelect');
+    getSzinek(szinSelect ? szinSelect.value : '3');
+
+    for (let i = 0; i < sorok; i++) {
+        grid[i] = [];
+        for (let j = 0; j < oszlopok; j++) {
+            const rc = szinek[Math.floor(Math.random() * szinek.length)];
+            // Látványos beugrás fentről (kaszkádolt késleltetéssel)
+            grid[i][j] = createCell(rc, -(sorok - i) * 16 - (j % 2) * 8);
+        }
+    }
+
+    // 4 új véletlenszerű power-up lehelyezése
+    const usedPositions = new Set();
+    function placePowerUp(colorKey) {
+        let px, py;
+        do {
+            px = Math.floor(Math.random() * oszlopok);
+            py = Math.floor(Math.random() * sorok);
+        } while (usedPositions.has(`${px}:${py}`));
+        usedPositions.add(`${px}:${py}`);
+        grid[py][px].color = colorKey;
+    }
+
+    const powerUpTypes = ['cyan', 'pink', '#f97316', 'darkgreen', '#14b8a6', '#6366f1', '#581845'];
+    const shuffledPows = powerUpTypes.sort(() => 0.5 - Math.random()).slice(0, 4);
+    shuffledPows.forEach(pow => placePowerUp(pow));
+
+    updateHoverPreview();
+}
+
+/**
+ * Pálya állapotának ellenőrzése minden lépés után:
+ * - 0 blokk esetén: Tökéletes takarítás bónusz (+500p) & új pálya
+ * - Nincs több lépés (Deadlock / Soft-lock) esetén: Dinamikus takarítási bónusz & új pálya
+ */
+function ellenorizdPalyaAllapot() {
+    if (!jatekFut || vegeAJateknak || palyaUjratoltesFolyamatban) return;
+
+    const maradt = szamolMaradtBlokk();
+
+    // 1. eset: Teljesen letisztított pálya (0 blokk maradt)
+    if (maradt === 0) {
+        palyaUjratoltesFolyamatban = true;
         pontSzam += 500;
         updateScoreUI();
+        playSound(doublerKatt);
+
+        shockwaves.push({
+            x: LOGICAL_SIZE / 2,
+            y: LOGICAL_SIZE / 2,
+            radius: 10,
+            maxRadius: LOGICAL_SIZE * 0.8,
+            color: '#10b981',
+            alpha: 1
+        });
         spawnFloatingText(LOGICAL_SIZE / 2, LOGICAL_SIZE / 2, 'PÁLYA KITISZTÍTVA! +500', '#10b981');
         setComboStatus('🌟 TÖKÉLETES! Teljes pálya letakarítva! (+500p)', true);
-        
+        showToast('🌟 Tökéletes táblatakarítás! +500 pont bónusz!', 'success');
+
         setTimeout(() => {
-            if (jatekFut && !vegeAJateknak) {
-                for (let i = 0; i < sorok; i++) {
-                    for (let j = 0; j < oszlopok; j++) {
-                        const rc = szinek[Math.floor(Math.random() * szinek.length)];
-                        grid[i][j] = createCell(rc, -(sorok - i) * 16);
-                    }
-                }
-                const p1 = Math.floor(Math.random() * oszlopok);
-                const p2 = Math.floor(Math.random() * oszlopok);
-                grid[sorok - 1][p1].color = 'cyan';
-                grid[sorok - 1][p2].color = '#f97316';
-                updateHoverPreview();
-            }
-        }, 350);
+            ujPalyaLedobas();
+            palyaUjratoltesFolyamatban = false;
+        }, 500);
+        return;
     }
+
+    // 2. eset: Soft-lock / Deadlock: van még blokk, de nincs érvényes lépés
+    if (!vanMegLepes()) {
+        palyaUjratoltesFolyamatban = true;
+        let bonusz = 50;
+        let bonuszSzoveg = '';
+
+        if (maradt <= 3) {
+            bonusz = 350;
+            bonuszSzoveg = `✨ Szinte tiszta pálya (${maradt} blokk)! +${bonusz}p`;
+        } else if (maradt <= 8) {
+            bonusz = 200;
+            bonuszSzoveg = `🧹 Takarítási bónusz (${maradt} blokk)! +${bonusz}p`;
+        } else {
+            bonusz = 50;
+            bonuszSzoveg = `🔄 Nincs több lépés (${maradt} blokk)! +${bonusz}p`;
+        }
+
+        pontSzam += bonusz;
+        updateScoreUI();
+        playSound(doublerKatt);
+
+        shockwaves.push({
+            x: LOGICAL_SIZE / 2,
+            y: LOGICAL_SIZE / 2,
+            radius: 10,
+            maxRadius: LOGICAL_SIZE * 0.7,
+            color: '#6366f1',
+            alpha: 1
+        });
+
+        spawnFloatingText(LOGICAL_SIZE / 2, LOGICAL_SIZE / 2, `+${bonusz} BÓNUSZ!`, '#818cf8');
+        setComboStatus(bonuszSzoveg, true);
+        showToast(`${bonuszSzoveg} - Új pálya érkezik...`, 'info');
+
+        // Maradék izolált blokkok látványos elporlasztása
+        for (let i = 0; i < sorok; i++) {
+            for (let j = 0; j < oszlopok; j++) {
+                if (grid[i]?.[j] && grid[i][j].color !== 'white') {
+                    spawnCellParticles(j, i, grid[i][j].color, 5);
+                    grid[i][j].color = 'white';
+                    grid[i][j].marked = true;
+                }
+            }
+        }
+
+        setTimeout(() => {
+            ujPalyaLedobas();
+            palyaUjratoltesFolyamatban = false;
+        }, 600);
+    }
+}
+
+// Régi függvénykompatibilitás
+function ellenorizdPalyaTisztitas() {
+    ellenorizdPalyaAllapot();
 }
 
 function spawnCellParticles(col, row, color, count = 7) {
@@ -1215,6 +1473,15 @@ function drawRoundedRect(x, y, w, h, r) {
 function drawGrid() {
     ctx.save();
 
+    // Tábla látványos forgatása / újrakeverése
+    if (isShufflingBoard || Math.abs(boardRotationAngle) > 0.001) {
+        ctx.translate(LOGICAL_SIZE / 2, LOGICAL_SIZE / 2);
+        ctx.rotate(boardRotationAngle);
+        const spinScale = 1 - Math.sin(boardRotationAngle / 2) * 0.16;
+        ctx.scale(spinScale, spinScale);
+        ctx.translate(-LOGICAL_SIZE / 2, -LOGICAL_SIZE / 2);
+    }
+
     // Képernyőrázkódás (TNT robbanásnál)
     if (screenShake > 0.2) {
         const dx = (Math.random() - 0.5) * screenShake;
@@ -1420,6 +1687,15 @@ function animationLoop(now) {
         screenShake = Math.max(0, screenShake - 35 * dt);
     }
 
+    // Pálya látványos forgatása újrakeveréskor
+    if (isShufflingBoard) {
+        boardRotationAngle += 14 * dt;
+        if (boardRotationAngle >= Math.PI * 2) {
+            boardRotationAngle = 0;
+            isShufflingBoard = false;
+        }
+    }
+
     // Cellák fizikai mozgása (zuhanás és emelkedés)
     for (let i = 0; i < sorok; i++) {
         if (!grid[i]) continue;
@@ -1538,6 +1814,13 @@ function jatekInditasa() {
 
     canvas.style.cursor = 'pointer';
 
+    if (shuffleCooldownInterval) {
+        clearInterval(shuffleCooldownInterval);
+        shuffleCooldownInterval = null;
+    }
+    shuffleCooldownRemaining = 0;
+    updateShuffleButtonUI();
+
     if (!toggledVOlume && masterVolume > 0) {
         const p = hatterZene.play();
         if (p && typeof p.catch === 'function') p.catch(() => {});
@@ -1599,6 +1882,11 @@ function timer() {
             timerInterval = null;
             jatekFut = false;
             vegeAJateknak = true;
+            if (shuffleCooldownInterval) {
+                clearInterval(shuffleCooldownInterval);
+                shuffleCooldownInterval = null;
+            }
+            updateShuffleButtonUI();
             hoverHighlightSet.clear();
             hoverPreviewText = '';
 

@@ -735,6 +735,91 @@ select:disabled {
     text-overflow: ellipsis;
 }
 
+/* Újrakeverés gomb és akció sáv */
+.stage-actions {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-shuffle {
+    width: 100%;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.88rem;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-shuffle:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.55);
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+}
+
+.btn-shuffle:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btn-shuffle:disabled {
+    background: #1e2433;
+    color: var(--text-muted);
+    border-color: rgba(255, 255, 255, 0.06);
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.shuffle-spin-icon {
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-shuffle.is-spinning .shuffle-spin-icon {
+    animation: spinIcon 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes spinIcon {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.shuffle-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    min-width: 42px;
+}
+
+.btn-shuffle:not(:disabled) .shuffle-badge {
+    background: rgba(34, 197, 94, 0.25);
+    border-color: rgba(34, 197, 94, 0.5);
+    color: #86efac;
+}
+
+.btn-shuffle:disabled .shuffle-badge {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
 /* Ranglista Panel */
 .leaderboard-panel {
     display: flex;
