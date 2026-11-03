@@ -137,8 +137,7 @@ let hoverPreviewText = '';
 let screenShake = 0;
 let lastFrameTime = performance.now();
 
-// Pálya forgatás és újrakeverés állapotok
-let boardRotationAngle = 0;
+// Pálya újrakeverés állapotok
 let isShufflingBoard = false;
 const SHUFFLE_COOLDOWN_SEC = 10;
 let shuffleCooldownRemaining = 0;
@@ -724,17 +723,29 @@ function executeBoardShuffle() {
     }
 
     isShufflingBoard = true;
-    boardRotationAngle = 0.01;
     playSound(doublerKatt);
+    screenShake = 3;
 
+    // Két egymást követő elegáns neon lökéshullám középről
     shockwaves.push({
         x: LOGICAL_SIZE / 2,
         y: LOGICAL_SIZE / 2,
         radius: 12,
-        maxRadius: LOGICAL_SIZE * 0.7,
+        maxRadius: LOGICAL_SIZE * 0.72,
         color: '#818cf8',
         alpha: 1
     });
+
+    setTimeout(() => {
+        shockwaves.push({
+            x: LOGICAL_SIZE / 2,
+            y: LOGICAL_SIZE / 2,
+            radius: 10,
+            maxRadius: LOGICAL_SIZE * 0.5,
+            color: '#c084fc',
+            alpha: 0.9
+        });
+    }, 90);
 
     const positions = [];
     const colors = [];
@@ -744,19 +755,36 @@ function executeBoardShuffle() {
             if (col && col !== 'white') {
                 positions.push({ x: j, y: i });
                 colors.push(col);
-                spawnCellParticles(j, i, col, 2);
             }
         }
     }
 
+    // Fisher-Yates keverés
     for (let k = colors.length - 1; k > 0; k--) {
         const r = Math.floor(Math.random() * (k + 1));
         [colors[k], colors[r]] = [colors[r], colors[k]];
     }
 
+    // Középponttól kifelé terjedő kaszkádolt "Pop & Swirl" animáció
+    const centerX = (oszlopok - 1) / 2;
+    const centerY = (sorok - 1) / 2;
+
     positions.forEach((pos, idx) => {
-        grid[pos.y][pos.x].color = colors[idx];
-        grid[pos.y][pos.x].scale = 1.22;
+        const cell = grid[pos.y][pos.x];
+        const dist = Math.hypot(pos.x - centerX, pos.y - centerY);
+        const delay = dist * 26; // Távolság alapú hullám késleltetés
+
+        setTimeout(() => {
+            // 1. Fázis: Összezsugorodás
+            cell.scale = 0.2;
+
+            setTimeout(() => {
+                // 2. Fázis: Színcsere + részecskeszikrák + ruganyos visszapattanás
+                cell.color = colors[idx];
+                cell.scale = 1.25;
+                spawnCellParticles(pos.x, pos.y, colors[idx], 3);
+            }, 100);
+        }, delay);
     });
 
     spawnFloatingText(LOGICAL_SIZE / 2, LOGICAL_SIZE / 2, '⟳ PÁLYA ÚJRAKEVERVE!', '#818cf8');
@@ -764,9 +792,10 @@ function executeBoardShuffle() {
     showToast('⟳ Pálya újrakeverve (10 mp újratöltődés)', 'info');
 
     setTimeout(() => {
+        isShufflingBoard = false;
         updateHoverPreview();
         ellenorizdPalyaAllapot();
-    }, 400);
+    }, 450);
 }
 
 document.getElementById('colorSelect').addEventListener('change', function () {
@@ -1473,16 +1502,7 @@ function drawRoundedRect(x, y, w, h, r) {
 function drawGrid() {
     ctx.save();
 
-    // Tábla látványos forgatása / újrakeverése
-    if (isShufflingBoard || Math.abs(boardRotationAngle) > 0.001) {
-        ctx.translate(LOGICAL_SIZE / 2, LOGICAL_SIZE / 2);
-        ctx.rotate(boardRotationAngle);
-        const spinScale = 1 - Math.sin(boardRotationAngle / 2) * 0.16;
-        ctx.scale(spinScale, spinScale);
-        ctx.translate(-LOGICAL_SIZE / 2, -LOGICAL_SIZE / 2);
-    }
-
-    // Képernyőrázkódás (TNT robbanásnál)
+    // Képernyőrázkódás (TNT robbanásnál és effekteknél)
     if (screenShake > 0.2) {
         const dx = (Math.random() - 0.5) * screenShake;
         const dy = (Math.random() - 0.5) * screenShake;
@@ -1685,15 +1705,6 @@ function animationLoop(now) {
     // Képernyőrázkódás csillapítása
     if (screenShake > 0) {
         screenShake = Math.max(0, screenShake - 35 * dt);
-    }
-
-    // Pálya látványos forgatása újrakeveréskor
-    if (isShufflingBoard) {
-        boardRotationAngle += 14 * dt;
-        if (boardRotationAngle >= Math.PI * 2) {
-            boardRotationAngle = 0;
-            isShufflingBoard = false;
-        }
     }
 
     // Cellák fizikai mozgása (zuhanás és emelkedés)

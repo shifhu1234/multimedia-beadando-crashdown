@@ -14,6 +14,18 @@ const firebaseConfig = {
   measurementId: "G-YBLP9TEZN4",
 };
 
+// Azonnali Firebase App inicializálás a modul betöltésekor
+if (typeof firebase !== 'undefined') {
+    try {
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+            console.log('Firebase sikeresen inicializálva a konfigurációval.');
+        }
+    } catch (err) {
+        console.warn('Firebase initializeApp figyelmeztetés:', err.message);
+    }
+}
+
 // ==================== AUTH SERVICE ====================
 class AuthService {
     constructor() {
@@ -27,6 +39,8 @@ class AuthService {
         try {
             if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
                 this.auth = firebase.auth();
+                console.log('Firebase Auth szolgáltatás aktív.');
+                
                 this.auth.onAuthStateChanged(user => {
                     if (user) {
                         this.currentUser = {
@@ -34,12 +48,18 @@ class AuthService {
                             email: user.email,
                             displayName: user.displayName || user.email.split('@')[0]
                         };
+                        sessionStorage.setItem('crashdown_session_user', JSON.stringify(this.currentUser));
                     } else {
                         // Ellenőrizzük a helyi mentett felhasználót
                         this.currentUser = JSON.parse(sessionStorage.getItem('crashdown_session_user') || 'null');
                     }
                     this.notifyAuthChanged();
                 });
+
+                // Helyi felhasználók automatikus feltöltése a Firebase Auth-ba
+                setTimeout(() => {
+                    this.syncLocalUsersToFirebase();
+                }, 800);
             } else {
                 this.currentUser = JSON.parse(sessionStorage.getItem('crashdown_session_user') || 'null');
                 this.notifyAuthChanged();
@@ -62,35 +82,102 @@ class AuthService {
         });
     }
 
-    async register(email, password, displayName) {
-        // 1. Megpróbáljuk Firebase Auth-szal
-        if (this.auth) {
+    findLocalUser(email, password) {
+        const users = JSON.parse(localStorage.getItem('crashdown_local_users') || '[]');
+        if (password !== undefined) {
+            return users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
+        }
+        return users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    }
+
+    removeLocalUser(email) {
+        let users = JSON.parse(localStorage.getItem('crashdown_local_users') || '[]');
+        users = users.filter(u => u.email.toLowerCase() !== email.toLowerCase());
+        localStorage.setItem('crashdown_local_users', JSON.stringify(users));
+    }
+
+    /**
+     * Korábban helyben (localStorage-ben) regisztrált felhasználók migrálása Firebase Auth-ba
+     */
+    async syncLocalUsersToFirebase() {
+        if (!this.auth) return;
+        const localUsers = JSON.parse(localStorage.getItem('crashdown_local_users') || '[]');
+        if (!localUsers || !localUsers.length) return;
+
+        console.log(`[AuthService] ${localUsers.length} korábban helyben tárolt felhasználó migrálása a Firebase Auth-ba...`);
+        const initialCurrentUser = this.auth.currentUser;
+
+        for (const u of [...localUsers]) {
+            if (!u.email || !u.password) continue;
             try {
-                const cred = await this.auth.createUserWithEmailAndPassword(email, password);
+                const cred = await this.auth.createUserWithEmailAndPassword(u.email, u.password);
                 if (cred.user) {
-                    await cred.user.updateProfile({ displayName: displayName });
-                    this.currentUser = {
-                        uid: cred.user.uid,
-                        email: cred.user.email,
-                        displayName: displayName
-                    };
-                    sessionStorage.setItem('crashdown_session_user', JSON.stringify(this.currentUser));
-                    this.notifyAuthChanged();
-                    return { success: true, user: this.currentUser };
+                    await cred.user.updateProfile({ displayName: u.displayName || u.email.split('@')[0] });
+                    console.log(`[AuthService] Sikeresen feltöltve Firebase Auth-ba: ${u.email}`);
+                    this.removeLocalUser(u.email);
                 }
             } catch (err) {
-                // Ha a Firebase Auth tiltva van vagy hiba lép fel, helyi tároló fallback
-                console.warn('Firebase Auth regisztrációs hiba, helyi tároló mentés:', err.message);
                 if (err.code === 'auth/email-already-in-use') {
-                    return { success: false, error: 'Ez az e-mail cím már regisztrálva van!' };
-                }
-                if (err.code === 'auth/weak-password') {
-                    return { success: false, error: 'A jelszónak legalább 6 karakternek kell lennie!' };
+                    // Már létezik a Firebase-ben
+                    console.log(`[AuthService] ${u.email} már szerepel a Firebase Auth adatbázisban.`);
+                    this.removeLocalUser(u.email);
+                } else if (err.code === 'auth/operation-not-allowed') {
+                    console.warn('[AuthService] Firebase Console: Email/Password Authentication nincs bekapcsolva!');
+                    break;
+                } else {
+                    console.warn(`[AuthService] Nem sikerült a szinkronizálás (${u.email}):`, err.message);
                 }
             }
         }
 
-        // 2. Helyi regisztrációs fallback
+        // Ha eredetileg senki nem volt bejelentkezve, vagy más volt belépve, kijelentkezünk
+        if (!initialCurrentUser && this.auth.currentUser) {
+            await this.auth.signOut();
+        }
+    }
+
+    async register(email, password, displayName) {
+        // 1. Megpróbáljuk Firebase Auth-szal regisztrálni
+        if (this.auth) {
+            try {
+                const cred = await this.auth.createUserWithEmailAndPassword(email, password);
+                if (cred.user) {
+                    if (displayName) {
+                        await cred.user.updateProfile({ displayName: displayName });
+                    }
+                    this.currentUser = {
+                        uid: cred.user.uid,
+                        email: cred.user.email,
+                        displayName: displayName || cred.user.email.split('@')[0]
+                    };
+                    sessionStorage.setItem('crashdown_session_user', JSON.stringify(this.currentUser));
+                    this.removeLocalUser(email);
+                    this.notifyAuthChanged();
+                    return { success: true, user: this.currentUser };
+                }
+            } catch (err) {
+                console.error('Firebase Auth regisztrációs hiba:', err.code, err.message);
+                if (err.code === 'auth/email-already-in-use') {
+                    return { success: false, error: 'Ez az e-mail cím már regisztrálva van!' };
+                }
+                if (err.code === 'auth/weak-password') {
+                    return { success: false, error: 'A jelszónak legalább 6 karakter hosszúnak kell lennie!' };
+                }
+                if (err.code === 'auth/invalid-email') {
+                    return { success: false, error: 'Érvénytelen e-mail formátum!' };
+                }
+                if (err.code === 'auth/operation-not-allowed') {
+                    return { success: false, error: 'Az Email/Password bejelentkezés nincs engedélyezve a Firebase konzolban!' };
+                }
+                return { success: false, error: `Hiba a regisztráció során: ${err.message}` };
+            }
+        }
+
+        // 2. Tartalék helyi regisztráció ha a hálózat nem elérhető
+        return this.registerLocally(email, password, displayName);
+    }
+
+    registerLocally(email, password, displayName) {
         let users = JSON.parse(localStorage.getItem('crashdown_local_users') || '[]');
         const existing = users.find(u => u.email.toLowerCase() === email.toLowerCase());
         if (existing) {
@@ -113,7 +200,7 @@ class AuthService {
     }
 
     async login(email, password) {
-        // 1. Megpróbáljuk Firebase Auth-szal
+        // 1. Megpróbáljuk Firebase Auth-szal beléptetni
         if (this.auth) {
             try {
                 const cred = await this.auth.signInWithEmailAndPassword(email, password);
@@ -124,20 +211,56 @@ class AuthService {
                         displayName: cred.user.displayName || cred.user.email.split('@')[0]
                     };
                     sessionStorage.setItem('crashdown_session_user', JSON.stringify(this.currentUser));
+                    this.removeLocalUser(email);
                     this.notifyAuthChanged();
                     return { success: true, user: this.currentUser };
                 }
             } catch (err) {
-                console.warn('Firebase Auth bejelentkezési hiba, helyi ellenőrzés:', err.message);
+                console.warn('Firebase Auth bejelentkezési hiba:', err.code, err.message);
+
+                // Ha nem található a Firebase-ben, ellenőrizzük: szerepel-e a helyi tárolóban?
                 if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
-                    // Megpróbáljuk a helyi tárolóból is, hátha ott regisztrált
+                    const localUser = this.findLocalUser(email, password);
+                    if (localUser) {
+                        // Megtaláltuk a helyi tárolóban! Feltöltjük (migráljuk) a Firebase-be
+                        try {
+                            const newCred = await this.auth.createUserWithEmailAndPassword(email, password);
+                            if (newCred.user) {
+                                await newCred.user.updateProfile({ displayName: localUser.displayName });
+                                this.currentUser = {
+                                    uid: newCred.user.uid,
+                                    email: newCred.user.email,
+                                    displayName: localUser.displayName
+                                };
+                                sessionStorage.setItem('crashdown_session_user', JSON.stringify(this.currentUser));
+                                this.removeLocalUser(email);
+                                this.notifyAuthChanged();
+                                return { success: true, user: this.currentUser };
+                            }
+                        } catch (createErr) {
+                            console.warn('Helyi felhasználó Firebase-be migrálása sikertelen:', createErr);
+                        }
+                    }
                 }
+
+                if (err.code === 'auth/user-not-found') {
+                    return { success: false, error: 'Nincs ilyen e-mail címmel regisztrált fiók!' };
+                }
+                if (err.code === 'auth/wrong-password') {
+                    return { success: false, error: 'Helytelen jelszó!' };
+                }
+                if (err.code === 'auth/invalid-email') {
+                    return { success: false, error: 'Érvénytelen e-mail formátum!' };
+                }
+                if (err.code === 'auth/operation-not-allowed') {
+                    return { success: false, error: 'Az Email/Password bejelentkezés nincs engedélyezve a Firebase konzolban!' };
+                }
+                return { success: false, error: err.message || 'Hiba a bejelentkezés során.' };
             }
         }
 
-        // 2. Helyi bejelentkezési fallback
-        let users = JSON.parse(localStorage.getItem('crashdown_local_users') || '[]');
-        const found = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
+        // 2. Tartalék helyi bejelentkezés
+        const found = this.findLocalUser(email, password);
         if (found) {
             this.currentUser = { uid: found.uid, email: found.email, displayName: found.displayName };
             sessionStorage.setItem('crashdown_session_user', JSON.stringify(this.currentUser));
