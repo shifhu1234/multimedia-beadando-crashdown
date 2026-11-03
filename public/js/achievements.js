@@ -519,5 +519,35 @@ function getPlayerProfileStats(username, allScores = []) {
         profile.chosenAvatar = localStorage.getItem('crashdown_chosen_avatar') || profile.chosenAvatar || 'avatar_default';
     }
 
+    const achSet = new Set(profile.achievements || []);
+
+    // Rangcím meghatározása
+    let activeTitle = null;
+    if (profile.chosenTitle) {
+        const foundTitle = PROFILE_TITLES.find(t => t.id === profile.chosenTitle);
+        if (foundTitle && foundTitle.isUnlocked(profile, achSet)) {
+            activeTitle = foundTitle;
+        }
+    }
+    if (!activeTitle) {
+        for (let i = PROFILE_TITLES.length - 1; i >= 0; i--) {
+            if (PROFILE_TITLES[i].isUnlocked(profile, achSet)) {
+                activeTitle = PROFILE_TITLES[i];
+                break;
+            }
+        }
+    }
+    profile.activeTitle = activeTitle || PROFILE_TITLES[0];
+
+    // Profilkép (Avatar) meghatározása
+    let activeAvatar = null;
+    if (profile.chosenAvatar) {
+        const foundAv = PROFILE_AVATARS.find(a => a.id === profile.chosenAvatar);
+        if (foundAv && (!foundAv.achId || achSet.has(foundAv.achId))) {
+            activeAvatar = foundAv;
+        }
+    }
+    profile.activeAvatar = activeAvatar || PROFILE_AVATARS[0];
+
     return profile;
 }

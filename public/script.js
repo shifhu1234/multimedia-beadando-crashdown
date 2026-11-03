@@ -718,6 +718,36 @@ function getPlayerProfileStats(username, allScores = []) {
         profile.chosenAvatar = localStorage.getItem('crashdown_chosen_avatar') || profile.chosenAvatar || 'avatar_default';
     }
 
+    const achSet = new Set(profile.achievements || []);
+
+    // Rangcím meghatározása
+    let activeTitle = null;
+    if (profile.chosenTitle) {
+        const foundTitle = PROFILE_TITLES.find(t => t.id === profile.chosenTitle);
+        if (foundTitle && foundTitle.isUnlocked(profile, achSet)) {
+            activeTitle = foundTitle;
+        }
+    }
+    if (!activeTitle) {
+        for (let i = PROFILE_TITLES.length - 1; i >= 0; i--) {
+            if (PROFILE_TITLES[i].isUnlocked(profile, achSet)) {
+                activeTitle = PROFILE_TITLES[i];
+                break;
+            }
+        }
+    }
+    profile.activeTitle = activeTitle || PROFILE_TITLES[0];
+
+    // Profilkép (Avatar) meghatározása
+    let activeAvatar = null;
+    if (profile.chosenAvatar) {
+        const foundAv = PROFILE_AVATARS.find(a => a.id === profile.chosenAvatar);
+        if (foundAv && (!foundAv.achId || achSet.has(foundAv.achId))) {
+            activeAvatar = foundAv;
+        }
+    }
+    profile.activeAvatar = activeAvatar || PROFILE_AVATARS[0];
+
     return profile;
 }
 
@@ -878,6 +908,16 @@ async function openPlayerProfileModal(username) {
     }
 
     const stats = getPlayerProfileStats(username, allScores);
+    if (!stats.activeAvatar) {
+        stats.activeAvatar = (typeof PROFILE_AVATARS !== 'undefined' && PROFILE_AVATARS[0])
+            ? PROFILE_AVATARS[0]
+            : { id: 'avatar_default', name: 'Alapértelmezett', symbol: '👤' };
+    }
+    if (!stats.activeTitle) {
+        stats.activeTitle = (typeof PROFILE_TITLES !== 'undefined' && PROFILE_TITLES[0])
+            ? PROFILE_TITLES[0]
+            : { id: 'title_kevezo', name: 'Újonc Blokktörő' };
+    }
     const currentUser = window.authService?.getCurrentUser();
     const isOwnProfile = currentUser && currentUser.displayName && currentUser.displayName.toLowerCase() === stats.username.toLowerCase();
     if (currentUser && !isOwnProfile) {
@@ -977,8 +1017,8 @@ async function openPlayerProfileModal(username) {
                         const avObj = PROFILE_AVATARS.find(a => a.id === avId);
                         const reqAch = avObj?.achId ? ACHIEVEMENTS.find(a => a.id === avObj.achId) : null;
                         showToast(`🔒 Ez a profilkép még zárolva van! Feloldáshoz: ${reqAch?.title || 'Teljesíts több mérföldkövet'}`, 'warning');
-                        playSound(rosszKatt);
                         triggerHaptic('error');
+                        if (typeof sorEffekt !== 'undefined') playSound(sorEffekt);
                         return;
                     }
 

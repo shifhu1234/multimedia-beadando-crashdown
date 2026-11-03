@@ -153,6 +153,16 @@ async function openPlayerProfileModal(username) {
     }
 
     const stats = getPlayerProfileStats(username, allScores);
+    if (!stats.activeAvatar) {
+        stats.activeAvatar = (typeof PROFILE_AVATARS !== 'undefined' && PROFILE_AVATARS[0])
+            ? PROFILE_AVATARS[0]
+            : { id: 'avatar_default', name: 'Alapértelmezett', symbol: '👤' };
+    }
+    if (!stats.activeTitle) {
+        stats.activeTitle = (typeof PROFILE_TITLES !== 'undefined' && PROFILE_TITLES[0])
+            ? PROFILE_TITLES[0]
+            : { id: 'title_kevezo', name: 'Újonc Blokktörő' };
+    }
     const currentUser = window.authService?.getCurrentUser();
     const isOwnProfile = currentUser && currentUser.displayName && currentUser.displayName.toLowerCase() === stats.username.toLowerCase();
     if (currentUser && !isOwnProfile) {
@@ -252,8 +262,8 @@ async function openPlayerProfileModal(username) {
                         const avObj = PROFILE_AVATARS.find(a => a.id === avId);
                         const reqAch = avObj?.achId ? ACHIEVEMENTS.find(a => a.id === avObj.achId) : null;
                         showToast(`🔒 Ez a profilkép még zárolva van! Feloldáshoz: ${reqAch?.title || 'Teljesíts több mérföldkövet'}`, 'warning');
-                        playSound(rosszKatt);
                         triggerHaptic('error');
+                        if (typeof sorEffekt !== 'undefined') playSound(sorEffekt);
                         return;
                     }
 
