@@ -186,17 +186,36 @@ function triggerHaptic(type = 'light') {
     }
 }
 
-// ==================== MÉRFÖLDKÖVEK & JELVÉNYEK ====================
+// ==================== MÉRFÖLDKÖVEK & JELVÉNYEK (18 DB) ====================
 const ACHIEVEMENTS = [
-    { id: 'first_match', icon: '🎯', title: 'Első lépés', desc: 'Törölj ki egy blokkcsoportot (legalább 3 db)' },
-    { id: 'first_500', icon: '⭐', title: 'Kezdő Pontgyűjtő', desc: 'Érj el legalább 500 pontot egy játékban' },
-    { id: 'score_10k', icon: '👑', title: 'Crashdown Mester', desc: 'Érj el legalább 10 000 pontot' },
-    { id: 'combo_x3', icon: '⚡', title: 'Kombó Guru', desc: 'Érj el legalább 3×-os lánc kombó szorzót' },
-    { id: 'combo_x5', icon: '🔥', title: 'Kombó Isten', desc: 'Érd el a maximális 5×-ös kombót!' },
-    { id: 'tnt_boom', icon: '💣', title: 'TNT Szakértő', desc: 'Aktiválj egy 3×3-as TNT robbanást' },
-    { id: 'freeze_time', icon: '❄️', title: 'Fagyos Pillanatok', desc: 'Állítsd meg az időt az Időfagyasztó Jégkockával' },
-    { id: 'magnet_pull', icon: '🧲', title: 'Szuper Mágnes', desc: 'Ránts össze egy egész színt a Szuper Mágnessel' }
+    // 1. Kezdő & Pontszám mérföldkövek
+    { id: 'first_match', icon: '🎯', title: 'Első Lépés', desc: 'Törölj ki egy legalább 3 blokkból álló csoportot!' },
+    { id: 'first_500', icon: '⭐', title: 'Kezdő Pontgyűjtő', desc: 'Érj el legalább 500 pontot egy menetben!' },
+    { id: 'score_1500', icon: '🏅', title: 'Haladó Törő', desc: 'Érj el legalább 1 500 pontot egy meccsben!' },
+    { id: 'score_5000', icon: '🏆', title: 'Pontvadász', desc: 'Érj el legalább 5 000 pontot egyetlen játékban!' },
+    { id: 'score_10k', icon: '👑', title: 'Crashdown Mester', desc: 'Lépd át a 10 000 pontos álomhatárt!' },
+    { id: 'score_25k', icon: '🌌', title: 'Galaktikus Bajnok', desc: 'Érj el szédítő 25 000 pontot egy menetben!' },
+
+    // 2. Kombók & Láncreakciók
+    { id: 'combo_x2', icon: '⚡', title: 'Kombó Kezdő', desc: 'Érj el 2×-es kombó szorzót gyors egymásutánban!' },
+    { id: 'combo_x3', icon: '⚡', title: 'Kombó Guru', desc: 'Pörgesd fel a szorzót legalább 3×-os értékre!' },
+    { id: 'combo_x5', icon: '🔥', title: 'Kombó Isten', desc: 'Érd el a maximális 5×-ös kombó csúcsot!' },
+    { id: 'mega_clear', icon: '💥', title: 'Mega Törlés', desc: 'Takaríts el egyetlen kattintással legalább 8 blokkot!' },
+
+    // 3. Power-Up Mester
+    { id: 'tnt_boom', icon: '💣', title: 'TNT Szakértő', desc: 'Robbants fel egy 3×3-as TNT power-up blokkot!' },
+    { id: 'freeze_time', icon: '❄️', title: 'Jégvarázs', desc: 'Fagyaszd be az időt az Időfagyasztó Jégkockával!' },
+    { id: 'magnet_pull', icon: '🧲', title: 'Szuper Mágnes', desc: 'Ránts össze egy egész színt egy blokkba a Mágnessel!' },
+    { id: 'color_bomb', icon: '✦', title: 'Szín-kataklizma', desc: 'Tisztíts le egy teljes színt a Szín-bomba használatával!' },
+    { id: 'frenzy_master', icon: '⚡', title: 'Dupla vagy Semmi', desc: 'Aktiválj egy 2× Pontduplázó Frenzy időszakot!' },
+    { id: 'time_bonus', icon: '⌛', title: 'Időutazó', desc: 'Gyűjts be egy +5 másodperces extra idő blokkot!' },
+
+    // 4. Stratégia & Játékmenet
+    { id: 'perfect_clear', icon: '✨', title: 'Tiszta Pálya', desc: 'Pucold le az utolsó szálig az egész táblát (0 blokk)!' },
+    { id: 'shuffle_master', icon: '⟳', title: 'Új Esély', desc: 'Használd a Pálya keverése funkciót szorult helyzetben!' }
 ];
+
+let currentAchievementFilter = 'all';
 
 function getUnlockedAchievements() {
     try {
@@ -218,6 +237,11 @@ function checkAchievement(id) {
     set.add(id);
     localStorage.setItem('crashdown_achievements', JSON.stringify([...set]));
 
+    const currentUser = window.authService?.getCurrentUser();
+    if (currentUser && currentUser.displayName) {
+        updatePlayerStatsRecord(currentUser.displayName, 0, '3', 0);
+    }
+
     triggerHaptic('success');
     playSound(sikeresKatt);
     showToast(`🏆 Jelvény feloldva: ${ach.icon} ${ach.title}!`, 'success');
@@ -228,28 +252,244 @@ function checkAchievement(id) {
 function updateAchievementsUI() {
     const unlockedList = getUnlockedAchievements();
     const unlockedSet = new Set(unlockedList);
+    const totalCount = ACHIEVEMENTS.length;
+    const unlockedCount = unlockedList.length;
+    const lockedCount = totalCount - unlockedCount;
+    const percent = Math.round((unlockedCount / totalCount) * 100);
 
     const countEl = document.getElementById('unlockedAchievementsCount');
+    const totalEl = document.getElementById('totalAchievementsCount');
+    if (countEl) countEl.textContent = unlockedCount;
+    if (totalEl) totalEl.textContent = totalCount;
+
     const summaryCountEl = document.getElementById('achievementsSummaryCount');
-    if (countEl) countEl.textContent = unlockedList.length;
-    if (summaryCountEl) summaryCountEl.textContent = unlockedList.length;
+    const totalSummaryCountEl = document.getElementById('achievementsTotalSummaryCount');
+    const percentEl = document.getElementById('achievementsPercent');
+    const progressFill = document.getElementById('achievementsProgressFill');
+
+    if (summaryCountEl) summaryCountEl.textContent = unlockedCount;
+    if (totalSummaryCountEl) totalSummaryCountEl.textContent = totalCount;
+    if (percentEl) percentEl.textContent = `${percent}%`;
+    if (progressFill) progressFill.style.width = `${percent}%`;
+
+    const fAll = document.getElementById('achFilterAllCount');
+    const fUn = document.getElementById('achFilterUnlockedCount');
+    const fLock = document.getElementById('achFilterLockedCount');
+    if (fAll) fAll.textContent = totalCount;
+    if (fUn) fUn.textContent = unlockedCount;
+    if (fLock) fLock.textContent = lockedCount;
 
     const listContainer = document.getElementById('achievementsList');
     if (!listContainer) return;
 
-    listContainer.innerHTML = ACHIEVEMENTS.map(ach => {
+    let filtered = ACHIEVEMENTS;
+    if (currentAchievementFilter === 'unlocked') {
+        filtered = ACHIEVEMENTS.filter(a => unlockedSet.has(a.id));
+    } else if (currentAchievementFilter === 'locked') {
+        filtered = ACHIEVEMENTS.filter(a => !unlockedSet.has(a.id));
+    }
+
+    if (filtered.length === 0) {
+        listContainer.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 24px; color: var(--text-secondary); font-size: 0.85rem;">Nincs megjeleníthető jelvény ebben a kategóriában.</div>';
+        return;
+    }
+
+    listContainer.innerHTML = filtered.map(ach => {
         const isUnlocked = unlockedSet.has(ach.id);
         return `
             <div class="achievement-card ${isUnlocked ? 'unlocked' : 'locked'}">
-                <div class="achievement-icon-wrap">${ach.icon}</div>
+                <div class="ach-card-header">
+                    <div class="achievement-icon-wrap">${ach.icon}</div>
+                    <span class="achievement-status">${isUnlocked ? 'Feloldva ✓' : '🔒 Zárolva'}</span>
+                </div>
                 <div class="achievement-info">
                     <strong>${ach.title}</strong>
                     <small>${ach.desc}</small>
                 </div>
-                <span class="achievement-status">${isUnlocked ? 'Feloldva ✓' : 'Zárolva'}</span>
             </div>
         `;
     }).join('');
+}
+
+// ==================== JÁTÉKOS PROFIL & STATISZTIKA MOTOR ====================
+function updatePlayerStatsRecord(username, score, colorCount, durationSeconds) {
+    if (!username) return;
+    try {
+        const key = 'crashdown_player_profiles';
+        const profiles = JSON.parse(localStorage.getItem(key) || '{}');
+        const p = profiles[username] || {
+            username: username,
+            totalMatches: 0,
+            totalPlaytimeSeconds: 0,
+            bestScore: 0,
+            achievements: [],
+            modes: {},
+            durations: {}
+        };
+
+        if (score > 0 || durationSeconds > 0) {
+            p.totalMatches += 1;
+            p.totalPlaytimeSeconds += parseInt(durationSeconds, 10) || 120;
+            if (score > p.bestScore) p.bestScore = score;
+
+            const cKey = String(colorCount || '3');
+            if (!p.modes[cKey]) p.modes[cKey] = { matches: 0, bestScore: 0 };
+            p.modes[cKey].matches += 1;
+            if (score > p.modes[cKey].bestScore) p.modes[cKey].bestScore = score;
+
+            const dKey = String(durationSeconds || '120');
+            p.durations[dKey] = (p.durations[dKey] || 0) + 1;
+        }
+
+        const currentUser = window.authService?.getCurrentUser();
+        if (currentUser && currentUser.displayName === username) {
+            p.achievements = getUnlockedAchievements();
+        }
+
+        profiles[username] = p;
+        localStorage.setItem(key, JSON.stringify(profiles));
+    } catch (e) {
+        console.error('Hiba a játékos statisztika mentésekor:', e);
+    }
+}
+
+function getPlayerProfileStats(username, allScores = []) {
+    let profile = null;
+    try {
+        const profiles = JSON.parse(localStorage.getItem('crashdown_player_profiles') || '{}');
+        profile = profiles[username] ? { ...profiles[username] } : null;
+    } catch (e) {}
+
+    const playerScores = allScores.filter(s => s.name && s.name.toLowerCase() === username.toLowerCase());
+
+    if (!profile) {
+        profile = {
+            username: username,
+            totalMatches: 0,
+            totalPlaytimeSeconds: 0,
+            bestScore: 0,
+            achievements: [],
+            modes: {},
+            durations: {}
+        };
+    }
+
+    playerScores.forEach(s => {
+        const sc = parseInt(s.score, 10) || 0;
+        if (sc > profile.bestScore) profile.bestScore = sc;
+        const cKey = String(s.color || '3');
+        if (!profile.modes[cKey]) profile.modes[cKey] = { matches: 0, bestScore: 0 };
+        if (sc > profile.modes[cKey].bestScore) profile.modes[cKey].bestScore = sc;
+    });
+
+    if (profile.totalMatches < playerScores.length) {
+        profile.totalMatches = playerScores.length;
+    }
+    if (profile.totalPlaytimeSeconds === 0 && playerScores.length > 0) {
+        playerScores.forEach(s => {
+            profile.totalPlaytimeSeconds += parseInt(s.duration, 10) || 120;
+        });
+    }
+
+    const currentUser = window.authService?.getCurrentUser();
+    if (currentUser && currentUser.displayName && currentUser.displayName.toLowerCase() === username.toLowerCase()) {
+        profile.achievements = getUnlockedAchievements();
+    } else {
+        const inferred = new Set(profile.achievements || []);
+        if (profile.totalMatches >= 1) inferred.add('first_match');
+        if (profile.bestScore >= 500) inferred.add('first_500');
+        if (profile.bestScore >= 1500) inferred.add('score_1500');
+        if (profile.bestScore >= 5000) inferred.add('score_5000');
+        if (profile.bestScore >= 10000) inferred.add('score_10k');
+        if (profile.bestScore >= 25000) inferred.add('score_25k');
+        if (profile.bestScore >= 3000) {
+            inferred.add('combo_x2');
+            inferred.add('combo_x3');
+        }
+        if (profile.bestScore >= 8000) {
+            inferred.add('combo_x5');
+            inferred.add('mega_clear');
+        }
+        profile.achievements = Array.from(inferred);
+    }
+
+    return profile;
+}
+
+async function openPlayerProfileModal(username) {
+    let allScores = [];
+    if (window.leaderboardService) {
+        allScores = await window.leaderboardService.getScores();
+    } else {
+        allScores = JSON.parse(localStorage.getItem('toplista')) || [];
+    }
+
+    const stats = getPlayerProfileStats(username, allScores);
+
+    const nameEl = document.getElementById('profilePlayerName');
+    const avatarEl = document.getElementById('profileAvatar');
+    const titleEl = document.getElementById('profilePlayerTitle');
+    const bestScoreEl = document.getElementById('profileBestScore');
+    const matchesEl = document.getElementById('profileTotalMatches');
+    const timeEl = document.getElementById('profileTotalTime');
+    const achCountEl = document.getElementById('profileAchievementsCount');
+    const modesListEl = document.getElementById('profileModesBreakdown');
+    const badgesListEl = document.getElementById('profileAchievementsList');
+    const badgeSummaryEl = document.getElementById('profileBadgeSummary');
+
+    if (nameEl) nameEl.textContent = stats.username;
+    if (avatarEl) avatarEl.textContent = (stats.username[0] || 'J').toUpperCase();
+
+    let title = 'Kezdő Blokktörő';
+    if (stats.bestScore >= 25000) title = '🌌 Galaktikus Legenda';
+    else if (stats.bestScore >= 10000) title = '👑 Crashdown Nagymester';
+    else if (stats.bestScore >= 5000) title = '🏆 Bajnok';
+    else if (stats.bestScore >= 1500) title = '⭐ Haladó Játékos';
+    if (titleEl) titleEl.textContent = title;
+
+    if (bestScoreEl) bestScoreEl.textContent = stats.bestScore.toLocaleString();
+    if (matchesEl) matchesEl.textContent = `${stats.totalMatches} meccs`;
+
+    const mins = Math.floor(stats.totalPlaytimeSeconds / 60);
+    const secs = stats.totalPlaytimeSeconds % 60;
+    const timeStr = mins > 0 ? `${mins} perc ${secs > 0 ? `${secs} mp` : ''}` : `${secs} mp`;
+    if (timeEl) timeEl.textContent = timeStr;
+
+    const achList = stats.achievements || [];
+    if (achCountEl) achCountEl.textContent = `${achList.length} / ${ACHIEVEMENTS.length}`;
+    if (badgeSummaryEl) badgeSummaryEl.textContent = `${achList.length} feloldva a ${ACHIEVEMENTS.length}-ből`;
+
+    if (modesListEl) {
+        const modes = ['2', '3', '4', '5'];
+        modesListEl.innerHTML = modes.map(m => {
+            const data = stats.modes[m] || { matches: 0, bestScore: 0 };
+            return `
+                <div class="profile-mode-card">
+                    <div>
+                        <strong>${m} szín mód</strong>
+                        <div style="font-size: 0.7rem; color: var(--text-secondary);">${data.matches} lejátszott meccs</div>
+                    </div>
+                    <span>${data.bestScore > 0 ? `${data.bestScore}p` : '-'}</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    if (badgesListEl) {
+        const achSet = new Set(achList);
+        badgesListEl.innerHTML = ACHIEVEMENTS.map(a => {
+            const unlocked = achSet.has(a.id);
+            return `
+                <div class="profile-badge-item ${unlocked ? 'unlocked' : 'locked'}" title="${a.title}: ${a.desc}">
+                    <span class="profile-badge-icon">${a.icon}</span>
+                    <span class="profile-badge-name">${a.title}</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    const modal = document.getElementById('playerProfileModal');
+    if (modal) modal.classList.remove('hidden');
 }
 
 function applyTheme(themeKey) {
@@ -349,7 +589,10 @@ function updateScoreUI(instant = false) {
         reqScore.classList.toggle('met', pontSzam >= 1000);
     }
     if (pontSzam >= 500) checkAchievement('first_500');
+    if (pontSzam >= 1500) checkAchievement('score_1500');
+    if (pontSzam >= 5000) checkAchievement('score_5000');
     if (pontSzam >= 10000) checkAchievement('score_10k');
+    if (pontSzam >= 25000) checkAchievement('score_25k');
 }
 
 /*############################## AUTH & TOPLISTA REGION ##############################*/
@@ -604,6 +847,7 @@ if (authForm) {
                 timestamp: new Date().toISOString()
             };
             const saveRes = await toplistaHozzaadas(scoreToSave);
+            updatePlayerStatsRecord(res.user.displayName, scoreToSave.score, scoreToSave.color, scoreToSave.duration);
             pendingScore = null;
             showToast(`🎉 Eredményed (${scoreToSave.score} pont) mentve a ranglistára!`, 'success');
             setLeaderboardFeedback('Eredményed sikeresen rögzítve a profiloddal!', false);
@@ -681,6 +925,7 @@ if (saveAsLoggedInBtn) {
         this.disabled = true;
         const res = await toplistaHozzaadas(jatekosAdat);
         if (res.success) {
+            updatePlayerStatsRecord(user.displayName, score, jatekosAdat.color, MAX_TIME);
             setLeaderboardFeedback('Eredményed sikeresen mentve a profiloddal!', false);
             showToast('Eredményed elmentve a ranglistára!', 'success');
             await toplistaMegjelenites();
@@ -758,7 +1003,11 @@ async function toplistaMegjelenites() {
     const medals = ['🥇', '🥈', '🥉'];
     toplista.forEach((elem, i) => {
         const listaElem = document.createElement('li');
-        listaElem.className = `leaderboard-item ${i < 3 ? `rank-${i + 1}` : ''}`;
+        listaElem.className = `leaderboard-item ${i < 3 ? `rank-${i + 1}` : ''} lb-clickable`;
+        listaElem.title = `Kattints ${elem.name} profiljának és statisztikáinak megtekintéséhez!`;
+        listaElem.addEventListener('click', () => {
+            openPlayerProfileModal(elem.name);
+        });
 
         const leftDiv = document.createElement('div');
         leftDiv.className = 'lb-left';
@@ -1061,6 +1310,7 @@ function executeBoardShuffle() {
     spawnFloatingText(LOGICAL_SIZE / 2, LOGICAL_SIZE / 2, '⟳ PÁLYA ÚJRAKEVERVE!', '#818cf8');
     setComboStatus('⟳ Pálya újrakeverve! Keresd az új kombinációkat!', true);
     showToast('⟳ Pálya újrakeverve (10 mp újratöltődés)', 'info');
+    checkAchievement('shuffle_master');
 
     setTimeout(() => {
         isShufflingBoard = false;
@@ -1115,6 +1365,33 @@ if (achievementsModal) {
     achievementsModal.addEventListener('click', (e) => {
         if (e.target === achievementsModal) {
             achievementsModal.classList.add('hidden');
+        }
+    });
+}
+
+// Jelvény szűrőfülek eseménykezelése
+document.querySelectorAll('.ach-filter-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+        document.querySelectorAll('.ach-filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentAchievementFilter = this.getAttribute('data-filter') || 'all';
+        updateAchievementsUI();
+    });
+});
+
+// Játékos Profil Modal bezárás
+const closePlayerProfileModalBtn = document.getElementById('closePlayerProfileModalBtn');
+const playerProfileModal = document.getElementById('playerProfileModal');
+
+if (closePlayerProfileModalBtn) {
+    closePlayerProfileModalBtn.addEventListener('click', () => {
+        if (playerProfileModal) playerProfileModal.classList.add('hidden');
+    });
+}
+if (playerProfileModal) {
+    playerProfileModal.addEventListener('click', (e) => {
+        if (e.target === playerProfileModal) {
+            playerProfileModal.classList.add('hidden');
         }
     });
 }
@@ -1193,6 +1470,7 @@ function aktivaldPontduplazot(seconds = 5) {
 
     showToast('⚡ 2× PONTDUPLÁZÓ AKTÍV 5 MÁSODPERCIG!', 'success');
     playSound(doublerKatt);
+    checkAchievement('frenzy_master');
 
     if (doublePointsInterval) clearInterval(doublePointsInterval);
     doublePointsInterval = setInterval(() => {
@@ -1341,6 +1619,9 @@ function regisztraljKomboLepest() {
     comboStreak++;
     comboMultiplier = Math.min(5, 1 + Math.floor(comboStreak / 2));
 
+    if (comboMultiplier >= 2) {
+        checkAchievement('combo_x2');
+    }
     if (comboMultiplier >= 3) {
         checkAchievement('combo_x3');
     }
@@ -1498,6 +1779,8 @@ function ellenorizdPalyaAllapot() {
         pontSzam += 500;
         updateScoreUI();
         playSound(doublerKatt);
+        triggerHaptic('success');
+        checkAchievement('perfect_clear');
 
         shockwaves.push({
             x: LOGICAL_SIZE / 2,
@@ -1752,6 +2035,7 @@ function handleClick(event) {
         const baseEarned = Math.max(50, wipedCount * 15);
         const earned = baseEarned * (isDoublePointsActive ? 2 : 1);
         pontSzam += earned;
+        checkAchievement('color_bomb');
         updateScoreUI();
         gridUjraRendezes();
         spawnFloatingText(x, y, isDoublePointsActive ? `✦ BOMB +${earned} (2×)` : `✦ BOMB +${earned}`, '#14b8a6');
@@ -1792,6 +2076,7 @@ function handleClick(event) {
         });
         const gained = 50 * (isDoublePointsActive ? 2 : 1);
         pontSzam += gained;
+        checkAchievement('shuffle_master');
         updateScoreUI();
         gridUjraRendezes();
         spawnFloatingText(x, y, isDoublePointsActive ? `⟳ KEVERÉS +${gained} (2×)` : `⟳ KEVERÉS +${gained}`, '#818cf8');
@@ -1806,6 +2091,7 @@ function handleClick(event) {
         triggerHaptic('medium');
         gridUjraRendezes();
         pluszIdoPowerUp();
+        checkAchievement('time_bonus');
         spawnFloatingText(x, y, '+5 MP!', '#c084fc');
         setComboStatus('⌛ +5 másodperc extra idő!', true);
         ellenorizdPalyaAllapot();
@@ -1833,6 +2119,9 @@ function handleClick(event) {
             playSound(sikeresKatt);
             triggerHaptic('light');
             checkAchievement('first_match');
+            if (torlendoNegyzetek.length >= 8) {
+                checkAchievement('mega_clear');
+            }
             const mult = regisztraljKomboLepest();
 
             for (let i = 0; i < torlendoNegyzetek.length; i++) {

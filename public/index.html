@@ -37,7 +37,7 @@
           <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
             <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/>
           </svg>
-          <span>Jelvények (<span id="unlockedAchievementsCount">0</span>/8)</span>
+          <span>Jelvények (<span id="unlockedAchievementsCount">0</span>/<span id="totalAchievementsCount">18</span>)</span>
         </button>
         <div id="loggedInUserBox" class="logged-in-box" style="display: none">
           <span class="user-avatar-dot"></span>
@@ -296,21 +296,22 @@
           </div>
         </div>
 
+        <!-- Aktív power-up effektek dedikált sávja: 0 layout shift, nem takarja el a pályát, egymás mellett jelennek meg -->
+        <div id="activeBuffsBar" class="active-buffs-bar">
+          <div id="doublePointsBanner" class="buff-pill buff-frenzy hidden">
+            <span class="buff-icon">⚡</span>
+            <span class="buff-title">2× DUPLÁZÓ</span>
+            <span id="frenzyTimerBadge" class="buff-timer">5.0s</span>
+          </div>
+
+          <div id="freezeOverlay" class="buff-pill buff-freeze hidden">
+            <span class="buff-icon">❄</span>
+            <span class="buff-title">IDŐSTOP</span>
+            <span id="freezeTimerBadge" class="buff-timer">4.0s</span>
+          </div>
+        </div>
+
         <div class="canvas-wrapper" id="canvasWrapper">
-          <!-- Abszolút pozícionált, layout-shift mentes 2× Frenzy lebegő badge -->
-          <div id="doublePointsBanner" class="frenzy-canvas-pill hidden">
-            <span class="frenzy-icon">⚡</span>
-            <span class="frenzy-title">2× PONTDUPLÁZÓ</span>
-            <span id="frenzyTimerBadge" class="frenzy-pill-badge">5.0s</span>
-          </div>
-
-          <!-- Abszolút pozícionált jégkocka fagyasztás overlay -->
-          <div id="freezeOverlay" class="freeze-canvas-pill hidden">
-            <span class="freeze-icon">❄</span>
-            <span class="freeze-title">IDŐ MEGÁLLÍTVA!</span>
-            <span id="freezeTimerBadge" class="freeze-pill-badge">4.0s</span>
-          </div>
-
           <canvas id="crashdownCanvas" width="440" height="440"></canvas>
           <div id="canvasOverlay" class="canvas-overlay">
             <div class="overlay-card">
@@ -605,18 +606,104 @@
       </div>
     </div>
 
-    <!-- ==================== MÉRFÖLDKÖVEK & JELVÉNYEK MODAL ==================== -->
+    <!-- ==================== MÉRFÖLDKÖVEK & JELVÉNYEK KÁRTYÁS MODAL ==================== -->
     <div id="achievementsModal" class="modal-backdrop hidden">
       <div class="auth-modal-card achievements-modal-card">
         <div class="auth-modal-header">
           <div>
-            <h3>Mérföldkövek & Jelvények</h3>
-            <span class="auth-hint-text">Feloldva: <strong id="achievementsSummaryCount" style="color: #fbbf24;">0</strong> / 8</span>
+            <h3>🏆 Mérföldkövek & Jelvények</h3>
+            <div class="ach-progress-wrap">
+              <span class="auth-hint-text">Feloldva: <strong id="achievementsSummaryCount" style="color: #fbbf24;">0</strong> / <strong id="achievementsTotalSummaryCount">18</strong> (<span id="achievementsPercent">0%</span>)</span>
+              <div class="ach-progress-track">
+                <div id="achievementsProgressFill" class="ach-progress-fill" style="width: 0%;"></div>
+              </div>
+            </div>
           </div>
           <button id="closeAchievementsModalBtn" class="modal-close-x" title="Bezárás">&times;</button>
         </div>
-        <div class="achievements-scroll-area" id="achievementsList">
+
+        <!-- Szűrőfülek -->
+        <div class="achievements-filter-bar">
+          <button class="ach-filter-btn active" data-filter="all">Mind (<span id="achFilterAllCount">18</span>)</button>
+          <button class="ach-filter-btn" data-filter="unlocked">Feloldva (<span id="achFilterUnlockedCount">0</span>)</button>
+          <button class="ach-filter-btn" data-filter="locked">Zárolva (<span id="achFilterLockedCount">18</span>)</button>
+        </div>
+
+        <!-- Nem-görgős / tágas Kártyás Rács -->
+        <div class="achievements-card-grid" id="achievementsList">
           <!-- Dinamikusan renderelve script.js-ből -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== JÁTÉKOS PROFIL & STATISZTIKÁK MODAL ==================== -->
+    <div id="playerProfileModal" class="modal-backdrop hidden">
+      <div class="auth-modal-card player-profile-modal-card">
+        <div class="auth-modal-header">
+          <div class="profile-header-info">
+            <div id="profileAvatar" class="profile-avatar-circle">J</div>
+            <div>
+              <h3 id="profilePlayerName">Játékos Neve</h3>
+              <span id="profilePlayerTitle" class="profile-player-badge">Crashdown Játékos</span>
+            </div>
+          </div>
+          <button id="closePlayerProfileModalBtn" class="modal-close-x" title="Bezárás">&times;</button>
+        </div>
+
+        <div class="profile-content-area">
+          <!-- 4 Statisztikai Kártya -->
+          <div class="profile-stats-grid">
+            <div class="profile-stat-box">
+              <span class="profile-stat-icon">🏆</span>
+              <div class="profile-stat-data">
+                <span class="profile-stat-label">Legjobb pont</span>
+                <strong id="profileBestScore" class="profile-stat-val">0</strong>
+              </div>
+            </div>
+
+            <div class="profile-stat-box">
+              <span class="profile-stat-icon">🎮</span>
+              <div class="profile-stat-data">
+                <span class="profile-stat-label">Lejátszott meccs</span>
+                <strong id="profileTotalMatches" class="profile-stat-val">0</strong>
+              </div>
+            </div>
+
+            <div class="profile-stat-box">
+              <span class="profile-stat-icon">⏱️</span>
+              <div class="profile-stat-data">
+                <span class="profile-stat-label">Összes játékidő</span>
+                <strong id="profileTotalTime" class="profile-stat-val">0 perc</strong>
+              </div>
+            </div>
+
+            <div class="profile-stat-box">
+              <span class="profile-stat-icon">🎖️</span>
+              <div class="profile-stat-data">
+                <span class="profile-stat-label">Jelvények</span>
+                <strong id="profileAchievementsCount" class="profile-stat-val">0 / 18</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Játékmódok szerinti lebontás -->
+          <div class="profile-section">
+            <h4 class="profile-section-title">📊 Teljesítmény Színmódok szerint</h4>
+            <div id="profileModesBreakdown" class="profile-modes-list">
+              <!-- Dinamikusan renderelve script.js-ből -->
+            </div>
+          </div>
+
+          <!-- Feloldott Jelvények & Eredmények -->
+          <div class="profile-section">
+            <div class="profile-section-header">
+              <h4 class="profile-section-title">🎖️ Elért Jelvények</h4>
+              <span id="profileBadgeSummary" class="auth-hint-text"></span>
+            </div>
+            <div id="profileAchievementsList" class="profile-badges-mini-grid">
+              <!-- Dinamikusan renderelve script.js-ből -->
+            </div>
+          </div>
         </div>
       </div>
     </div>
