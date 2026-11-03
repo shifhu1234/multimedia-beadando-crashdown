@@ -469,11 +469,13 @@ class LeaderboardService {
         const currentScores = await this.getScores();
         const userNameLower = String(jatekosAdat.name || '').trim().toLowerCase();
         const targetColor = String(jatekosAdat.color || '3');
+        const targetModifier = String(jatekosAdat.modifier || 'normal');
         const newScore = parseInt(jatekosAdat.score, 10) || 0;
 
         const existingIndex = currentScores.findIndex(s => 
             String(s.name || '').trim().toLowerCase() === userNameLower &&
-            String(s.color || '3') === targetColor
+            String(s.color || '3') === targetColor &&
+            String(s.modifier || 'normal') === targetModifier
         );
 
         let wasUpdated = false;
@@ -484,6 +486,7 @@ class LeaderboardService {
             if (newScore > (parseInt(existing.score, 10) || 0)) {
                 existing.score = newScore;
                 existing.duration = jatekosAdat.duration;
+                existing.modifier = targetModifier;
                 existing.timestamp = jatekosAdat.timestamp;
                 wasUpdated = true;
 
@@ -492,6 +495,7 @@ class LeaderboardService {
                         await this.db.ref('leaderboard/' + existing.firebaseKey).update({
                             score: newScore,
                             duration: jatekosAdat.duration,
+                            modifier: targetModifier,
                             timestamp: jatekosAdat.timestamp
                         });
                     } catch (err) {
@@ -505,6 +509,7 @@ class LeaderboardService {
         } else {
             // Új bejegyzés ebben a kategóriában
             wasAdded = true;
+            jatekosAdat.modifier = targetModifier;
             if (this.isOnline && this.db) {
                 try {
                     const newRef = this.db.ref('leaderboard').push();

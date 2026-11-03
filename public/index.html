@@ -13,7 +13,7 @@
       href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css?v=3.3" />
+    <link rel="stylesheet" href="style.css?v=3.4" />
 
     <!-- Firebase SDK (Compat - automatikus integráció) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -127,195 +127,198 @@
     </header>
 
     <div class="app-shell">
-      <!-- Bal oldali vezérlő és infó panel -->
+      <!-- Bal oldali vezérlő és infó panel (Kettéválasztva: Felső játékmód/beállítások, Alsó téma/power-up/audio) -->
       <aside class="panel controls-panel" id="controlsPanel">
-        <div class="brand">
-          <div class="brand-icon">
-            <span class="tile tile-red"></span>
-            <span class="tile tile-yellow"></span>
-            <span class="tile tile-green"></span>
-            <span class="tile tile-blue"></span>
+        <!-- Felső Doboz: Játékbeállítások, Játékmód/Modifierek & Indító gombok -->
+        <div class="panel-card game-settings-box">
+          <div class="brand">
+            <div class="brand-icon">
+              <span class="tile tile-red"></span>
+              <span class="tile tile-yellow"></span>
+              <span class="tile tile-green"></span>
+              <span class="tile tile-blue"></span>
+            </div>
+            <div class="brand-text">
+              <h1>CRASHDOWN</h1>
+              <span class="subtitle">Arcade Block Puzzle</span>
+            </div>
           </div>
-          <div class="brand-text">
-            <h1>CRASHDOWN</h1>
-            <span class="subtitle">Arcade Block Puzzle</span>
+
+          <div class="select-option control-group">
+            <div class="select-grid">
+              <div class="select-field">
+                <label for="colorSelect" class="control-label">Színek száma</label>
+                <div class="select-wrapper">
+                  <select id="colorSelect">
+                    <option value="2">2 szín (Könnyű)</option>
+                    <option value="3" selected>3 szín (Normál)</option>
+                    <option value="4">4 szín (Nehéz)</option>
+                    <option value="5">5 szín (Extrém)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="select-field">
+                <label for="timeSelect" class="control-label">Játékidő</label>
+                <div class="select-wrapper">
+                  <select id="timeSelect">
+                    <option value="30">30 mp (Villám)</option>
+                    <option value="60" selected>1 perc (Gyors)</option>
+                    <option value="90">90 mp (Klasszikus)</option>
+                    <option value="120">2 perc (Normál)</option>
+                    <option value="150">2.5 perc (Bővített)</option>
+                    <option value="180">3 perc (Maraton)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="select-field select-field-full">
+                <label for="modeSelect" class="control-label">Játékmód (Modifier)</label>
+                <div class="select-wrapper">
+                  <select id="modeSelect">
+                    <option value="normal" selected>Normál (Klasszikus)</option>
+                    <option value="no_powerups">Nyers Mód (Power-up nélkül)</option>
+                    <option value="chaos">Káosz Mód (Gyakori Power-upok)</option>
+                    <option value="time_rush">Időhajsza (+Időbónusz fókusz)</option>
+                    <option value="bomb_frenzy">Robbanás Mánia (TNT & Színbomba)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="button-stack">
+              <button id="startGameButton" class="btn btn-primary">
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+                <span>Játék indítása</span>
+              </button>
+              <button id="startNewGame" class="btn btn-secondary">
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                  <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
+                </svg>
+                <span>Új játék kezdése</span>
+              </button>
+            </div>
           </div>
         </div>
 
-        <div class="select-option control-group">
-          <div class="select-grid">
-            <div class="select-field">
-              <label for="colorSelect" class="control-label"
-                >Színek száma</label
-              >
-              <div class="select-wrapper">
-                <select id="colorSelect">
-                  <option value="2">2 szín (Könnyű)</option>
-                  <option value="3" selected>3 szín (Normál)</option>
-                  <option value="4">4 szín (Nehéz)</option>
-                  <option value="5">5 szín (Extrém)</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="select-field">
-              <label for="timeSelect" class="control-label">Játékidő</label>
-              <div class="select-wrapper">
-                <select id="timeSelect">
-                  <option value="30">30 mp (Villám)</option>
-                  <option value="60" selected>1 perc (Gyors)</option>
-                  <option value="90">90 mp (Klasszikus)</option>
-                  <option value="120">2 perc (Normál)</option>
-                  <option value="150">2.5 perc (Bővített)</option>
-                  <option value="180">3 perc (Maraton)</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="select-field">
-              <label for="themeSelect" class="control-label">Téma</label>
-              <div class="select-wrapper">
-                <select id="themeSelect">
-                  <option value="retro" selected>Retro Arcade</option>
-                  <option value="cyber">Cyber Neon</option>
-                  <option value="candy">Candy Pop</option>
-                  <option value="space">Deep Space</option>
-                  <option value="sunset">Sunset Synthwave</option>
-                  <option value="forest">Emerald Forest</option>
-                  <option value="lava">Vulkán Láva</option>
-                  <option value="noir">Monokróm Noir</option>
-                  <option value="ocean">Mélytengeri Misztikum</option>
-                </select>
-              </div>
+        <!-- Alsó Doboz: Téma választó (magyarosítva), Különleges Power-upok & Hangerő -->
+        <div class="panel-card game-extra-box">
+          <div class="theme-field-wrap">
+            <label for="themeSelect" class="control-label">Téma</label>
+            <div class="select-wrapper">
+              <select id="themeSelect">
+                <option value="retro" selected>Retro Játékterem</option>
+                <option value="cyber">Kiber Neon</option>
+                <option value="candy">Cukorka Pop</option>
+                <option value="space">Mélyűr Odüsszeia</option>
+                <option value="sunset">Naplemente Szintetizátor</option>
+                <option value="forest">Smaragd Vadon</option>
+                <option value="lava">Tűzhányó Láva</option>
+                <option value="noir">Éjféli Noir</option>
+                <option value="ocean">Mélytengeri Misztikum</option>
+              </select>
             </div>
           </div>
 
-          <div class="button-stack">
-            <button id="startGameButton" class="btn btn-primary">
-              <svg
-                class="btn-icon"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                width="16"
-                height="16"
+          <div class="legend-card">
+            <h3>Különleges Power-upok</h3>
+            <ul class="legend-list">
+              <li>
+                <span class="legend-badge badge-cyan">2×</span>
+                <div>
+                  <strong>Pontduplázó (5 mp)</strong>
+                  <small>5 mp-ig a kapott pontokat megduplázza</small>
+                </div>
+              </li>
+              <li>
+                <span class="legend-badge badge-pink">⇄</span>
+                <div>
+                  <strong>Cunami sorirtó</strong>
+                  <small>Törli a teljes vízszintes sort (+100)</small>
+                </div>
+              </li>
+              <li>
+                <span class="legend-badge badge-orange">⇅</span>
+                <div>
+                  <strong>Oszloptörlő lézer</strong>
+                  <small>Törli a teljes függőleges oszlopot (+100)</small>
+                </div>
+              </li>
+              <li>
+                <span class="legend-badge badge-green">TNT</span>
+                <div>
+                  <strong>TNT Robbanófej</strong>
+                  <small>3×3-as zónát robbant ki (+90)</small>
+                </div>
+              </li>
+              <li>
+                <span class="legend-badge badge-teal">✦</span>
+                <div>
+                  <strong>Szín-bomba</strong>
+                  <small>Egy teljes szín összes blokkját törli (+15/db)</small>
+                </div>
+              </li>
+              <li>
+                <span class="legend-badge badge-indigo">⟳</span>
+                <div>
+                  <strong>Pálya keverés</strong>
+                  <small>Újrakeveri az összes blokk színét (+50)</small>
+                </div>
+              </li>
+              <li>
+                <span class="legend-badge badge-purple">+5s</span>
+                <div>
+                  <strong>Időbónusz</strong>
+                  <small>+5 mp extra játékidőt ad</small>
+                </div>
+              </li>
+              <li>
+                <span class="legend-badge badge-blue">❄</span>
+                <div>
+                  <strong>Időfagyasztó Jégkocka</strong>
+                  <small>Megállítja a visszaszámlálót 4 másodpercre</small>
+                </div>
+              </li>
+              <li>
+                <span class="legend-badge badge-red">🧲</span>
+                <div>
+                  <strong>Szuper Mágnes</strong>
+                  <small>Összeránt egy teljes színt egy tömbbe</small>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="audio-card">
+            <div class="audio-header">
+              <button
+                id="toggleVolBtn"
+                class="vol-btn"
+                title="Hang némítása / visszakapcsolása (M)"
               >
-                <path d="M8 5v14l11-7z" />
-              </svg>
-              <span>Játék indítása</span>
-            </button>
-            <button id="startNewGame" class="btn btn-secondary">
-              <svg
-                class="btn-icon"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                width="16"
-                height="16"
-              >
-                <path
-                  d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"
+                <img
+                  src="volume_on_icon.png"
+                  id="toggleVol"
+                  alt="Hangerő"
+                  width="20"
+                  height="20"
                 />
-              </svg>
-              <span>Új játék kezdése</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="legend-card">
-          <h3>Különleges Power-upok</h3>
-          <ul class="legend-list">
-            <li>
-              <span class="legend-badge badge-cyan">2×</span>
-              <div>
-                <strong>Pontduplázó (5 mp)</strong>
-                <small>5 mp-ig a kapott pontokat megduplázza</small>
+              </button>
+              <div class="audio-slider-wrap">
+                <div class="audio-label-row">
+                  <span>Hangerő</span>
+                  <span id="volumeValue">35%</span>
+                </div>
+                <input
+                  type="range"
+                  id="volumeSlider"
+                  min="0"
+                  max="100"
+                  value="35"
+                />
               </div>
-            </li>
-            <li>
-              <span class="legend-badge badge-pink">⇄</span>
-              <div>
-                <strong>Cunami sorirtó</strong>
-                <small>Törli a teljes vízszintes sort (+100)</small>
-              </div>
-            </li>
-            <li>
-              <span class="legend-badge badge-orange">⇅</span>
-              <div>
-                <strong>Oszloptörlő lézer</strong>
-                <small>Törli a teljes függőleges oszlopot (+100)</small>
-              </div>
-            </li>
-            <li>
-              <span class="legend-badge badge-green">TNT</span>
-              <div>
-                <strong>TNT Robbanófej</strong>
-                <small>3×3-as zónát robbant ki (+90)</small>
-              </div>
-            </li>
-            <li>
-              <span class="legend-badge badge-teal">✦</span>
-              <div>
-                <strong>Szín-bomba</strong>
-                <small>Egy teljes szín összes blokkját törli (+15/db)</small>
-              </div>
-            </li>
-            <li>
-              <span class="legend-badge badge-indigo">⟳</span>
-              <div>
-                <strong>Pálya keverés</strong>
-                <small>Újrakeveri az összes blokk színét (+50)</small>
-              </div>
-            </li>
-            <li>
-              <span class="legend-badge badge-purple">+5s</span>
-              <div>
-                <strong>Időbónusz</strong>
-                <small>+5 mp extra játékidőt ad</small>
-              </div>
-            </li>
-            <li>
-              <span class="legend-badge badge-blue">❄</span>
-              <div>
-                <strong>Időfagyasztó Jégkocka</strong>
-                <small>Megállítja a visszaszámlálót 4 másodpercre</small>
-              </div>
-            </li>
-            <li>
-              <span class="legend-badge badge-red">🧲</span>
-              <div>
-                <strong>Szuper Mágnes</strong>
-                <small>Összeránt egy teljes színt egy tömbbe</small>
-              </div>
-            </li>
-          </ul>
-        </div>
-
-        <div class="audio-card">
-          <div class="audio-header">
-            <button
-              id="toggleVolBtn"
-              class="vol-btn"
-              title="Hang némítása / visszakapcsolása (M)"
-            >
-              <img
-                src="volume_on_icon.png"
-                id="toggleVol"
-                alt="Hangerő"
-                width="20"
-                height="20"
-              />
-            </button>
-            <div class="audio-slider-wrap">
-              <div class="audio-label-row">
-                <span>Hangerő</span>
-                <span id="volumeValue">35%</span>
-              </div>
-              <input
-                type="range"
-                id="volumeSlider"
-                min="0"
-                max="100"
-                value="35"
-              />
             </div>
           </div>
         </div>
@@ -324,44 +327,48 @@
       <!-- Középső játéktér -->
       <main class="game-stage active" id="stagePanel">
         <div id="safeTimer" class="hud-bar">
-          <div class="stat-box">
-            <span class="stat-label">Hátralévő idő</span>
-            <div class="timer-row">
-              <p id="timerDisplay">01:00</p>
+          <div class="hud-main-row">
+            <div class="stat-box">
+              <span class="stat-label">Hátralévő idő</span>
+              <div class="timer-row">
+                <p id="timerDisplay">01:00</p>
+              </div>
+              <div class="timer-progress-track">
+                <div id="timerProgressBar" class="timer-progress-fill"></div>
+              </div>
             </div>
-            <div class="timer-progress-track">
-              <div id="timerProgressBar" class="timer-progress-fill"></div>
+
+            <!-- Aktív power-up effektek a HUD közepén (egymás felett, nem ütköznek) -->
+            <div id="activeBuffsBar" class="hud-center-buffs">
+              <div id="doublePointsBanner" class="buff-pill buff-frenzy hidden">
+                <span class="buff-icon">⚡</span>
+                <span class="buff-title">2× DUPLÁZÓ</span>
+                <span id="frenzyTimerBadge" class="buff-timer">5.0s</span>
+              </div>
+
+              <div id="freezeOverlay" class="buff-pill buff-freeze hidden">
+                <span class="buff-icon">❄</span>
+                <span class="buff-title">IDŐSTOP</span>
+                <span id="freezeTimerBadge" class="buff-timer">4.0s</span>
+              </div>
+            </div>
+
+            <div class="stat-box score-box">
+              <span class="stat-label">Pontszám</span>
+              <h2><span id="score">0</span></h2>
             </div>
           </div>
 
-          <!-- Aktív power-up effektek & Információs sáv a HUD közepén (0 layout shift, nem takar és nem tolja el a keverést) -->
-          <div id="activeBuffsBar" class="hud-center-buffs">
-            <div id="doublePointsBanner" class="buff-pill buff-frenzy hidden">
-              <span class="buff-icon">⚡</span>
-              <span class="buff-title">2× DUPLÁZÓ</span>
-              <span id="frenzyTimerBadge" class="buff-timer">5.0s</span>
-            </div>
-
-            <div id="freezeOverlay" class="buff-pill buff-freeze hidden">
-              <span class="buff-icon">❄</span>
-              <span class="buff-title">IDŐSTOP</span>
-              <span id="freezeTimerBadge" class="buff-timer">4.0s</span>
-            </div>
-
-            <div id="comboIndicatorWrap" class="combo-indicator-wrap">
-              <span id="comboIndicator" class="combo-pill">Készen állsz?</span>
-            </div>
-          </div>
-
-          <div class="stat-box score-box">
-            <span class="stat-label">Pontszám</span>
-            <h2><span id="score">0</span></h2>
+          <!-- A doboz aljára rögzített információs sáv / kombóméter -->
+          <div id="comboIndicatorWrap" class="combo-indicator-bottom-bar">
+            <span id="comboIndicator" class="combo-pill">Készen állsz?</span>
           </div>
         </div>
 
         <div class="canvas-wrapper" id="canvasWrapper">
           <canvas id="crashdownCanvas" width="440" height="440"></canvas>
-          <div id="canvasOverlay" class="canvas-overlay">
+          <!-- Az overlay alapértelmezetten rejtett, csak a játék végén/eredménynél jelenik meg! -->
+          <div id="canvasOverlay" class="canvas-overlay hidden">
             <div class="overlay-card">
               <h2 id="overlayTitle">Crashdown</h2>
               <p id="overlaySubtitle">
@@ -479,6 +486,17 @@
               >
                 5 szín
               </button>
+            </div>
+          </div>
+          <div class="filter-row">
+            <span class="filter-row-label">Mód:</span>
+            <div class="filter-chip-group" id="modeFilterGroup">
+              <button class="filter-chip active" data-filter-type="mode" data-filter="all">Mind</button>
+              <button class="filter-chip" data-filter-type="mode" data-filter="normal">Normál</button>
+              <button class="filter-chip" data-filter-type="mode" data-filter="no_powerups">Nyers</button>
+              <button class="filter-chip" data-filter-type="mode" data-filter="chaos">Káosz</button>
+              <button class="filter-chip" data-filter-type="mode" data-filter="time_rush">Időhajsza</button>
+              <button class="filter-chip" data-filter-type="mode" data-filter="bomb_frenzy">Robbanás</button>
             </div>
           </div>
           <div class="filter-row">
@@ -896,11 +914,11 @@
     <div id="toastContainer" class="toast-container"></div>
 
     <!-- Modularizált JavaScript modulok a villámgyors futásért és tiszta átláthatóságért -->
-    <script src="js/config.js?v=3.3"></script>
-    <script src="js/audio.js?v=3.3"></script>
-    <script src="js/achievements.js?v=3.3"></script>
-    <script src="js/ui.js?v=3.3"></script>
-    <script src="js/game.js?v=3.3"></script>
-    <script src="js/main.js?v=3.3"></script>
+    <script src="js/config.js?v=3.4"></script>
+    <script src="js/audio.js?v=3.4"></script>
+    <script src="js/achievements.js?v=3.4"></script>
+    <script src="js/ui.js?v=3.4"></script>
+    <script src="js/game.js?v=3.4"></script>
+    <script src="js/main.js?v=3.4"></script>
   </body>
 </html>

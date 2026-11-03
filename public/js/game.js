@@ -325,6 +325,36 @@ function vanMegLepes() {
 }
 
 function valasszVeletlenPowerUpok(db = 4) {
+    const modeSelect = document.getElementById('modeSelect');
+    const mode = modeSelect ? modeSelect.value : 'normal';
+
+    // 1. Nyers mód: egyetlen power-up sem jelenik meg
+    if (mode === 'no_powerups') {
+        return [];
+    }
+
+    // 2. Káosz mód: 8-10 db power-up a táblán (freeze és +5s csak picivel gyakoribb)
+    if (mode === 'chaos') {
+        const chaosPows = ['cyan', 'pink', '#f97316', 'darkgreen', '#14b8a6', '#6366f1', '#e11d48', '#f97316', 'darkgreen', 'cyan'];
+        if (Math.random() < 0.4) chaosPows.push('#0284c7'); // Időfagyasztó picivel gyakoribb
+        if (Math.random() < 0.4) chaosPows.push('#581845'); // +5 mp időbónusz picivel gyakoribb
+        const shuffled = [...chaosPows].sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, 9);
+    }
+
+    // 3. Időhajsza mód: +5s extra idő és 2× Duplázó fókusz
+    if (mode === 'time_rush') {
+        const timePows = ['#581845', '#581845', 'cyan', 'cyan', '#0284c7', '#6366f1', '#f97316'];
+        return timePows.sort(() => 0.5 - Math.random()).slice(0, 6);
+    }
+
+    // 4. Robbanás Mánia: TNT, Színbomba és Szuper Mágnes túlsúly
+    if (mode === 'bomb_frenzy') {
+        const bombPows = ['darkgreen', 'darkgreen', 'darkgreen', '#14b8a6', '#14b8a6', '#e11d48', '#e11d48', '#f97316'];
+        return bombPows.sort(() => 0.5 - Math.random()).slice(0, 8);
+    }
+
+    // 5. Normál mód (Klasszikus kiegyensúlyozott)
     const basePows = ['cyan', 'pink', '#f97316', 'darkgreen', '#14b8a6', '#6366f1', '#0284c7', '#e11d48'];
     const shuffled = [...basePows].sort(() => 0.5 - Math.random());
     if (Math.random() < 0.3) {
@@ -1317,6 +1347,9 @@ function timer() {
                 if (overlayTitle) overlayTitle.textContent = `Végső pontszám: ${pontSzam} p`;
 
                 const overlaySaveBtn = document.getElementById('overlaySaveScoreBtn');
+                const modeSelectEl = document.getElementById('modeSelect');
+                const modVal = modeSelectEl ? modeSelectEl.value : 'normal';
+
                 if (currentUser) {
                     if (overlaySaveBtn) overlaySaveBtn.style.display = 'none';
                     const colorVal = szinValaszto ? szinValaszto.value : '3';
@@ -1326,20 +1359,21 @@ function timer() {
                         name: currentUser.displayName,
                         score: pontSzam,
                         color: colorVal,
+                        modifier: modVal,
                         duration: MAX_TIME,
                         timestamp: new Date().toISOString()
                     }).then(res => {
                         toplistaMegjelenites();
                         if (res && res.isRecord) {
                             if (overlaySubtitle) {
-                                overlaySubtitle.textContent = `Gratulálunk, ${currentUser.displayName}! Új egyéni rekordot értél el ebben a módban (${colorVal} szín)!`;
+                                overlaySubtitle.textContent = `Gratulálunk, ${currentUser.displayName}! Új egyéni rekordot értél el ebben a módban (${colorVal} szín, ${GAME_MODIFIERS[modVal]?.name || modVal})!`;
                             }
                             showToast(`🏆 Új személyes rekord rögzítve: ${pontSzam} pont!`, 'success');
                             playSound(sikeresKatt);
                             triggerHaptic('success');
                         } else {
                             if (overlaySubtitle) {
-                                overlaySubtitle.textContent = `Szép menet, ${currentUser.displayName}! A jelenlegi rekordod ebben a módban: ${res?.previousBest || 'magasabb'} pont.`;
+                                overlaySubtitle.textContent = `Szép menet, ${currentUser.displayName}! A jelenlegi rekordod ebben a kategóriában: ${res?.previousBest || 'magasabb'} pont.`;
                             }
                             showToast(`Játék vége! Pontszám: ${pontSzam} p`, 'info');
                         }
@@ -1351,12 +1385,13 @@ function timer() {
                     pendingScore = {
                         score: pontSzam,
                         color: colorVal,
+                        modifier: modVal,
                         duration: MAX_TIME,
                         timestamp: new Date().toISOString()
                     };
                     if (overlaySaveBtn) overlaySaveBtn.style.display = 'inline-flex';
                     if (overlaySubtitle) {
-                        overlaySubtitle.textContent = `Elért pontszám: ${pontSzam} pont. Jelentkezz be vagy regisztrálj az eredmény elmentéséhez!`;
+                        overlaySubtitle.textContent = `Elért pontszám: ${pontSzam} pont (${GAME_MODIFIERS[modVal]?.name || modVal}). Jelentkezz be vagy regisztrálj az eredmény elmentéséhez!`;
                     }
                     showToast(`Játék vége! Pontszám: ${pontSzam} p`, 'info');
                 }
@@ -1368,6 +1403,8 @@ function timer() {
 
             if (szinValaszto) szinValaszto.disabled = false;
             if (timeSelectEl) timeSelectEl.disabled = false;
+            const modeSelectEl = document.getElementById('modeSelect');
+            if (modeSelectEl) modeSelectEl.disabled = false;
             const startBtn = document.getElementById('startGameButton');
             if (startBtn) startBtn.disabled = false;
 
@@ -1393,6 +1430,8 @@ function startMatch() {
 
     const startBtn = document.getElementById('startGameButton');
     if (startBtn) startBtn.disabled = true;
+    const modeSelectEl = document.getElementById('modeSelect');
+    if (modeSelectEl) modeSelectEl.disabled = true;
 
     const overlay = document.getElementById('canvasOverlay');
     if (overlay) overlay.classList.add('hidden');
@@ -1428,6 +1467,8 @@ function ujJatekInditasaFunc() {
     if (szinValaszto) szinValaszto.disabled = false;
     const timeSelectEl = document.getElementById('timeSelect');
     if (timeSelectEl) timeSelectEl.disabled = false;
+    const modeSelectEl2 = document.getElementById('modeSelect');
+    if (modeSelectEl2) modeSelectEl2.disabled = false;
     const startBtn = document.getElementById('startGameButton');
     if (startBtn) startBtn.disabled = false;
 
@@ -1449,7 +1490,8 @@ function ujJatekInditasaFunc() {
     const overlaySaveBtn = document.getElementById('overlaySaveScoreBtn');
     const timeUpMsg = document.getElementById('timeUpMessage');
 
-    if (overlay) overlay.classList.remove('hidden');
+    // Kezdő nézetben az overlay rejtve marad, a pálya azonnal látható és használható!
+    if (overlay) overlay.classList.add('hidden');
     if (overlayTitle) overlayTitle.textContent = 'Crashdown';
     if (overlaySubtitle) overlaySubtitle.textContent = 'Kattints vagy érints legalább 3 azonos színű szomszédos blokkot a törléshez!';
     if (overlaySaveBtn) overlaySaveBtn.style.display = 'none';
@@ -1459,7 +1501,7 @@ function ujJatekInditasaFunc() {
     }
 
     setComboStatus('Készen állsz?', false);
-    showToast('Alaphelyzet: válassz nehézséget és játékidőt, majd indítsd a játékot!', 'info');
+    showToast('Alaphelyzet: válassz nehézséget, módot és játékidőt, majd indítsd a játékot!', 'info');
 }
 
 // ==================== PÁLYA ÚJRAKEVERÉS (SHUFFLE) ====================

@@ -20,18 +20,27 @@ const THEME_PALETTES = {
     ocean:  ['#06b6d4', '#0284c7', '#3b82f6', '#0d9488', '#6366f1']
 };
 
-// Téma katalógus az unlockoláshoz
+// Téma katalógus az unlockoláshoz (Magyarosított elnevezésekkel)
 const THEMES_CATALOG = [
-    { id: 'retro', name: 'Retro Arcade', achId: null },
-    { id: 'cyber', name: 'Cyber Neon', achId: null },
-    { id: 'candy', name: 'Candy Pop', achId: 'first_500' },
-    { id: 'space', name: 'Deep Space', achId: 'score_1500' },
-    { id: 'sunset', name: 'Sunset Synthwave', achId: 'powerup_10' },
-    { id: 'forest', name: 'Emerald Forest', achId: 'play_time_5m' },
-    { id: 'lava', name: 'Vulkán Láva', achId: 'powerup_25' },
-    { id: 'noir', name: 'Monokróm Noir', achId: 'inspect_profile' },
+    { id: 'retro', name: 'Retro Játékterem', achId: null },
+    { id: 'cyber', name: 'Kiber Neon', achId: null },
+    { id: 'candy', name: 'Cukorka Pop', achId: 'first_500' },
+    { id: 'space', name: 'Mélyűr Odüsszeia', achId: 'score_1500' },
+    { id: 'sunset', name: 'Naplemente Szintetizátor', achId: 'powerup_10' },
+    { id: 'forest', name: 'Smaragd Vadon', achId: 'play_time_5m' },
+    { id: 'lava', name: 'Tűzhányó Láva', achId: 'powerup_25' },
+    { id: 'noir', name: 'Éjféli Noir', achId: 'inspect_profile' },
     { id: 'ocean', name: 'Mélytengeri Misztikum', achId: 'score_5000' }
 ];
+
+// Játékmódok / Modifierek definíciói
+const GAME_MODIFIERS = {
+    normal: { id: 'normal', name: 'Normál', badge: 'Normál', desc: 'Klasszikus Crashdown szabályok kiegyensúlyozott power-upokkal' },
+    no_powerups: { id: 'no_powerups', name: 'Nyers Mód', badge: 'Nyers', desc: 'Csak színtiszta blokktörés, power-upok nélkül' },
+    chaos: { id: 'chaos', name: 'Káosz Mód', badge: 'Káosz', desc: 'A power-upok sokkal gyakrabban bukkannak fel a pályán' },
+    time_rush: { id: 'time_rush', name: 'Időhajsza', badge: 'Időhajsza', desc: 'Gyakori +Időbónusz és 2× Duplázó blokkok a maximális tempóért' },
+    bomb_frenzy: { id: 'bomb_frenzy', name: 'Robbanás Mánia', badge: 'Robbanás', desc: 'Több TNT robbanófej, szuper mágnes és szín-bomba a hatalmas pusztításért' }
+};
 
 // 3D plasztikus színek és árnyalatok a vászon kirajzolásához
 const COLOR_STYLES = {

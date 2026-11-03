@@ -3,6 +3,7 @@
    ================================================================ */
 
 let currentLeaderboardColorFilter = 'all';
+let currentLeaderboardModeFilter = 'all';
 let currentLeaderboardTimeFilter = 'all';
 let pendingScore = null;
 
@@ -566,11 +567,13 @@ async function toplistaHozzaadas(jatekosAdat) {
     let toplista = JSON.parse(localStorage.getItem('toplista')) || [];
     const userNameLower = String(jatekosAdat.name || '').trim().toLowerCase();
     const targetColor = String(jatekosAdat.color || '3');
+    const targetModifier = String(jatekosAdat.modifier || 'normal');
     const newScore = parseInt(jatekosAdat.score, 10) || 0;
 
     const existingIndex = toplista.findIndex(s => 
         String(s.name || '').trim().toLowerCase() === userNameLower &&
-        String(s.color || '3') === targetColor
+        String(s.color || '3') === targetColor &&
+        String(s.modifier || 'normal') === targetModifier
     );
 
     let isRecord = false;
@@ -582,12 +585,14 @@ async function toplistaHozzaadas(jatekosAdat) {
         if (newScore > previousBest) {
             existing.score = newScore;
             existing.duration = jatekosAdat.duration;
+            existing.modifier = targetModifier;
             existing.timestamp = jatekosAdat.timestamp;
             isRecord = true;
         } else {
             return { success: true, isRecord: false, previousBest: previousBest };
         }
     } else {
+        jatekosAdat.modifier = targetModifier;
         toplista.push(jatekosAdat);
         isRecord = true;
     }
@@ -620,6 +625,9 @@ async function toplistaMegjelenites() {
 
     if (currentLeaderboardColorFilter !== 'all') {
         toplista = toplista.filter(elem => String(elem.color) === String(currentLeaderboardColorFilter));
+    }
+    if (currentLeaderboardModeFilter !== 'all') {
+        toplista = toplista.filter(elem => String(elem.modifier || 'normal') === String(currentLeaderboardModeFilter));
     }
     if (currentLeaderboardTimeFilter !== 'all') {
         toplista = toplista.filter(elem => String(elem.duration || '60') === String(currentLeaderboardTimeFilter));
@@ -679,8 +687,10 @@ async function toplistaMegjelenites() {
 
         const colorTag = document.createElement('span');
         colorTag.className = 'lb-color-tag';
+        const modKey = elem.modifier || 'normal';
+        const modBadge = (typeof GAME_MODIFIERS !== 'undefined' && GAME_MODIFIERS[modKey]?.badge) ? GAME_MODIFIERS[modKey].badge : 'Normál';
         const durText = elem.duration ? `${elem.duration}s` : '';
-        colorTag.textContent = durText ? `${elem.color} sz • ${durText}` : `${elem.color} szín`;
+        colorTag.textContent = `${elem.color} sz • ${modBadge} • ${durText}`;
 
         rightDiv.appendChild(scoreSpan);
         rightDiv.appendChild(colorTag);

@@ -324,6 +324,10 @@ document.querySelectorAll('.filter-chip').forEach(btn => {
             document.querySelectorAll('#colorFilterGroup .filter-chip').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             currentLeaderboardColorFilter = filterVal;
+        } else if (filterType === 'mode') {
+            document.querySelectorAll('#modeFilterGroup .filter-chip').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentLeaderboardModeFilter = filterVal;
         } else if (filterType === 'time') {
             document.querySelectorAll('#timeFilterGroup .filter-chip').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
