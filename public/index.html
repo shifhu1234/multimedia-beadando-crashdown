@@ -289,25 +289,25 @@
             </div>
           </div>
 
+          <!-- Aktív power-up effektek a HUD közepén: 0 layout shift, nem tolja el a pályát és a keverést -->
+          <div id="activeBuffsBar" class="hud-center-buffs">
+            <div id="doublePointsBanner" class="buff-pill buff-frenzy hidden">
+              <span class="buff-icon">⚡</span>
+              <span class="buff-title">2× DUPLÁZÓ</span>
+              <span id="frenzyTimerBadge" class="buff-timer">5.0s</span>
+            </div>
+
+            <div id="freezeOverlay" class="buff-pill buff-freeze hidden">
+              <span class="buff-icon">❄</span>
+              <span class="buff-title">IDŐSTOP</span>
+              <span id="freezeTimerBadge" class="buff-timer">4.0s</span>
+            </div>
+          </div>
+
           <div class="stat-box score-box">
             <span class="stat-label">Pontszám</span>
             <h2><span id="score">0</span></h2>
             <span id="comboIndicator" class="combo-pill">Készen állsz?</span>
-          </div>
-        </div>
-
-        <!-- Aktív power-up effektek dedikált sávja: 0 layout shift, nem takarja el a pályát, egymás mellett jelennek meg -->
-        <div id="activeBuffsBar" class="active-buffs-bar">
-          <div id="doublePointsBanner" class="buff-pill buff-frenzy hidden">
-            <span class="buff-icon">⚡</span>
-            <span class="buff-title">2× DUPLÁZÓ</span>
-            <span id="frenzyTimerBadge" class="buff-timer">5.0s</span>
-          </div>
-
-          <div id="freezeOverlay" class="buff-pill buff-freeze hidden">
-            <span class="buff-icon">❄</span>
-            <span class="buff-title">IDŐSTOP</span>
-            <span id="freezeTimerBadge" class="buff-timer">4.0s</span>
           </div>
         </div>
 
@@ -642,9 +642,12 @@
         <div class="auth-modal-header">
           <div class="profile-header-info">
             <div id="profileAvatar" class="profile-avatar-circle">J</div>
-            <div>
+            <div class="profile-title-container">
               <h3 id="profilePlayerName">Játékos Neve</h3>
-              <span id="profilePlayerTitle" class="profile-player-badge">Crashdown Játékos</span>
+              <div class="profile-title-row">
+                <span id="profilePlayerTitle" class="profile-player-badge">Crashdown Játékos</span>
+                <select id="profileTitleSelect" class="profile-title-select" style="display: none;" title="Válassz a megszerzett rangcímeid közül"></select>
+              </div>
             </div>
           </div>
           <button id="closePlayerProfileModalBtn" class="modal-close-x" title="Bezárás">&times;</button>

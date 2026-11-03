@@ -282,22 +282,12 @@ function updateAchievementsUI() {
     const listContainer = document.getElementById('achievementsList');
     if (!listContainer) return;
 
-    let filtered = ACHIEVEMENTS;
-    if (currentAchievementFilter === 'unlocked') {
-        filtered = ACHIEVEMENTS.filter(a => unlockedSet.has(a.id));
-    } else if (currentAchievementFilter === 'locked') {
-        filtered = ACHIEVEMENTS.filter(a => !unlockedSet.has(a.id));
-    }
-
-    if (filtered.length === 0) {
-        listContainer.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 24px; color: var(--text-secondary); font-size: 0.85rem;">Nincs megjeleníthető jelvény ebben a kategóriában.</div>';
-        return;
-    }
-
-    listContainer.innerHTML = filtered.map(ach => {
+    // Rendereljük a kártyákat ha még üres vagy ha változott az állapot
+    listContainer.innerHTML = ACHIEVEMENTS.map(ach => {
         const isUnlocked = unlockedSet.has(ach.id);
+        const shouldHide = (currentAchievementFilter === 'unlocked' && !isUnlocked) || (currentAchievementFilter === 'locked' && isUnlocked);
         return `
-            <div class="achievement-card ${isUnlocked ? 'unlocked' : 'locked'}">
+            <div class="achievement-card ${isUnlocked ? 'unlocked' : 'locked'} ${shouldHide ? 'card-filtered-out' : ''}" data-ach-id="${ach.id}" data-unlocked="${isUnlocked ? '1' : '0'}">
                 <div class="ach-card-header">
                     <div class="achievement-icon-wrap">${ach.icon}</div>
                     <span class="achievement-status">${isUnlocked ? 'Feloldva ✓' : '🔒 Zárolva'}</span>
@@ -310,6 +300,100 @@ function updateAchievementsUI() {
         `;
     }).join('');
 }
+
+function applyAchievementFilter(filter) {
+    currentAchievementFilter = filter;
+    const listContainer = document.getElementById('achievementsList');
+    if (!listContainer) return;
+
+    const cards = listContainer.querySelectorAll('.achievement-card');
+    cards.forEach(card => {
+        const isUnlocked = card.getAttribute('data-unlocked') === '1';
+        if (filter === 'all') {
+            card.classList.remove('card-filtered-out');
+        } else if (filter === 'unlocked') {
+            card.classList.toggle('card-filtered-out', !isUnlocked);
+        } else if (filter === 'locked') {
+            card.classList.toggle('card-filtered-out', isUnlocked);
+        }
+    });
+}
+
+// ==================== RANGCÍMEK (PROFILE TITLES) RENDSZER ====================
+const PROFILE_TITLES = [
+    {
+        id: 'title_beginner',
+        name: '🔰 Kezdő Blokktörő',
+        desc: 'Alapértelmezett kezdő rangcím minden játékosnak',
+        isUnlocked: (stats, achSet) => true
+    },
+    {
+        id: 'title_advanced',
+        name: '⭐ Haladó Játékos',
+        desc: 'Érj el legalább 1 500 pontot vagy játssz 3 meccset',
+        isUnlocked: (stats, achSet) => (stats.bestScore >= 1500) || (stats.totalMatches >= 3)
+    },
+    {
+        id: 'title_champion',
+        name: '🏆 Crashdown Bajnok',
+        desc: 'Érj el legalább 5 000 pontot egy meccsben',
+        isUnlocked: (stats, achSet) => (stats.bestScore >= 5000) || achSet.has('score_5000')
+    },
+    {
+        id: 'title_grandmaster',
+        name: '👑 Crashdown Nagymester',
+        desc: 'Lépd át a 10 000 pontos álomhatárt',
+        isUnlocked: (stats, achSet) => (stats.bestScore >= 10000) || achSet.has('score_10k')
+    },
+    {
+        id: 'title_legend',
+        name: '🌌 Galaktikus Legenda',
+        desc: 'Érj el szédítő 25 000 pontot',
+        isUnlocked: (stats, achSet) => (stats.bestScore >= 25000) || achSet.has('score_25k')
+    },
+    {
+        id: 'title_combo_mage',
+        name: '⚡ Kombó Mágus',
+        desc: 'Érd el a maximális 5×-ös kombó szorzót',
+        isUnlocked: (stats, achSet) => achSet.has('combo_x5')
+    },
+    {
+        id: 'title_demolition',
+        name: '💣 Robbantómester',
+        desc: 'Használj TNT robbantást vagy Szín-bombát',
+        isUnlocked: (stats, achSet) => achSet.has('tnt_boom') || achSet.has('color_bomb')
+    },
+    {
+        id: 'title_ice_lord',
+        name: '❄️ Jégkirály',
+        desc: 'Fagyaszd meg az időt az Időfagyasztóval',
+        isUnlocked: (stats, achSet) => achSet.has('freeze_time')
+    },
+    {
+        id: 'title_magnet_force',
+        name: '🧲 Mágneses Erőmű',
+        desc: 'Ránts össze egy egész színt a Szuper Mágnessel',
+        isUnlocked: (stats, achSet) => achSet.has('magnet_pull')
+    },
+    {
+        id: 'title_perfectionist',
+        name: '✨ Tökéletesség Híve',
+        desc: 'Takarítsd le a teljes táblát 0 blokkra',
+        isUnlocked: (stats, achSet) => achSet.has('perfect_clear')
+    },
+    {
+        id: 'title_time_bender',
+        name: '⏱️ Időhajlító',
+        desc: 'Játssz legalább 10 percet vagy gyűjts időbónuszt',
+        isUnlocked: (stats, achSet) => (stats.totalPlaytimeSeconds >= 600) || achSet.has('time_bonus')
+    },
+    {
+        id: 'title_veteran',
+        name: '🛡️ Veterán Blokktörő',
+        desc: 'Játssz le legalább 8 teljes meccset',
+        isUnlocked: (stats, achSet) => stats.totalMatches >= 8
+    }
+];
 
 // ==================== JÁTÉKOS PROFIL & STATISZTIKA MOTOR ====================
 function updatePlayerStatsRecord(username, score, colorCount, durationSeconds) {
@@ -324,7 +408,8 @@ function updatePlayerStatsRecord(username, score, colorCount, durationSeconds) {
             bestScore: 0,
             achievements: [],
             modes: {},
-            durations: {}
+            durations: {},
+            chosenTitle: null
         };
 
         if (score > 0 || durationSeconds > 0) {
@@ -344,6 +429,7 @@ function updatePlayerStatsRecord(username, score, colorCount, durationSeconds) {
         const currentUser = window.authService?.getCurrentUser();
         if (currentUser && currentUser.displayName === username) {
             p.achievements = getUnlockedAchievements();
+            p.chosenTitle = localStorage.getItem('crashdown_chosen_title') || p.chosenTitle;
         }
 
         profiles[username] = p;
@@ -370,7 +456,8 @@ function getPlayerProfileStats(username, allScores = []) {
             bestScore: 0,
             achievements: [],
             modes: {},
-            durations: {}
+            durations: {},
+            chosenTitle: null
         };
     }
 
@@ -394,6 +481,7 @@ function getPlayerProfileStats(username, allScores = []) {
     const currentUser = window.authService?.getCurrentUser();
     if (currentUser && currentUser.displayName && currentUser.displayName.toLowerCase() === username.toLowerCase()) {
         profile.achievements = getUnlockedAchievements();
+        profile.chosenTitle = localStorage.getItem('crashdown_chosen_title') || profile.chosenTitle;
     } else {
         const inferred = new Set(profile.achievements || []);
         if (profile.totalMatches >= 1) inferred.add('first_match');
@@ -413,6 +501,27 @@ function getPlayerProfileStats(username, allScores = []) {
         profile.achievements = Array.from(inferred);
     }
 
+    // Rangcím meghatározása
+    const achSet = new Set(profile.achievements || []);
+    let activeTitle = null;
+
+    if (profile.chosenTitle) {
+        const found = PROFILE_TITLES.find(t => t.id === profile.chosenTitle);
+        if (found && found.isUnlocked(profile, achSet)) {
+            activeTitle = found;
+        }
+    }
+
+    if (!activeTitle) {
+        for (let i = PROFILE_TITLES.length - 1; i >= 0; i--) {
+            if (PROFILE_TITLES[i].isUnlocked(profile, achSet)) {
+                activeTitle = PROFILE_TITLES[i];
+                break;
+            }
+        }
+    }
+    profile.activeTitle = activeTitle || PROFILE_TITLES[0];
+
     return profile;
 }
 
@@ -425,10 +534,14 @@ async function openPlayerProfileModal(username) {
     }
 
     const stats = getPlayerProfileStats(username, allScores);
+    const currentUser = window.authService?.getCurrentUser();
+    const isOwnProfile = currentUser && currentUser.displayName && currentUser.displayName.toLowerCase() === stats.username.toLowerCase();
+    const achSet = new Set(stats.achievements || []);
 
     const nameEl = document.getElementById('profilePlayerName');
     const avatarEl = document.getElementById('profileAvatar');
     const titleEl = document.getElementById('profilePlayerTitle');
+    const titleSelectEl = document.getElementById('profileTitleSelect');
     const bestScoreEl = document.getElementById('profileBestScore');
     const matchesEl = document.getElementById('profileTotalMatches');
     const timeEl = document.getElementById('profileTotalTime');
@@ -440,12 +553,49 @@ async function openPlayerProfileModal(username) {
     if (nameEl) nameEl.textContent = stats.username;
     if (avatarEl) avatarEl.textContent = (stats.username[0] || 'J').toUpperCase();
 
-    let title = 'Kezdő Blokktörő';
-    if (stats.bestScore >= 25000) title = '🌌 Galaktikus Legenda';
-    else if (stats.bestScore >= 10000) title = '👑 Crashdown Nagymester';
-    else if (stats.bestScore >= 5000) title = '🏆 Bajnok';
-    else if (stats.bestScore >= 1500) title = '⭐ Haladó Játékos';
-    if (titleEl) titleEl.textContent = title;
+    // Rangcím beállítása
+    if (titleEl) titleEl.textContent = stats.activeTitle.name;
+
+    if (titleSelectEl) {
+        if (isOwnProfile) {
+            titleSelectEl.style.display = 'inline-block';
+            titleSelectEl.innerHTML = PROFILE_TITLES.map(t => {
+                const unlocked = t.isUnlocked(stats, achSet);
+                const isSelected = stats.chosenTitle ? (t.id === stats.chosenTitle) : (t.id === stats.activeTitle.id);
+                if (unlocked) {
+                    return `<option value="${t.id}" ${isSelected ? 'selected' : ''}>${t.name} (✓ Feloldva)</option>`;
+                } else {
+                    return `<option value="${t.id}" disabled>🔒 ${t.name} (${t.desc})</option>`;
+                }
+            }).join('');
+
+            titleSelectEl.onchange = function () {
+                const chosenId = this.value;
+                const titleObj = PROFILE_TITLES.find(t => t.id === chosenId);
+                if (titleObj) {
+                    localStorage.setItem('crashdown_chosen_title', chosenId);
+                    stats.chosenTitle = chosenId;
+                    stats.activeTitle = titleObj;
+
+                    try {
+                        const profiles = JSON.parse(localStorage.getItem('crashdown_player_profiles') || '{}');
+                        if (!profiles[stats.username]) {
+                            profiles[stats.username] = { ...stats };
+                        }
+                        profiles[stats.username].chosenTitle = chosenId;
+                        localStorage.setItem('crashdown_player_profiles', JSON.stringify(profiles));
+                    } catch (e) {}
+
+                    if (titleEl) titleEl.textContent = titleObj.name;
+                    showToast(`🎖️ Új rangcím beállítva: ${titleObj.name}!`, 'success');
+                    playSound(sikeresKatt);
+                    triggerHaptic('success');
+                }
+            };
+        } else {
+            titleSelectEl.style.display = 'none';
+        }
+    }
 
     if (bestScoreEl) bestScoreEl.textContent = stats.bestScore.toLocaleString();
     if (matchesEl) matchesEl.textContent = `${stats.totalMatches} meccs`;
@@ -475,14 +625,21 @@ async function openPlayerProfileModal(username) {
         }).join('');
     }
 
+    // Mini jelvények elegáns, azonnali lebegő tooltip kártyákkal (nem natív böngészős title!)
     if (badgesListEl) {
-        const achSet = new Set(achList);
         badgesListEl.innerHTML = ACHIEVEMENTS.map(a => {
             const unlocked = achSet.has(a.id);
             return `
-                <div class="profile-badge-item ${unlocked ? 'unlocked' : 'locked'}" title="${a.title}: ${a.desc}">
+                <div class="profile-badge-item ${unlocked ? 'unlocked' : 'locked'}">
                     <span class="profile-badge-icon">${a.icon}</span>
                     <span class="profile-badge-name">${a.title}</span>
+                    <div class="badge-custom-tooltip">
+                        <div class="b-tooltip-header">
+                            <span class="b-tooltip-title">${a.icon} ${a.title}</span>
+                            <span class="b-tooltip-status ${unlocked ? 'unlocked' : 'locked'}">${unlocked ? 'Megszerezve ✓' : 'Zárolva'}</span>
+                        </div>
+                        <p class="b-tooltip-desc">${a.desc}</p>
+                    </div>
                 </div>
             `;
         }).join('');
@@ -1023,6 +1180,17 @@ async function toplistaMegjelenites() {
         leftDiv.appendChild(rankSpan);
         leftDiv.appendChild(nameSpan);
 
+        try {
+            const pStats = getPlayerProfileStats(elem.name, toplista);
+            if (pStats && pStats.activeTitle) {
+                const titleBadge = document.createElement('span');
+                titleBadge.className = 'lb-title-badge';
+                titleBadge.textContent = `${pStats.activeTitle.icon} ${pStats.activeTitle.name}`;
+                titleBadge.title = `Rangcím: ${pStats.activeTitle.name} (${pStats.activeTitle.desc})`;
+                leftDiv.appendChild(titleBadge);
+            }
+        } catch (e) {}
+
         const rightDiv = document.createElement('div');
         rightDiv.className = 'lb-right';
 
@@ -1369,13 +1537,13 @@ if (achievementsModal) {
     });
 }
 
-// Jelvény szűrőfülek eseménykezelése
+// Jelvény szűrőfülek eseménykezelése (lagg-mentes, azonnali osztályváltással)
 document.querySelectorAll('.ach-filter-btn').forEach(btn => {
     btn.addEventListener('click', function () {
         document.querySelectorAll('.ach-filter-btn').forEach(b => b.classList.remove('active'));
         this.classList.add('active');
         currentAchievementFilter = this.getAttribute('data-filter') || 'all';
-        updateAchievementsUI();
+        applyAchievementFilter(currentAchievementFilter);
     });
 });
 
