@@ -37,13 +37,13 @@
           <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
             <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/>
           </svg>
-          <span>Jelvények (<span id="unlockedAchievementsCount">0</span>/<span id="totalAchievementsCount">18</span>)</span>
+          <span>Jelvények (<span id="unlockedAchievementsCount">0</span>/<span id="totalAchievementsCount">24</span>)</span>
         </button>
         <div id="loggedInUserBox" class="logged-in-box" style="display: none">
-          <span class="user-avatar-dot"></span>
-          <span id="currentUserNameLabel" class="current-user-name"
-            >Játékos</span
-          >
+          <button id="openMyProfileBtn" class="btn-user-profile-badge" title="Kattints a saját profilod és rangod megtekintéséhez">
+            <span id="userAvatarDot" class="user-avatar-symbol">👤</span>
+            <span id="currentUserNameLabel" class="current-user-name">Játékos</span>
+          </button>
           <button
             id="openChangePasswordModalBtn"
             class="btn-profile-link"
@@ -377,12 +377,6 @@
             <span id="shuffleCooldownBadge" class="shuffle-badge">Kész</span>
           </button>
         </div>
-
-        <div class="stage-Hint">
-          <span
-            >Tipp: Kattints vagy érints blokkcsoportokat a pontszerzéshez!</span
-          >
-        </div>
       </main>
 
       <!-- Jobb oldali toplista panel -->
@@ -684,8 +678,19 @@
               <span class="profile-stat-icon">🎖️</span>
               <div class="profile-stat-data">
                 <span class="profile-stat-label">Jelvények</span>
-                <strong id="profileAchievementsCount" class="profile-stat-val">0 / 18</strong>
+                <strong id="profileAchievementsCount" class="profile-stat-val">0 / 24</strong>
               </div>
+            </div>
+          </div>
+
+          <!-- Profilkép választó részleg (Saját profilnál feloldott avatárok) -->
+          <div id="profileAvatarSection" class="profile-section" style="display: none;">
+            <div class="profile-section-header">
+              <h4 class="profile-section-title">🖼️ Profilkép választása</h4>
+              <span class="auth-hint-text">Mérföldkövekkel kinyitható szimbólumok</span>
+            </div>
+            <div id="profileAvatarGrid" class="profile-avatar-grid">
+              <!-- Dinamikusan renderelve script.js-ből -->
             </div>
           </div>
 
@@ -710,6 +715,9 @@
         </div>
       </div>
     </div>
+
+    <!-- Lebegő intelligens tooltip a jelvényekhez (nem vágódik le az ablak szélén) -->
+    <div id="profileBadgeFloatingTooltip" class="profile-floating-tooltip"></div>
 
     <div id="toastContainer" class="toast-container"></div>
 

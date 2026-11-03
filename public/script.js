@@ -186,7 +186,7 @@ function triggerHaptic(type = 'light') {
     }
 }
 
-// ==================== MÉRFÖLDKÖVEK & JELVÉNYEK (18 DB) ====================
+// ==================== MÉRFÖLDKÖVEK & JELVÉNYEK (24 DB) ====================
 const ACHIEVEMENTS = [
     // 1. Kezdő & Pontszám mérföldkövek
     { id: 'first_match', icon: '🎯', title: 'Első Lépés', desc: 'Törölj ki egy legalább 3 blokkból álló csoportot!' },
@@ -195,12 +195,14 @@ const ACHIEVEMENTS = [
     { id: 'score_5000', icon: '🏆', title: 'Pontvadász', desc: 'Érj el legalább 5 000 pontot egyetlen játékban!' },
     { id: 'score_10k', icon: '👑', title: 'Crashdown Mester', desc: 'Lépd át a 10 000 pontos álomhatárt!' },
     { id: 'score_25k', icon: '🌌', title: 'Galaktikus Bajnok', desc: 'Érj el szédítő 25 000 pontot egy menetben!' },
+    { id: 'score_50k', icon: '💎', title: 'Kozmikus Rekorder', desc: 'Lépd át a felfoghatatlan 50 000 pontos rekordot!' },
 
     // 2. Kombók & Láncreakciók
     { id: 'combo_x2', icon: '⚡', title: 'Kombó Kezdő', desc: 'Érj el 2×-es kombó szorzót gyors egymásutánban!' },
     { id: 'combo_x3', icon: '⚡', title: 'Kombó Guru', desc: 'Pörgesd fel a szorzót legalább 3×-os értékre!' },
     { id: 'combo_x5', icon: '🔥', title: 'Kombó Isten', desc: 'Érd el a maximális 5×-ös kombó csúcsot!' },
     { id: 'mega_clear', icon: '💥', title: 'Mega Törlés', desc: 'Takaríts el egyetlen kattintással legalább 8 blokkot!' },
+    { id: 'hyper_clear', icon: '⚡', title: 'Kolosszus Törlés', desc: 'Takaríts el legalább 12 blokkot egyetlen kattintással!' },
 
     // 3. Power-Up Mester
     { id: 'tnt_boom', icon: '💣', title: 'TNT Szakértő', desc: 'Robbants fel egy 3×3-as TNT power-up blokkot!' },
@@ -212,8 +214,30 @@ const ACHIEVEMENTS = [
 
     // 4. Stratégia & Játékmenet
     { id: 'perfect_clear', icon: '✨', title: 'Tiszta Pálya', desc: 'Pucold le az utolsó szálig az egész táblát (0 blokk)!' },
-    { id: 'shuffle_master', icon: '⟳', title: 'Új Esély', desc: 'Használd a Pálya keverése funkciót szorult helyzetben!' }
+    { id: 'shuffle_master', icon: '⟳', title: 'Új Esély', desc: 'Használd a Pálya keverése funkciót szorult helyzetben!' },
+    { id: 'play_5_matches', icon: '🎮', title: 'Gyakori Vendég', desc: 'Játssz le legalább 5 teljes mérkőzést!' },
+    { id: 'play_20_matches', icon: '🔥', title: 'Elhivatott Zúzó', desc: 'Játssz le legalább 20 teljes mérkőzést!' },
+    { id: 'speed_demon', icon: '🐆', title: 'Villám Kéz', desc: 'Kattints legalább 8 sikeres csoportra 10 másodpercen belül!' },
+    { id: 'master_5_color', icon: '🌈', title: 'Színkavalkád', desc: 'Érj el legalább 2 000 pontot az 5 színű mester módban!' }
 ];
+
+// ==================== PROFILKÉPEK (AVATARS) RENDSZER ====================
+const PROFILE_AVATARS = [
+    { id: 'avatar_default', symbol: '👤', name: 'Alapértelmezett', achId: null },
+    { id: 'avatar_ice', symbol: '🧊', name: 'Jégkristály', achId: 'freeze_time' },
+    { id: 'avatar_fire', symbol: '🔥', name: 'Főnix Láng', achId: 'play_20_matches' },
+    { id: 'avatar_bomb', symbol: '💣', name: 'Robbanófej', achId: 'tnt_boom' },
+    { id: 'avatar_lightning', symbol: '⚡', name: 'Neon Villám', achId: 'hyper_clear' },
+    { id: 'avatar_magnet', symbol: '🧲', name: 'Mágnes', achId: 'magnet_pull' },
+    { id: 'avatar_crown', symbol: '👑', name: 'Arany Korona', achId: 'score_10k' },
+    { id: 'avatar_diamond', symbol: '💎', name: 'Kozmikus Gyémánt', achId: 'score_50k' },
+    { id: 'avatar_star', symbol: '✨', name: 'Szupernóva', achId: 'perfect_clear' },
+    { id: 'avatar_rainbow', symbol: '🌈', name: 'Szivárvány Prizma', achId: 'master_5_color' },
+    { id: 'avatar_speed', symbol: '🐆', name: 'Villám Párduc', achId: 'speed_demon' },
+    { id: 'avatar_galaxy', symbol: '🌌', name: 'Kozmosz', achId: 'score_25k' }
+];
+
+let recentSuccessfulClicks = [];
 
 let currentAchievementFilter = 'all';
 
@@ -319,79 +343,126 @@ function applyAchievementFilter(filter) {
     });
 }
 
-// ==================== RANGCÍMEK (PROFILE TITLES) RENDSZER ====================
+// ==================== RANGCÍMEK (PROFILE TITLES) RENDSZER (17 DB) ====================
 const PROFILE_TITLES = [
     {
         id: 'title_beginner',
         name: '🔰 Kezdő Blokktörő',
         desc: 'Alapértelmezett kezdő rangcím minden játékosnak',
+        achId: null,
         isUnlocked: (stats, achSet) => true
     },
     {
         id: 'title_advanced',
         name: '⭐ Haladó Játékos',
         desc: 'Érj el legalább 1 500 pontot vagy játssz 3 meccset',
+        achId: null,
         isUnlocked: (stats, achSet) => (stats.bestScore >= 1500) || (stats.totalMatches >= 3)
     },
     {
         id: 'title_champion',
         name: '🏆 Crashdown Bajnok',
         desc: 'Érj el legalább 5 000 pontot egy meccsben',
+        achId: 'score_5000',
         isUnlocked: (stats, achSet) => (stats.bestScore >= 5000) || achSet.has('score_5000')
     },
     {
         id: 'title_grandmaster',
         name: '👑 Crashdown Nagymester',
         desc: 'Lépd át a 10 000 pontos álomhatárt',
+        achId: 'score_10k',
         isUnlocked: (stats, achSet) => (stats.bestScore >= 10000) || achSet.has('score_10k')
     },
     {
         id: 'title_legend',
         name: '🌌 Galaktikus Legenda',
         desc: 'Érj el szédítő 25 000 pontot',
+        achId: 'score_25k',
         isUnlocked: (stats, achSet) => (stats.bestScore >= 25000) || achSet.has('score_25k')
+    },
+    {
+        id: 'title_cosmic',
+        name: '💎 Kozmikus Rekorder',
+        desc: 'Lépd át az 50 000 pontos csúcsot',
+        achId: 'score_50k',
+        isUnlocked: (stats, achSet) => (stats.bestScore >= 50000) || achSet.has('score_50k')
     },
     {
         id: 'title_combo_mage',
         name: '⚡ Kombó Mágus',
         desc: 'Érd el a maximális 5×-ös kombó szorzót',
+        achId: 'combo_x5',
         isUnlocked: (stats, achSet) => achSet.has('combo_x5')
+    },
+    {
+        id: 'title_titan',
+        name: '🌋 Titán Zúzó',
+        desc: 'Takaríts el legalább 12 blokkot egyetlen kattintással',
+        achId: 'hyper_clear',
+        isUnlocked: (stats, achSet) => achSet.has('hyper_clear')
+    },
+    {
+        id: 'title_speed',
+        name: '🐆 Villámkezű',
+        desc: 'Kattints legalább 8 sikeres csoportra 10 másodpercen belül',
+        achId: 'speed_demon',
+        isUnlocked: (stats, achSet) => achSet.has('speed_demon')
+    },
+    {
+        id: 'title_color_master',
+        name: '🌈 Színmester',
+        desc: 'Érj el legalább 2 000 pontot az 5 színű mester módban',
+        achId: 'master_5_color',
+        isUnlocked: (stats, achSet) => achSet.has('master_5_color')
     },
     {
         id: 'title_demolition',
         name: '💣 Robbantómester',
         desc: 'Használj TNT robbantást vagy Szín-bombát',
+        achId: 'tnt_boom',
         isUnlocked: (stats, achSet) => achSet.has('tnt_boom') || achSet.has('color_bomb')
     },
     {
         id: 'title_ice_lord',
         name: '❄️ Jégkirály',
         desc: 'Fagyaszd meg az időt az Időfagyasztóval',
+        achId: 'freeze_time',
         isUnlocked: (stats, achSet) => achSet.has('freeze_time')
     },
     {
         id: 'title_magnet_force',
         name: '🧲 Mágneses Erőmű',
         desc: 'Ránts össze egy egész színt a Szuper Mágnessel',
+        achId: 'magnet_pull',
         isUnlocked: (stats, achSet) => achSet.has('magnet_pull')
     },
     {
         id: 'title_perfectionist',
         name: '✨ Tökéletesség Híve',
         desc: 'Takarítsd le a teljes táblát 0 blokkra',
+        achId: 'perfect_clear',
         isUnlocked: (stats, achSet) => achSet.has('perfect_clear')
     },
     {
         id: 'title_time_bender',
         name: '⏱️ Időhajlító',
         desc: 'Játssz legalább 10 percet vagy gyűjts időbónuszt',
+        achId: 'time_bonus',
         isUnlocked: (stats, achSet) => (stats.totalPlaytimeSeconds >= 600) || achSet.has('time_bonus')
     },
     {
         id: 'title_veteran',
         name: '🛡️ Veterán Blokktörő',
-        desc: 'Játssz le legalább 8 teljes meccset',
-        isUnlocked: (stats, achSet) => stats.totalMatches >= 8
+        desc: 'Játssz le legalább 5 teljes meccset',
+        achId: 'play_5_matches',
+        isUnlocked: (stats, achSet) => stats.totalMatches >= 5 || achSet.has('play_5_matches')
+    },
+    {
+        id: 'title_devoted',
+        name: '🔥 Zúzó Legenda',
+        desc: 'Játssz le legalább 20 teljes mérkőzést',
+        achId: 'play_20_matches',
+        isUnlocked: (stats, achSet) => stats.totalMatches >= 20 || achSet.has('play_20_matches')
     }
 ];
 
@@ -430,7 +501,11 @@ function updatePlayerStatsRecord(username, score, colorCount, durationSeconds) {
         if (currentUser && currentUser.displayName === username) {
             p.achievements = getUnlockedAchievements();
             p.chosenTitle = localStorage.getItem('crashdown_chosen_title') || p.chosenTitle;
+            p.chosenAvatar = localStorage.getItem('crashdown_chosen_avatar') || p.chosenAvatar || 'avatar_default';
         }
+
+        if (p.totalMatches >= 5) checkAchievement('play_5_matches');
+        if (p.totalMatches >= 20) checkAchievement('play_20_matches');
 
         profiles[username] = p;
         localStorage.setItem(key, JSON.stringify(profiles));
@@ -457,7 +532,8 @@ function getPlayerProfileStats(username, allScores = []) {
             achievements: [],
             modes: {},
             durations: {},
-            chosenTitle: null
+            chosenTitle: null,
+            chosenAvatar: 'avatar_default'
         };
     }
 
@@ -482,6 +558,7 @@ function getPlayerProfileStats(username, allScores = []) {
     if (currentUser && currentUser.displayName && currentUser.displayName.toLowerCase() === username.toLowerCase()) {
         profile.achievements = getUnlockedAchievements();
         profile.chosenTitle = localStorage.getItem('crashdown_chosen_title') || profile.chosenTitle;
+        profile.chosenAvatar = localStorage.getItem('crashdown_chosen_avatar') || profile.chosenAvatar || 'avatar_default';
     } else {
         const inferred = new Set(profile.achievements || []);
         if (profile.totalMatches >= 1) inferred.add('first_match');
@@ -490,6 +567,9 @@ function getPlayerProfileStats(username, allScores = []) {
         if (profile.bestScore >= 5000) inferred.add('score_5000');
         if (profile.bestScore >= 10000) inferred.add('score_10k');
         if (profile.bestScore >= 25000) inferred.add('score_25k');
+        if (profile.bestScore >= 50000) inferred.add('score_50k');
+        if (profile.totalMatches >= 5) inferred.add('play_5_matches');
+        if (profile.totalMatches >= 20) inferred.add('play_20_matches');
         if (profile.bestScore >= 3000) {
             inferred.add('combo_x2');
             inferred.add('combo_x3');
@@ -522,6 +602,16 @@ function getPlayerProfileStats(username, allScores = []) {
     }
     profile.activeTitle = activeTitle || PROFILE_TITLES[0];
 
+    // Profilkép (Avatar) meghatározása
+    let activeAvatar = null;
+    if (profile.chosenAvatar) {
+        const foundAv = PROFILE_AVATARS.find(a => a.id === profile.chosenAvatar);
+        if (foundAv && (!foundAv.achId || achSet.has(foundAv.achId))) {
+            activeAvatar = foundAv;
+        }
+    }
+    profile.activeAvatar = activeAvatar || PROFILE_AVATARS[0];
+
     return profile;
 }
 
@@ -551,7 +641,10 @@ async function openPlayerProfileModal(username) {
     const badgeSummaryEl = document.getElementById('profileBadgeSummary');
 
     if (nameEl) nameEl.textContent = stats.username;
-    if (avatarEl) avatarEl.textContent = (stats.username[0] || 'J').toUpperCase();
+    if (avatarEl) {
+        avatarEl.textContent = stats.activeAvatar.symbol;
+        avatarEl.title = `Profilkép: ${stats.activeAvatar.name}`;
+    }
 
     // Rangcím beállítása
     if (titleEl) titleEl.textContent = stats.activeTitle.name;
@@ -590,10 +683,81 @@ async function openPlayerProfileModal(username) {
                     showToast(`🎖️ Új rangcím beállítva: ${titleObj.name}!`, 'success');
                     playSound(sikeresKatt);
                     triggerHaptic('success');
+                    toplistaMegjelenites();
                 }
             };
         } else {
             titleSelectEl.style.display = 'none';
+        }
+    }
+
+    // Profilkép (Avatar) választó rács inicializálása
+    const avatarSection = document.getElementById('profileAvatarSection');
+    const avatarGrid = document.getElementById('profileAvatarGrid');
+    if (avatarSection && avatarGrid) {
+        if (isOwnProfile) {
+            avatarSection.style.display = 'block';
+            avatarGrid.innerHTML = PROFILE_AVATARS.map(av => {
+                const unlocked = !av.achId || achSet.has(av.achId);
+                const isSelected = stats.activeAvatar.id === av.id;
+                const reqAch = av.achId ? ACHIEVEMENTS.find(a => a.id === av.achId) : null;
+                const lockTitle = reqAch ? `Zárolva: ${reqAch.title} (${reqAch.desc}) szükséges hozzá!` : '';
+                return `
+                    <div class="avatar-pick-card ${unlocked ? '' : 'locked'} ${isSelected ? 'active' : ''}"
+                         data-avatar-id="${av.id}"
+                         data-unlocked="${unlocked ? '1' : '0'}"
+                         title="${unlocked ? av.name : lockTitle}">
+                        ${!unlocked ? '<span class="avatar-lock-icon">🔒</span>' : ''}
+                        <span class="avatar-pick-symbol">${av.symbol}</span>
+                        <span class="avatar-pick-name">${av.name}</span>
+                    </div>
+                `;
+            }).join('');
+
+            avatarGrid.querySelectorAll('.avatar-pick-card').forEach(card => {
+                card.addEventListener('click', function () {
+                    const avId = this.getAttribute('data-avatar-id');
+                    const isUnlocked = this.getAttribute('data-unlocked') === '1';
+                    if (!isUnlocked) {
+                        const avObj = PROFILE_AVATARS.find(a => a.id === avId);
+                        const reqAch = avObj?.achId ? ACHIEVEMENTS.find(a => a.id === avObj.achId) : null;
+                        showToast(`🔒 Ez a profilkép még zárolva van! Feloldáshoz: ${reqAch?.title || 'Teljesíts több mérföldkövet'}`, 'warning');
+                        playSound(rosszKatt);
+                        triggerHaptic('error');
+                        return;
+                    }
+
+                    const avObj = PROFILE_AVATARS.find(a => a.id === avId);
+                    if (!avObj) return;
+
+                    localStorage.setItem('crashdown_chosen_avatar', avId);
+                    stats.chosenAvatar = avId;
+                    stats.activeAvatar = avObj;
+
+                    try {
+                        const profiles = JSON.parse(localStorage.getItem('crashdown_player_profiles') || '{}');
+                        if (!profiles[stats.username]) {
+                            profiles[stats.username] = { ...stats };
+                        }
+                        profiles[stats.username].chosenAvatar = avId;
+                        localStorage.setItem('crashdown_player_profiles', JSON.stringify(profiles));
+                    } catch (e) {}
+
+                    if (avatarEl) avatarEl.textContent = avObj.symbol;
+                    const userAvatarDot = document.getElementById('userAvatarDot');
+                    if (userAvatarDot) userAvatarDot.textContent = avObj.symbol;
+
+                    avatarGrid.querySelectorAll('.avatar-pick-card').forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+
+                    showToast(`🖼️ Új profilkép beállítva: ${avObj.symbol} ${avObj.name}!`, 'success');
+                    playSound(sikeresKatt);
+                    triggerHaptic('success');
+                    toplistaMegjelenites();
+                });
+            });
+        } else {
+            avatarSection.style.display = 'none';
         }
     }
 
@@ -625,24 +789,64 @@ async function openPlayerProfileModal(username) {
         }).join('');
     }
 
-    // Mini jelvények elegáns, azonnali lebegő tooltip kártyákkal (nem natív böngészős title!)
+    // Mini jelvények intelligens lebegő tooltippel (soha nem vágódik le az ablak szélén)
     if (badgesListEl) {
         badgesListEl.innerHTML = ACHIEVEMENTS.map(a => {
             const unlocked = achSet.has(a.id);
             return `
-                <div class="profile-badge-item ${unlocked ? 'unlocked' : 'locked'}">
+                <div class="profile-badge-item ${unlocked ? 'unlocked' : 'locked'}" data-ach-id="${a.id}">
                     <span class="profile-badge-icon">${a.icon}</span>
                     <span class="profile-badge-name">${a.title}</span>
-                    <div class="badge-custom-tooltip">
-                        <div class="b-tooltip-header">
-                            <span class="b-tooltip-title">${a.icon} ${a.title}</span>
-                            <span class="b-tooltip-status ${unlocked ? 'unlocked' : 'locked'}">${unlocked ? 'Megszerezve ✓' : 'Zárolva'}</span>
-                        </div>
-                        <p class="b-tooltip-desc">${a.desc}</p>
-                    </div>
                 </div>
             `;
         }).join('');
+
+        const floatingTip = document.getElementById('profileBadgeFloatingTooltip');
+        badgesListEl.querySelectorAll('.profile-badge-item').forEach(item => {
+            const achId = item.getAttribute('data-ach-id');
+            const a = ACHIEVEMENTS.find(x => x.id === achId);
+            if (!a || !floatingTip) return;
+
+            item.addEventListener('mouseenter', () => {
+                const unlocked = achSet.has(a.id);
+                let rewardText = '';
+                const linkedAv = PROFILE_AVATARS.find(av => av.achId === a.id);
+                const linkedTitle = PROFILE_TITLES.find(t => t.achId === a.id);
+                if (linkedAv) rewardText += `🖼️ Profilkép jutalom: ${linkedAv.symbol} ${linkedAv.name} `;
+                if (linkedTitle) rewardText += `🎖️ Rangcím: ${linkedTitle.name}`;
+
+                floatingTip.innerHTML = `
+                    <div class="b-tooltip-header">
+                        <span class="b-tooltip-title">${a.icon} ${a.title}</span>
+                        <span class="b-tooltip-status ${unlocked ? 'unlocked' : 'locked'}">${unlocked ? 'Megszerezve ✓' : '🔒 Zárolva'}</span>
+                    </div>
+                    <p class="b-tooltip-desc">${a.desc}</p>
+                    ${rewardText ? `<div class="b-tooltip-reward">${rewardText}</div>` : ''}
+                `;
+
+                const rect = item.getBoundingClientRect();
+                const tipWidth = 230;
+                let tipLeft = rect.left + (rect.width / 2) - (tipWidth / 2);
+                tipLeft = Math.max(12, Math.min(window.innerWidth - tipWidth - 12, tipLeft));
+
+                let tipTop = rect.top - 74;
+                if (tipTop < 10) {
+                    tipTop = rect.bottom + 8;
+                }
+
+                floatingTip.style.left = `${tipLeft}px`;
+                floatingTip.style.top = `${tipTop}px`;
+                floatingTip.style.display = 'block';
+                floatingTip.style.opacity = '1';
+            });
+
+            item.addEventListener('mouseleave', () => {
+                if (floatingTip) {
+                    floatingTip.style.display = 'none';
+                    floatingTip.style.opacity = '0';
+                }
+            });
+        });
     }
 
     const modal = document.getElementById('playerProfileModal');
@@ -750,6 +954,9 @@ function updateScoreUI(instant = false) {
     if (pontSzam >= 5000) checkAchievement('score_5000');
     if (pontSzam >= 10000) checkAchievement('score_10k');
     if (pontSzam >= 25000) checkAchievement('score_25k');
+    if (pontSzam >= 50000) checkAchievement('score_50k');
+    const colorSelect = document.getElementById('colorSelect');
+    if (colorSelect && colorSelect.value === '5' && pontSzam >= 2000) checkAchievement('master_5_color');
 }
 
 /*############################## AUTH & TOPLISTA REGION ##############################*/
@@ -1042,6 +1249,14 @@ function updateAuthUI(user) {
         if (loggedInUserBox) loggedInUserBox.style.display = 'inline-flex';
         if (currentUserNameLabel) currentUserNameLabel.textContent = user.displayName;
         
+        try {
+            const myStats = getPlayerProfileStats(user.displayName);
+            const userAvatarDot = document.getElementById('userAvatarDot');
+            if (userAvatarDot) {
+                userAvatarDot.textContent = myStats?.activeAvatar?.symbol || '👤';
+            }
+        } catch (e) {}
+
         // Játék végi mentési gombok állapota
         const saveAsLoggedInBtn = document.getElementById('saveAsLoggedInBtn');
         const saveWithLoginModalBtn = document.getElementById('saveWithLoginModalBtn');
@@ -1058,6 +1273,17 @@ function updateAuthUI(user) {
         if (saveAsLoggedInBtn) saveAsLoggedInBtn.style.display = 'none';
         if (saveWithLoginModalBtn) saveWithLoginModalBtn.style.display = 'block';
     }
+}
+
+// Felső fejléc saját profil gomb kattintás
+const openMyProfileBtn = document.getElementById('openMyProfileBtn');
+if (openMyProfileBtn) {
+    openMyProfileBtn.addEventListener('click', () => {
+        const currentUser = window.authService?.getCurrentUser();
+        if (currentUser && currentUser.displayName) {
+            openPlayerProfileModal(currentUser.displayName);
+        }
+    });
 }
 
 // Játék végi mentés gombok eseményei
@@ -1172,24 +1398,36 @@ async function toplistaMegjelenites() {
         const rankSpan = document.createElement('span');
         rankSpan.className = 'lb-rank';
         rankSpan.textContent = i < 3 ? medals[i] : `${i + 1}.`;
-
-        const nameSpan = document.createElement('span');
-        nameSpan.className = 'lb-name';
-        nameSpan.textContent = elem.name;
-
         leftDiv.appendChild(rankSpan);
-        leftDiv.appendChild(nameSpan);
 
         try {
             const pStats = getPlayerProfileStats(elem.name, toplista);
+            if (pStats && pStats.activeAvatar) {
+                const avatarSpan = document.createElement('span');
+                avatarSpan.className = 'lb-avatar';
+                avatarSpan.textContent = pStats.activeAvatar.symbol;
+                avatarSpan.title = `Profilkép: ${pStats.activeAvatar.name}`;
+                leftDiv.appendChild(avatarSpan);
+            }
+
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'lb-name';
+            nameSpan.textContent = elem.name;
+            leftDiv.appendChild(nameSpan);
+
             if (pStats && pStats.activeTitle) {
                 const titleBadge = document.createElement('span');
                 titleBadge.className = 'lb-title-badge';
-                titleBadge.textContent = `${pStats.activeTitle.icon} ${pStats.activeTitle.name}`;
+                titleBadge.textContent = `${pStats.activeTitle.name}`;
                 titleBadge.title = `Rangcím: ${pStats.activeTitle.name} (${pStats.activeTitle.desc})`;
                 leftDiv.appendChild(titleBadge);
             }
-        } catch (e) {}
+        } catch (e) {
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'lb-name';
+            nameSpan.textContent = elem.name;
+            leftDiv.appendChild(nameSpan);
+        }
 
         const rightDiv = document.createElement('div');
         rightDiv.className = 'lb-right';
@@ -2290,6 +2528,15 @@ function handleClick(event) {
             if (torlendoNegyzetek.length >= 8) {
                 checkAchievement('mega_clear');
             }
+            if (torlendoNegyzetek.length >= 12) {
+                checkAchievement('hyper_clear');
+            }
+
+            recentSuccessfulClicks.push(Date.now());
+            recentSuccessfulClicks = recentSuccessfulClicks.filter(t => Date.now() - t <= 10000);
+            if (recentSuccessfulClicks.length >= 8) {
+                checkAchievement('speed_demon');
+            }
             const mult = regisztraljKomboLepest();
 
             for (let i = 0; i < torlendoNegyzetek.length; i++) {
@@ -2723,6 +2970,16 @@ function drawGrid() {
 function animationLoop(now) {
     const dt = Math.min(0.05, (now - lastFrameTime) / 1000);
     lastFrameTime = now;
+
+    // Ha bármilyen párbeszédablak (modal) nyitva van és a játék nem fut vagy nincsenek aktív effektek,
+    // felfüggesztjük a canvas folyamatos újrarajzolását, biztosítva a sima, lagg-mentes 60-120 FPS-t
+    const isAnyModalOpen = !!document.querySelector('.modal-backdrop:not(.hidden)');
+    const hasActiveFx = (particles && particles.length > 0) || (floatingTexts && floatingTexts.length > 0) || (shockwaves && shockwaves.length > 0) || screenShake > 0.1 || isShufflingBoard;
+
+    if (isAnyModalOpen && !jatekFut && !hasActiveFx) {
+        requestAnimationFrame(animationLoop);
+        return;
+    }
 
     // Pontszám animált pörgetése
     if (displayedScore !== pontSzam) {
