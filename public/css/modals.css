@@ -24,10 +24,10 @@
 }
 
 .auth-modal-card {
-    background: #181f2f;
-    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: var(--bg-panel);
+    border: 1px solid var(--border-subtle);
     border-radius: var(--radius-lg);
-    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.75), 0 0 0 1px var(--border-subtle);
     width: 100%;
     max-width: 380px;
     padding: 20px;
@@ -410,13 +410,14 @@
     display: flex;
     align-items: center;
     gap: 14px;
+    width: 100%;
 }
 
 .profile-avatar-circle {
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    background: linear-gradient(135deg, var(--color-blue), var(--color-blue-dark));
     color: #ffffff;
     font-size: 1.45rem;
     font-weight: 900;
@@ -424,7 +425,7 @@
     align-items: center;
     justify-content: center;
     border: 2px solid rgba(255, 255, 255, 0.25);
-    box-shadow: 0 0 16px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 0 16px rgba(0, 0, 0, 0.45);
     flex-shrink: 0;
     user-select: none;
 }
@@ -433,6 +434,8 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
+    flex: 1;
+    min-width: 0;
 }
 
 #profilePlayerName {
@@ -460,19 +463,25 @@
     font-weight: 800;
     padding: 2px 9px;
     border-radius: 999px;
-    background: rgba(99, 102, 241, 0.2);
-    color: #a5b4fc;
-    border: 1px solid rgba(99, 102, 241, 0.4);
+    background: var(--bg-input);
+    color: var(--text-primary);
+    border: 1px solid var(--border-subtle);
     display: inline-block;
 }
 
+.profile-title-select-wrap {
+    margin-left: auto;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
 .profile-title-select {
-    background: #1e2433;
-    border: 1px solid rgba(99, 102, 241, 0.45);
-    color: #c7d2fe;
+    background: var(--bg-input);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-primary);
     font-size: 0.75rem;
     font-weight: 700;
-    padding: 3px 8px;
+    padding: 4px 10px;
     border-radius: 999px;
     cursor: pointer;
     outline: none;

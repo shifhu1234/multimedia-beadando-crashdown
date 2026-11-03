@@ -541,6 +541,44 @@ class LeaderboardService {
         }
         this.notifySubscribers([]);
     }
+
+    async getPlayerProfile(username) {
+        if (!username) return null;
+        const safeKey = encodeURIComponent(username.trim().toLowerCase()).replace(/\./g, '%2E');
+        if (this.db) {
+            try {
+                const snap = await this.db.ref('profiles/' + safeKey).once('value');
+                if (snap.exists()) {
+                    return snap.val();
+                }
+            } catch (e) {
+                console.warn('Firebase profil lekérési hiba:', e);
+            }
+        }
+        return null;
+    }
+
+    async savePlayerProfile(username, profileData) {
+        if (!username || !profileData) return;
+        const safeKey = encodeURIComponent(username.trim().toLowerCase()).replace(/\./g, '%2E');
+        if (this.isOnline && this.db) {
+            try {
+                await this.db.ref('profiles/' + safeKey).set({
+                    username: username,
+                    bestScore: profileData.bestScore || 0,
+                    totalMatches: profileData.totalMatches || 0,
+                    totalPlaytimeSeconds: profileData.totalPlaytimeSeconds || 0,
+                    achievements: profileData.achievements || [],
+                    history: (profileData.history || []).slice(0, 10),
+                    chosenTitle: profileData.chosenTitle || null,
+                    chosenAvatar: profileData.chosenAvatar || 'avatar_default',
+                    updatedAt: new Date().toISOString()
+                });
+            } catch (e) {
+                console.warn('Firebase profil mentési hiba:', e);
+            }
+        }
+    }
 }
 
 // Globális példányok

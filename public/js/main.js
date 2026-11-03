@@ -56,6 +56,9 @@ if (colorSelect) {
     colorSelect.addEventListener('change', function () {
         localStorage.setItem('selectedColorCount', this.value);
         getSzinek(this.value);
+        if (!jatekFut && !vegeAJateknak && typeof initPreviewBoard === 'function') {
+            initPreviewBoard();
+        }
         showToast(`Nehézség beállítva: ${this.value} szín`, 'info');
     });
 }

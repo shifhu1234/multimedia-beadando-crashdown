@@ -282,9 +282,9 @@ select:disabled {
     flex: 1;
 }
 
-.legend-list::-webkit-scrollbar { width: 3px; }
+.legend-list::-webkit-scrollbar { width: 4px; }
 .legend-list::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.15);
+    background: var(--color-blue);
     border-radius: 999px;
 }
 
@@ -426,15 +426,15 @@ select:disabled {
 /* HUD Felső sáv - Két zónás: felül az idő/powerup/pont, alul a lebegő info sáv */
 .hud-bar {
     width: 100%;
-    height: 82px;
-    min-height: 82px;
+    height: 92px;
+    min-height: 92px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     background: var(--bg-panel);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-lg);
-    padding: 6px 12px 4px 12px;
+    padding: 6px 12px 5px 12px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
     position: relative;
     flex-shrink: 0;
@@ -447,7 +447,7 @@ select:disabled {
     gap: 6px;
     align-items: center;
     width: 100%;
-    height: 48px;
+    height: 56px;
 }
 
 .hud-center-buffs {
@@ -455,24 +455,24 @@ select:disabled {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 3px;
+    gap: 4px;
     min-width: 0;
     height: 100%;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .buff-pill {
     display: inline-flex;
     align-items: center;
     justify-content: space-between;
-    width: 140px;
-    min-width: 140px;
-    max-width: 140px;
+    width: auto;
+    max-width: 135px;
+    min-width: 0;
     height: 22px;
-    padding: 1px 8px;
+    padding: 1px 7px;
     box-sizing: border-box;
     border-radius: 999px;
-    font-size: 0.66rem;
+    font-size: 0.65rem;
     font-weight: 800;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
     animation: buffBounce 1s infinite alternate ease-in-out;
@@ -652,6 +652,7 @@ select:disabled {
     width: 456px;
     height: 456px;
     max-width: 100%;
+    aspect-ratio: 1 / 1;
     padding: 8px;
     border-radius: var(--radius-lg);
     background: #141824;
@@ -662,6 +663,7 @@ select:disabled {
     justify-content: center;
     flex-shrink: 0;
     transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    box-sizing: border-box;
 }
 
 .canvas-wrapper.frenzy-active {
@@ -675,9 +677,10 @@ select:disabled {
 }
 
 #crashdownCanvas {
-    width: 440px;
-    height: 440px;
-    max-width: 100%;
+    width: 100%;
+    max-width: 440px;
+    height: auto;
+    aspect-ratio: 1 / 1;
     border-radius: 10px;
     background-color: #0d1017;
     cursor: pointer;
@@ -950,7 +953,7 @@ select:disabled {
 
 .leaderboard-list::-webkit-scrollbar { width: 4px; }
 .leaderboard-list::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.15);
+    background: var(--color-blue);
     border-radius: 999px;
 }
 

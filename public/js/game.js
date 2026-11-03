@@ -333,18 +333,22 @@ function valasszVeletlenPowerUpok(db = 4) {
         return [];
     }
 
-    // 2. Káosz mód: 8-10 db power-up a táblán (freeze és +5s csak picivel gyakoribb)
+    // 2. Káosz mód: lényegesen gyakoribb power-up spawn (12-14 db a táblán)
     if (mode === 'chaos') {
-        const chaosPows = ['cyan', 'pink', '#f97316', 'darkgreen', '#14b8a6', '#6366f1', '#e11d48', '#f97316', 'darkgreen', 'cyan'];
-        if (Math.random() < 0.4) chaosPows.push('#0284c7'); // Időfagyasztó picivel gyakoribb
-        if (Math.random() < 0.4) chaosPows.push('#581845'); // +5 mp időbónusz picivel gyakoribb
+        const chaosPows = ['cyan', 'pink', '#f97316', 'darkgreen', '#14b8a6', '#6366f1', '#e11d48', '#f97316', 'darkgreen', 'cyan', '#0284c7', '#581845', '#14b8a6', '#6366f1'];
         const shuffled = [...chaosPows].sort(() => 0.5 - Math.random());
-        return shuffled.slice(0, 9);
+        return shuffled.slice(0, 13);
     }
 
-    // 3. Időhajsza mód: csakis fagyasztó power-up és pontduplázó kis mennyiségben
+    // 3. Időhajsza mód: ritkábban jelenjenek meg a powerupok (csakis fagyasztó és 2x, mindössze 1-2 db)
     if (mode === 'time_rush') {
-        return ['#0284c7', 'cyan', 'cyan'];
+        const candidates = ['#0284c7', 'cyan'];
+        const count = Math.random() < 0.55 ? 1 : 2;
+        const res = [];
+        for (let i = 0; i < count; i++) {
+            res.push(candidates[Math.floor(Math.random() * candidates.length)]);
+        }
+        return res;
     }
 
     // 4. Robbanás Mánia: kizárólag TNT spawnoljon, semmilyen más power-up!
@@ -508,7 +512,13 @@ function spawnFloatingText(col, row, text, color = '#ffffff') {
 }
 
 function handleClick(event) {
-    if (!jatekFut || vegeAJateknak || kattOffset) return;
+    if (!jatekFut) {
+        if (typeof startMatch === 'function') {
+            startMatch();
+        }
+        return;
+    }
+    if (vegeAJateknak || kattOffset) return;
 
     const rect = canvas.getBoundingClientRect();
     const scaleX = LOGICAL_SIZE / rect.width;
@@ -1630,3 +1640,15 @@ canvas.addEventListener('mouseleave', function () {
 });
 
 canvas.addEventListener('click', handleClick);
+
+const canvasOverlayEl = document.getElementById('canvasOverlay');
+if (canvasOverlayEl) {
+    canvasOverlayEl.addEventListener('click', function (e) {
+        if (e.target && (e.target.id === 'overlaySaveScoreBtn' || e.target.closest('#overlaySaveScoreBtn'))) {
+            return;
+        }
+        if (typeof startMatch === 'function') {
+            startMatch();
+        }
+    });
+}

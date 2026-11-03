@@ -361,7 +361,10 @@ function updateAchievementsUI() {
         
         const rewList = [];
         if (linkedAv) rewList.push(`Profilkép ${linkedAv.symbol}`);
-        if (linkedTitle) rewList.push(`Rangcím ${linkedTitle.name.split(' ')[0] || ''}`);
+        if (linkedTitle) {
+            const cleanTitle = linkedTitle.name.replace(/^[^\w\s\u00C0-\u017F]+/, '').trim();
+            rewList.push(`Rangcím: ${cleanTitle}`);
+        }
         if (linkedTheme) rewList.push(`Téma: ${linkedTheme.name}`);
         const rewardSnippet = rewList.length > 0 ? `<div class="ach-card-reward-tag">🎁 Jutalmak: ${rewList.join(', ')}</div>` : '';
 
@@ -468,6 +471,10 @@ function updatePlayerStatsRecord(username, score, colorCount, durationSeconds, m
 
         profiles[username] = p;
         localStorage.setItem(key, JSON.stringify(profiles));
+
+        if (window.databaseService && typeof window.databaseService.savePlayerProfile === 'function') {
+            window.databaseService.savePlayerProfile(username, p).catch(() => {});
+        }
     } catch (e) {
         console.error('Hiba a játékos statisztika mentésekor:', e);
     }
@@ -483,7 +490,7 @@ function regisztraljPowerupHasznalatot() {
     if (count >= 50) checkAchievement('powerup_50');
 }
 
-function getPlayerProfileStats(username, allScores = []) {
+function getPlayerProfileStats(username, allScores = [], onlineProfile = null) {
     let profile = null;
     try {
         const profiles = JSON.parse(localStorage.getItem('crashdown_player_profiles') || '{}');
@@ -508,6 +515,21 @@ function getPlayerProfileStats(username, allScores = []) {
     }
     if (!profile.history) profile.history = [];
 
+    // Online profil adatainak összefésülése
+    if (onlineProfile) {
+        if (onlineProfile.history && Array.isArray(onlineProfile.history) && onlineProfile.history.length > 0) {
+            profile.history = onlineProfile.history;
+        }
+        if (onlineProfile.achievements && Array.isArray(onlineProfile.achievements) && onlineProfile.achievements.length > 0) {
+            profile.achievements = Array.from(new Set([...(profile.achievements || []), ...onlineProfile.achievements]));
+        }
+        if (onlineProfile.chosenTitle) profile.chosenTitle = onlineProfile.chosenTitle;
+        if (onlineProfile.chosenAvatar) profile.chosenAvatar = onlineProfile.chosenAvatar;
+        if ((onlineProfile.bestScore || 0) > profile.bestScore) profile.bestScore = onlineProfile.bestScore;
+        if ((onlineProfile.totalMatches || 0) > profile.totalMatches) profile.totalMatches = onlineProfile.totalMatches;
+        if ((onlineProfile.totalPlaytimeSeconds || 0) > profile.totalPlaytimeSeconds) profile.totalPlaytimeSeconds = onlineProfile.totalPlaytimeSeconds;
+    }
+
     playerScores.forEach(s => {
         const sc = parseInt(s.score, 10) || 0;
         if (sc > profile.bestScore) profile.bestScore = sc;
@@ -523,6 +545,39 @@ function getPlayerProfileStats(username, allScores = []) {
         playerScores.forEach(s => {
             profile.totalPlaytimeSeconds += parseInt(s.duration, 10) || 120;
         });
+    }
+
+    // Ha az előzmények üresek, de vannak meccsei a ranglistán, töltsük be azokat!
+    if (!profile.history || profile.history.length === 0) {
+        profile.history = playerScores.map(s => ({
+            score: parseInt(s.score, 10) || 0,
+            color: String(s.color || '3'),
+            modifier: s.modifier || 'normal',
+            duration: parseInt(s.duration, 10) || 60,
+            timestamp: s.timestamp || new Date().toISOString()
+        })).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 10);
+    }
+
+    // Ha nincsenek szinkronizált mérföldkövei, a statisztikái alapján következtessük ki
+    if (!profile.achievements || profile.achievements.length === 0) {
+        const inferred = [];
+        if (profile.bestScore >= 500) inferred.push('first_blood');
+        if (profile.bestScore >= 1000) inferred.push('score_1000');
+        if (profile.bestScore >= 2500) inferred.push('score_2500');
+        if (profile.bestScore >= 5000) inferred.push('score_5000');
+        if (profile.bestScore >= 10000) inferred.push('score_10k');
+        if (profile.bestScore >= 25000) inferred.push('score_25k');
+        if (profile.bestScore >= 50000) inferred.push('score_50k');
+        if (profile.totalMatches >= 1) inferred.push('first_game');
+        if (profile.totalMatches >= 5) inferred.push('play_5_matches');
+        if (profile.totalMatches >= 10) inferred.push('matches_10');
+        if (profile.totalMatches >= 20) inferred.push('play_20_matches');
+        if (profile.totalMatches >= 50) inferred.push('matches_50');
+        if (profile.totalPlaytimeSeconds >= 60) inferred.push('play_time_1m');
+        if (profile.totalPlaytimeSeconds >= 300) inferred.push('play_time_5m');
+        if (profile.totalPlaytimeSeconds >= 900) inferred.push('play_time_15m');
+        if (profile.totalPlaytimeSeconds >= 1800) inferred.push('play_time_30m');
+        profile.achievements = inferred;
     }
 
     const currentUser = window.authService?.getCurrentUser();

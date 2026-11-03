@@ -113,13 +113,17 @@ function applyTheme(themeKey) {
         themeSelect.value = themeKey;
     }
 
-    // Canvas azonnali frissítése újraszínezéssel
-    if (jatekFut && palya && palya.length) {
-        palya.forEach(sor => {
+    // Canvas azonnali frissítése újraszínezéssel, előnézet alaphelyzetbe állítása nélkül!
+    const targetGrid = (typeof grid !== 'undefined' && grid && grid.length) ? grid : ((typeof palya !== 'undefined') ? palya : []);
+    if (targetGrid && targetGrid.length) {
+        targetGrid.forEach(sor => {
             sor.forEach(cella => {
-                if (cella && (!cella.type || cella.type === 'normal')) {
-                    if (!negyzetSzinek.includes(cella.color)) {
-                        cella.color = negyzetSzinek[Math.floor(Math.random() * negyzetSzinek.length)];
+                if (cella && cella.color !== 'white' && (!cella.type || cella.type === 'normal')) {
+                    if (typeof powerUpColors !== 'undefined' && powerUpColors.has(cella.color)) {
+                        return; // Power-upok egyedi színét ne írjuk felül
+                    }
+                    if (!szinek.includes(cella.color)) {
+                        cella.color = szinek[Math.floor(Math.random() * szinek.length)];
                     }
                 }
             });
@@ -127,7 +131,6 @@ function applyTheme(themeKey) {
         if (typeof drawGrid === 'function') drawGrid();
     } else {
         if (typeof initPreviewBoard === 'function') initPreviewBoard();
-        if (typeof drawGrid === 'function') drawGrid();
     }
 }
 
@@ -153,7 +156,12 @@ async function openPlayerProfileModal(username) {
         allScores = JSON.parse(localStorage.getItem('toplista')) || [];
     }
 
-    const stats = getPlayerProfileStats(username, allScores);
+    let onlineProfile = null;
+    if (window.databaseService && typeof window.databaseService.getPlayerProfile === 'function') {
+        onlineProfile = await window.databaseService.getPlayerProfile(username);
+    }
+
+    const stats = getPlayerProfileStats(username, allScores, onlineProfile);
     if (!stats.activeAvatar) {
         stats.activeAvatar = (typeof PROFILE_AVATARS !== 'undefined' && PROFILE_AVATARS[0])
             ? PROFILE_AVATARS[0]
@@ -360,7 +368,8 @@ async function openPlayerProfileModal(username) {
                     rewardRows.push(`<div class="reward-line"><span>Profilkép</span> <span class="reward-sym">${linkedAv.symbol}</span></div>`);
                 }
                 if (linkedTitle) {
-                    rewardRows.push(`<div class="reward-line"><span>Rangcím:</span> <span class="reward-sym">${linkedTitle.name}</span></div>`);
+                    const cleanTitle = linkedTitle.name.replace(/^[^\w\s\u00C0-\u017F]+/, '').trim();
+                    rewardRows.push(`<div class="reward-line"><span>Rangcím:</span> <span class="reward-sym">${cleanTitle}</span></div>`);
                 }
                 if (linkedTheme) {
                     rewardRows.push(`<div class="reward-line"><span>Téma</span> <span class="reward-sym">${linkedTheme.name}</span></div>`);
@@ -689,7 +698,8 @@ async function toplistaMegjelenites() {
         colorTag.className = 'lb-color-tag';
         const modKey = elem.modifier || 'normal';
         const modBadge = (typeof GAME_MODIFIERS !== 'undefined' && GAME_MODIFIERS[modKey]?.badge) ? GAME_MODIFIERS[modKey].badge : 'Normál';
-        colorTag.textContent = modBadge;
+        const durText = elem.duration ? `${elem.duration}s` : '60s';
+        colorTag.textContent = `${elem.color} sz • ${modBadge} • ${durText}`;
 
         rightDiv.appendChild(scoreSpan);
         rightDiv.appendChild(colorTag);
