@@ -1,3 +1,28 @@
+// ==================== TELJES ADATBÁZIS & TÁROLÓ NULLÁZÁSA (RESET TO 0) ====================
+(function resetAllDataToZero() {
+    const RESET_FLAG = 'crashdown_reset_zero_v2026_complete';
+    if (!localStorage.getItem(RESET_FLAG)) {
+        console.warn('Crashdown adatbázis és tároló teljes nullázása...');
+        try {
+            localStorage.removeItem('toplista');
+            localStorage.removeItem('crashdown_player_profiles');
+            localStorage.removeItem('crashdown_achievements');
+            localStorage.removeItem('crashdown_chosen_title');
+            localStorage.removeItem('crashdown_chosen_avatar');
+            localStorage.removeItem('crashdown_users');
+            localStorage.removeItem('crashdown_current_user');
+            localStorage.setItem(RESET_FLAG, 'true');
+        } catch (e) {}
+
+        // Firebase Realtime Database nullázása ha csatlakozva van
+        setTimeout(() => {
+            if (window.leaderboardService && typeof window.leaderboardService.resetLeaderboard === 'function') {
+                window.leaderboardService.resetLeaderboard().catch(() => {});
+            }
+        }, 1200);
+    }
+})();
+
 /*############################## AUDIO & CONFIG REGION ##############################*/
 
 const hatterZene = new Audio('hopes_and_dreams.mp3');
@@ -480,8 +505,12 @@ function updatePlayerStatsRecord(username, score, colorCount, durationSeconds) {
             achievements: [],
             modes: {},
             durations: {},
-            chosenTitle: null
+            history: [],
+            chosenTitle: null,
+            chosenAvatar: 'avatar_default'
         };
+
+        if (!p.history) p.history = [];
 
         if (score > 0 || durationSeconds > 0) {
             p.totalMatches += 1;
@@ -495,6 +524,17 @@ function updatePlayerStatsRecord(username, score, colorCount, durationSeconds) {
 
             const dKey = String(durationSeconds || '120');
             p.durations[dKey] = (p.durations[dKey] || 0) + 1;
+
+            // Legutóbbi 10 meccs előzményének rögzítése
+            p.history.unshift({
+                score: score,
+                color: cKey,
+                duration: parseInt(durationSeconds, 10) || 120,
+                timestamp: new Date().toISOString()
+            });
+            if (p.history.length > 10) {
+                p.history = p.history.slice(0, 10);
+            }
         }
 
         const currentUser = window.authService?.getCurrentUser();
@@ -532,10 +572,12 @@ function getPlayerProfileStats(username, allScores = []) {
             achievements: [],
             modes: {},
             durations: {},
+            history: [],
             chosenTitle: null,
             chosenAvatar: 'avatar_default'
         };
     }
+    if (!profile.history) profile.history = [];
 
     playerScores.forEach(s => {
         const sc = parseInt(s.score, 10) || 0;
@@ -847,6 +889,31 @@ async function openPlayerProfileModal(username) {
                 }
             });
         });
+    }
+
+    // Meccselőzmények (Utolsó 10 játék) renderelése
+    const historyListEl = document.getElementById('profileHistoryList');
+    if (historyListEl) {
+        const history = stats.history || [];
+        if (history.length === 0) {
+            historyListEl.innerHTML = '<div class="history-empty">Még nincs rögzített meccselőzmény. Játssz le egy mérkőzést!</div>';
+        } else {
+            historyListEl.innerHTML = history.map(item => {
+                const dateObj = item.timestamp ? new Date(item.timestamp) : new Date();
+                const dateStr = dateObj.toLocaleDateString('hu-HU', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                return `
+                    <div class="profile-history-item">
+                        <div class="history-left">
+                            <span class="history-mode-tag">${item.color} szín • ${item.duration}s</span>
+                            <span class="history-date">${dateStr}</span>
+                        </div>
+                        <div class="history-right">
+                            <span class="history-score">${item.score} p</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
     }
 
     const modal = document.getElementById('playerProfileModal');
@@ -1300,68 +1367,42 @@ if (openMyProfileBtn) {
     });
 }
 
-// Játék végi mentés gombok eseményei
-const saveAsLoggedInBtn = document.getElementById('saveAsLoggedInBtn');
-if (saveAsLoggedInBtn) {
-    saveAsLoggedInBtn.addEventListener('click', async function () {
-        const user = window.authService?.getCurrentUser();
-        if (!user) {
-            openAuthModal(true);
-            return;
-        }
-        const score = pontSzam;
-        const szinValaszto = document.getElementById('colorSelect');
-        const jatekosAdat = {
-            id: Date.now(),
-            name: user.displayName,
-            score: score,
-            color: szinValaszto ? szinValaszto.value : '3',
-            duration: MAX_TIME,
-            timestamp: new Date().toISOString()
-        };
-        this.disabled = true;
-        const res = await toplistaHozzaadas(jatekosAdat);
-        if (res.success) {
-            updatePlayerStatsRecord(user.displayName, score, jatekosAdat.color, MAX_TIME);
-            setLeaderboardFeedback('Eredményed sikeresen mentve a profiloddal!', false);
-            showToast('Eredményed elmentve a ranglistára!', 'success');
-            await toplistaMegjelenites();
-        } else {
-            setLeaderboardFeedback('Hiba történt a mentés során.', true);
-        }
-    });
-}
-
-const saveWithLoginModalBtn = document.getElementById('saveWithLoginModalBtn');
-if (saveWithLoginModalBtn) {
-    saveWithLoginModalBtn.addEventListener('click', function () {
-        openAuthModal(true);
-    });
-}
-
-const overlaySaveScoreBtn = document.getElementById('overlaySaveScoreBtn');
-if (overlaySaveScoreBtn) {
-    overlaySaveScoreBtn.addEventListener('click', function () {
-        const user = window.authService?.getCurrentUser();
-        if (user) {
-            // Már be van lépve, azonnal mentjük
-            saveAsLoggedInBtn?.click();
-            overlaySaveScoreBtn.style.display = 'none';
-        } else {
-            openAuthModal(true);
-        }
-    });
-}
-
 async function toplistaHozzaadas(jatekosAdat) {
     if (window.leaderboardService) {
         return await window.leaderboardService.addScore(jatekosAdat);
     }
     let toplista = JSON.parse(localStorage.getItem('toplista')) || [];
-    toplista.push(jatekosAdat);
+    const userNameLower = String(jatekosAdat.name || '').trim().toLowerCase();
+    const targetColor = String(jatekosAdat.color || '3');
+    const newScore = parseInt(jatekosAdat.score, 10) || 0;
+
+    const existingIndex = toplista.findIndex(s => 
+        String(s.name || '').trim().toLowerCase() === userNameLower &&
+        String(s.color || '3') === targetColor
+    );
+
+    let isRecord = false;
+    let previousBest = 0;
+
+    if (existingIndex !== -1) {
+        const existing = toplista[existingIndex];
+        previousBest = parseInt(existing.score, 10) || 0;
+        if (newScore > previousBest) {
+            existing.score = newScore;
+            existing.duration = jatekosAdat.duration;
+            existing.timestamp = jatekosAdat.timestamp;
+            isRecord = true;
+        } else {
+            return { success: true, isRecord: false, previousBest: previousBest };
+        }
+    } else {
+        toplista.push(jatekosAdat);
+        isRecord = true;
+    }
+
     toplista.sort((a, b) => b.score - a.score);
     localStorage.setItem('toplista', JSON.stringify(toplista));
-    return { success: true, isOnline: false };
+    return { success: true, isRecord: isRecord, previousBest: previousBest, isOnline: false };
 }
 
 async function toplistaMegjelenites() {
@@ -1509,13 +1550,8 @@ function startMatch() {
     const timeUpMsg = document.getElementById('timeUpMessage');
     if (timeUpMsg) timeUpMsg.style.display = 'none';
 
-    const appearLb = document.getElementById('appear-leaderboard');
-    if (appearLb) appearLb.style.display = 'none';
-
     const toplistaBtn = document.getElementById('toplistaHozzaadas');
     if (toplistaBtn) toplistaBtn.disabled = false;
-
-    setLeaderboardFeedback('', false);
 }
 
 /**
@@ -1567,15 +1603,10 @@ function ujJatekInditasaFunc() {
     const timeUpMsg = document.getElementById('timeUpMessage');
     if (timeUpMsg) timeUpMsg.style.display = 'none';
 
-    const appearLb = document.getElementById('appear-leaderboard');
-    if (appearLb) appearLb.style.display = 'none';
-
     const overlay = document.getElementById('canvasOverlay');
     const overlayTitle = document.getElementById('overlayTitle');
     const overlaySubtitle = document.getElementById('overlaySubtitle');
     const overlayBtn = document.getElementById('overlayStartBtn');
-    const overlaySaveBtn = document.getElementById('overlaySaveScoreBtn');
-    if (overlaySaveBtn) overlaySaveBtn.style.display = 'none';
 
     if (overlay) {
         overlay.classList.remove('hidden');
@@ -3209,39 +3240,46 @@ function timer() {
             const overlayTitle = document.getElementById('overlayTitle');
             const overlaySubtitle = document.getElementById('overlaySubtitle');
             const overlayBtn = document.getElementById('overlayStartBtn');
-            const overlaySaveBtn = document.getElementById('overlaySaveScoreBtn');
 
             if (overlay) {
                 overlay.classList.remove('hidden');
-                if (overlayTitle) overlayTitle.textContent = `Végső pontszám: ${pontSzam}`;
+                if (overlayTitle) overlayTitle.textContent = `Végső pontszám: ${pontSzam} p`;
 
                 if (currentUser) {
-                    if (overlaySubtitle) {
-                        overlaySubtitle.textContent = `Szép játék, ${currentUser.displayName}! Mentsd el az eredményed az alábbi gombbal.`;
-                    }
-                    if (overlaySaveBtn) {
-                        overlaySaveBtn.style.display = 'inline-flex';
-                        overlaySaveBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/></svg><span>Eredmény mentése (' + currentUser.displayName + ')</span>';
-                    }
-                } else {
-                    // Bejelentkezés nélkül játszott -> elmentjük a pendingScore-ba
-                    pendingScore = {
+                    const colorVal = szinValaszto ? szinValaszto.value : '3';
+                    // Rögzítjük a meccset a játékos előzményeiben (utolsó 10 meccs)
+                    updatePlayerStatsRecord(currentUser.displayName, pontSzam, colorVal, MAX_TIME);
+
+                    // Automatikus mentés a ranglistára (kizárólag ha jobb az eddigi rekordjánál ebben a módban!)
+                    toplistaHozzaadas({
+                        name: currentUser.displayName,
                         score: pontSzam,
-                        color: szinValaszto ? szinValaszto.value : '3',
+                        color: colorVal,
                         duration: MAX_TIME,
                         timestamp: new Date().toISOString()
-                    };
+                    }).then(res => {
+                        toplistaMegjelenites();
+                        if (res && res.isRecord) {
+                            if (overlaySubtitle) {
+                                overlaySubtitle.textContent = `Gratulálunk, ${currentUser.displayName}! Új egyéni rekordot értél el ebben a módban (${colorVal} szín)!`;
+                            }
+                            showToast(`🏆 Új személyes rekord rögzítve: ${pontSzam} pont!`, 'success');
+                            playSound(sikeresKatt);
+                            triggerHaptic('success');
+                        } else {
+                            if (overlaySubtitle) {
+                                overlaySubtitle.textContent = `Szép menet, ${currentUser.displayName}! A jelenlegi rekordod ebben a módban: ${res?.previousBest || 'magasabb'} pont.`;
+                            }
+                            showToast(`Játék vége! Pontszám: ${pontSzam} p`, 'info');
+                        }
+                    }).catch(() => {
+                        toplistaMegjelenites();
+                    });
+                } else {
                     if (overlaySubtitle) {
-                        overlaySubtitle.textContent = `Elértél ${pontSzam} pontot! Jelentkezz be vagy regisztrálj most, és az eredményed azonnal rögzítésre kerül!`;
+                        overlaySubtitle.textContent = `Elért pontszám: ${pontSzam} pont. Jelentkezz be vagy regisztrálj, hogy az egyéni rekordjaid és a legutóbbi 10 meccsed automatikusan elmentésre kerüljön!`;
                     }
-                    if (overlaySaveBtn) {
-                        overlaySaveBtn.style.display = 'inline-flex';
-                        overlaySaveBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/></svg><span>Mentés bejelentkezéssel</span>';
-                    }
-                    // Automatikus párbeszédablak megnyitás
-                    setTimeout(() => {
-                        openAuthModal(true);
-                    }, 400);
+                    showToast(`Játék vége! Pontszám: ${pontSzam} p`, 'info');
                 }
 
                 if (overlayBtn) {
@@ -3249,7 +3287,6 @@ function timer() {
                 }
             }
 
-            if (toplistaMegjelenitesDiv) toplistaMegjelenitesDiv.style.display = 'block';
             szinValaszto.disabled = false;
             if (timeSelectEl) timeSelectEl.disabled = false;
             const startBtn = document.getElementById('startGameButton');

@@ -459,25 +459,74 @@ class LeaderboardService {
 
     async addScore(jatekosAdat) {
         const currentScores = await this.getScores();
-        
-        // Helyi mentés
-        currentScores.push(jatekosAdat);
-        currentScores.sort((a, b) => b.score - a.score);
-        localStorage.setItem('toplista', JSON.stringify(currentScores));
+        const userNameLower = String(jatekosAdat.name || '').trim().toLowerCase();
+        const targetColor = String(jatekosAdat.color || '3');
+        const newScore = parseInt(jatekosAdat.score, 10) || 0;
 
-        // Online mentés
-        if (this.isOnline && this.db) {
-            try {
-                const newRef = this.db.ref('leaderboard').push();
-                await newRef.set(jatekosAdat);
-                return { success: true, isOnline: true };
-            } catch (err) {
-                console.warn('Nem sikerült az online mentés a Firebase-be:', err);
-                return { success: true, isOnline: false, error: err.message };
+        const existingIndex = currentScores.findIndex(s => 
+            String(s.name || '').trim().toLowerCase() === userNameLower &&
+            String(s.color || '3') === targetColor
+        );
+
+        let wasUpdated = false;
+        let wasAdded = false;
+
+        if (existingIndex !== -1) {
+            const existing = currentScores[existingIndex];
+            if (newScore > (parseInt(existing.score, 10) || 0)) {
+                existing.score = newScore;
+                existing.duration = jatekosAdat.duration;
+                existing.timestamp = jatekosAdat.timestamp;
+                wasUpdated = true;
+
+                if (this.isOnline && this.db && existing.firebaseKey) {
+                    try {
+                        await this.db.ref('leaderboard/' + existing.firebaseKey).update({
+                            score: newScore,
+                            duration: jatekosAdat.duration,
+                            timestamp: jatekosAdat.timestamp
+                        });
+                    } catch (err) {
+                        console.warn('Nem sikerült az online rekordfrissítés:', err);
+                    }
+                }
+            } else {
+                // Nem döntötte meg a rekordját ebben a kategóriában, nem mentjük feleslegesen
+                return { success: true, updated: false, isRecord: false, previousBest: existing.score };
             }
+        } else {
+            // Új bejegyzés ebben a kategóriában
+            wasAdded = true;
+            if (this.isOnline && this.db) {
+                try {
+                    const newRef = this.db.ref('leaderboard').push();
+                    await newRef.set(jatekosAdat);
+                    jatekosAdat.firebaseKey = newRef.key;
+                } catch (err) {
+                    console.warn('Nem sikerült az online mentés:', err);
+                }
+            }
+            currentScores.push(jatekosAdat);
         }
 
-        return { success: true, isOnline: false };
+        currentScores.sort((a, b) => b.score - a.score);
+        localStorage.setItem('toplista', JSON.stringify(currentScores));
+        this.notifySubscribers(currentScores);
+
+        return { success: true, updated: wasUpdated, isNew: wasAdded, isRecord: true };
+    }
+
+    async resetLeaderboard() {
+        localStorage.removeItem('toplista');
+        if (this.isOnline && this.db) {
+            try {
+                await this.db.ref('leaderboard').remove();
+                console.log('Firebase leaderboard sikeresen nullázva.');
+            } catch (err) {
+                console.warn('Nem sikerült a Firebase leaderboard törlése:', err);
+            }
+        }
+        this.notifySubscribers([]);
     }
 }
 
