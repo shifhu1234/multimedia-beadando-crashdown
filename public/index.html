@@ -13,13 +13,13 @@
       href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=3.0" />
 
     <!-- Firebase SDK (Compat - automatikus integráció) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="firebase-config.js"></script>
+    <script src="firebase-config.js?v=3.0"></script>
   </head>
   <body>
     <!-- Felső Felhasználói Sáv & Mobilos Navigáció -->
@@ -48,7 +48,7 @@
           <span
             >Jelvények (<span id="unlockedAchievementsCount">0</span>/<span
               id="totalAchievementsCount"
-              >24</span
+              >36</span
             >)</span
           >
         </button>
@@ -163,9 +163,9 @@
               <div class="select-wrapper">
                 <select id="timeSelect">
                   <option value="30">30 mp (Villám)</option>
-                  <option value="60">1 perc (Gyors)</option>
+                  <option value="60" selected>1 perc (Gyors)</option>
                   <option value="90">90 mp (Klasszikus)</option>
-                  <option value="120" selected>2 perc (Normál)</option>
+                  <option value="120">2 perc (Normál)</option>
                   <option value="150">2.5 perc (Bővített)</option>
                   <option value="180">3 perc (Maraton)</option>
                 </select>
@@ -176,10 +176,15 @@
               <label for="themeSelect" class="control-label">Téma / Skin</label>
               <div class="select-wrapper">
                 <select id="themeSelect">
-                  <option value="cyber" selected>Neon Cyber</option>
+                  <option value="retro" selected>Retro Arcade</option>
+                  <option value="cyber">Cyber Neon</option>
                   <option value="candy">Candy Pop</option>
-                  <option value="retro">Retro Arcade</option>
                   <option value="space">Deep Space</option>
+                  <option value="sunset">Sunset Synthwave</option>
+                  <option value="forest">Emerald Forest</option>
+                  <option value="lava">Vulkán Láva</option>
+                  <option value="noir">Monokróm Noir</option>
+                  <option value="ocean">Mélytengeri Misztikum</option>
                 </select>
               </div>
             </div>
@@ -322,7 +327,7 @@
           <div class="stat-box">
             <span class="stat-label">Hátralévő idő</span>
             <div class="timer-row">
-              <p id="timerDisplay">02:00</p>
+              <p id="timerDisplay">01:00</p>
             </div>
             <div class="timer-progress-track">
               <div id="timerProgressBar" class="timer-progress-fill"></div>
@@ -434,12 +439,28 @@
           >
         </div>
 
-        <div class="leaderboard-filter">
-          <button class="filter-chip active" data-filter="all">Mind</button>
-          <button class="filter-chip" data-filter="2">2 szín</button>
-          <button class="filter-chip" data-filter="3">3 szín</button>
-          <button class="filter-chip" data-filter="4">4 szín</button>
-          <button class="filter-chip" data-filter="5">5 szín</button>
+        <div class="leaderboard-filters-wrap">
+          <div class="filter-row">
+            <span class="filter-row-label">Színek:</span>
+            <div class="filter-chip-group" id="colorFilterGroup">
+              <button class="filter-chip active" data-filter-type="color" data-filter="all">Mind</button>
+              <button class="filter-chip" data-filter-type="color" data-filter="2">2 szín</button>
+              <button class="filter-chip" data-filter-type="color" data-filter="3">3 szín</button>
+              <button class="filter-chip" data-filter-type="color" data-filter="4">4 szín</button>
+              <button class="filter-chip" data-filter-type="color" data-filter="5">5 szín</button>
+            </div>
+          </div>
+          <div class="filter-row">
+            <span class="filter-row-label">Idő:</span>
+            <div class="filter-chip-group" id="timeFilterGroup">
+              <button class="filter-chip active" data-filter-type="time" data-filter="all">Mind</button>
+              <button class="filter-chip" data-filter-type="time" data-filter="30">30s</button>
+              <button class="filter-chip" data-filter-type="time" data-filter="60">1p</button>
+              <button class="filter-chip" data-filter-type="time" data-filter="90">90s</button>
+              <button class="filter-chip" data-filter-type="time" data-filter="120">2p</button>
+              <button class="filter-chip" data-filter-type="time" data-filter="180">3p</button>
+            </div>
+          </div>
         </div>
 
         <ul id="toplistaLista" class="leaderboard-list"></ul>
@@ -807,6 +828,6 @@
 
     <div id="toastContainer" class="toast-container"></div>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=3.0"></script>
   </body>
 </html>
