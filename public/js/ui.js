@@ -653,187 +653,219 @@ async function openPlayerProfileModal(username, resetScroll = true) {
     typeof THEMES_CATALOG !== "undefined" ? THEMES_CATALOG : [];
 
   if (themeSection && themeGrid) {
-    if (canManageCustomization) {
-      themeSection.style.display = "block";
-      themeGrid.innerHTML = themesCatalog
-        .map((th) => {
-          const unlocked = (stats.unlockedThemes || ["retro", "cyber"]).includes(th.id);
-          const isSelected = (isOwnProfile ? (typeof currentTheme !== "undefined" ? currentTheme : "retro") : (stats.chosenTheme || stats.activeTheme || "retro")) === th.id;
-          const reqAch = th.achId
-            ? ACHIEVEMENTS.find((a) => a.id === th.achId)
-            : null;
-          const lockTitle = reqAch
-            ? `Zárolva: ${reqAch.title} (${reqAch.desc}) szükséges hozzá!`
-            : "Zárolva";
-          const palette = (typeof THEME_PALETTES !== "undefined" && THEME_PALETTES[th.id]) ? THEME_PALETTES[th.id] : ["#ef4444", "#10b981", "#f59e0b", "#06b6d4", "#8b5cf6"];
-          const dotsHtml = palette
-            .map((c) => `<span class="theme-palette-dot" style="background-color: ${c};"></span>`)
-            .join("");
-          const specialBadge = th.isSpecial
-            ? '<span class="title-pick-special-tag">Speciális</span>'
-            : "";
+    themeSection.style.display = "block";
 
-          return `
-            <div class="theme-pick-card ${unlocked ? "" : "locked"} ${isSelected ? "active" : ""} ${isAdmin ? "admin-manageable" : ""}"
-                 data-theme-id="${th.id}"
-                 data-unlocked="${unlocked ? "1" : "0"}"
-                 title="${isAdmin ? (unlocked ? `${th.name} (Kattints a beállításhoz, jobb felső gombbal zárolhatod)` : `${lockTitle} (Admin: kattints a feloldáshoz)`) : (unlocked ? th.name : lockTitle)}">
-                ${isAdmin && th.id !== "retro" && th.id !== "cyber" ? `
-                  <button type="button" class="card-admin-toggle-badge ${unlocked ? "unlocked" : "locked"}" 
-                          data-action="toggle-lock"
-                          title="${unlocked ? "Zárolás (Admin)" : "Feloldás (Admin)"}">
-                    ${unlocked ? "✓" : "🔒"}
-                  </button>
-                ` : (!unlocked ? '<span class="avatar-lock-icon">🔒</span>' : "")}
-                <div class="theme-palette-preview">
-                  ${dotsHtml}
-                </div>
-                <div class="theme-pick-name">
-                  <span>${th.name}</span>
-                  ${specialBadge}
-                </div>
-            </div>
-          `;
-        })
-        .join("");
+    // Kliens oldalon feloldott témák összegyűjtése a bejelentkezett játékosnak / helyi eredményeknek
+    let clientUnlockedThemes = ["retro", "cyber"];
+    const myUser = window.authService?.getCurrentUser();
+    if (myUser && myUser.displayName) {
+      try {
+        const localProfiles = JSON.parse(localStorage.getItem("crashdown_player_profiles") || "{}");
+        const myProf = localProfiles[myUser.displayName];
+        if (myProf && Array.isArray(myProf.unlockedThemes)) {
+          clientUnlockedThemes = [...myProf.unlockedThemes];
+        }
+      } catch (e) {}
+    }
+    if (isOwnProfile && Array.isArray(stats.unlockedThemes)) {
+      clientUnlockedThemes = Array.from(new Set([...clientUnlockedThemes, ...stats.unlockedThemes]));
+    }
+    const localAchKey = myUser && myUser.displayName
+      ? "crashdown_achievements_" + myUser.displayName.trim().toLowerCase()
+      : "crashdown_achievements";
+    const clientAchs = new Set(JSON.parse(localStorage.getItem(localAchKey) || localStorage.getItem("crashdown_achievements") || "[]"));
+    themesCatalog.forEach((th) => {
+      if (th.achId && clientAchs.has(th.achId) && !clientUnlockedThemes.includes(th.id)) {
+        clientUnlockedThemes.push(th.id);
+      }
+    });
+    if (!clientUnlockedThemes.includes("retro")) clientUnlockedThemes.unshift("retro");
+    if (!clientUnlockedThemes.includes("cyber")) clientUnlockedThemes.push("cyber");
 
-      themeGrid
-        .querySelectorAll(".theme-pick-card")
-        .forEach((card) => {
-          card.addEventListener("click", async function (e) {
-            const thId = this.getAttribute("data-theme-id");
-            const thObj = themesCatalog.find((t) => t.id === thId);
-            if (!thObj) return;
+    const clientActiveTheme = (typeof currentTheme !== "undefined" && currentTheme)
+      ? currentTheme
+      : (localStorage.getItem("crashdown_theme") || "retro");
 
-            const isToggleBtn = e.target.closest("[data-action='toggle-lock']");
-            const isUnlocked = this.getAttribute("data-unlocked") === "1";
+    themeGrid.innerHTML = themesCatalog
+      .map((th) => {
+        const unlocked = (isAdmin && !isOwnProfile)
+          ? (stats.unlockedThemes || ["retro", "cyber"]).includes(th.id)
+          : clientUnlockedThemes.includes(th.id);
+        const isSelected = clientActiveTheme === th.id;
+        const reqAch = th.achId
+          ? ACHIEVEMENTS.find((a) => a.id === th.achId)
+          : null;
+        const lockTitle = reqAch
+          ? `Zárolva: ${reqAch.title} (${reqAch.desc}) szükséges hozzá!`
+          : "Zárolva";
+        const palette = (typeof THEME_PALETTES !== "undefined" && THEME_PALETTES[th.id]) ? THEME_PALETTES[th.id] : ["#ef4444", "#10b981", "#f59e0b", "#06b6d4", "#8b5cf6"];
+        const dotsHtml = palette
+          .map((c) => `<span class="theme-palette-dot" style="background-color: ${c};"></span>`)
+          .join("");
+        const specialBadge = th.isSpecial
+          ? '<span class="title-pick-special-tag">Speciális</span>'
+          : "";
 
-            // Ha az admin a jobb felső státusz gombra kattint: feloldás/visszazárás kapcsolása
-            if (isToggleBtn && isAdmin && thObj.id !== "retro" && thObj.id !== "cyber") {
-              e.stopPropagation();
-              if (this.dataset.busy === "1") return;
-              this.dataset.busy = "1";
+        return `
+          <div class="theme-pick-card ${unlocked ? "" : "locked"} ${isSelected ? "active" : ""} ${isAdmin ? "admin-manageable" : ""}"
+               data-theme-id="${th.id}"
+               data-unlocked="${unlocked ? "1" : "0"}"
+               title="${isAdmin ? (unlocked ? `${th.name} (Kattints a beállításhoz, jobb felső gombbal zárolhatod)` : `${lockTitle} (Admin: kattints a feloldáshoz)`) : (unlocked ? th.name : lockTitle)}">
+              ${isAdmin && th.id !== "retro" && th.id !== "cyber" ? `
+                <button type="button" class="card-admin-toggle-badge ${unlocked ? "unlocked" : "locked"}" 
+                        data-action="toggle-lock"
+                        title="${unlocked ? "Zárolás (Admin)" : "Feloldás (Admin)"}">
+                  ${unlocked ? "✓" : "🔒"}
+                </button>
+              ` : (!unlocked ? '<span class="avatar-lock-icon">🔒</span>' : "")}
+              <div class="theme-palette-preview">
+                ${dotsHtml}
+              </div>
+              <div class="theme-pick-name">
+                <span>${th.name}</span>
+                ${specialBadge}
+              </div>
+          </div>
+        `;
+      })
+      .join("");
 
-              const nextUnlocked = !isUnlocked;
-              this.setAttribute("data-unlocked", nextUnlocked ? "1" : "0");
-              this.classList.toggle("locked", !nextUnlocked);
+    themeGrid
+      .querySelectorAll(".theme-pick-card")
+      .forEach((card) => {
+        card.addEventListener("click", async function (e) {
+          const thId = this.getAttribute("data-theme-id");
+          const thObj = themesCatalog.find((t) => t.id === thId);
+          if (!thObj) return;
+
+          const isToggleBtn = e.target.closest("[data-action='toggle-lock']");
+          const isUnlocked = this.getAttribute("data-unlocked") === "1";
+
+          // Ha az admin a jobb felső státusz gombra kattint: feloldás/visszazárás kapcsolása
+          if (isToggleBtn && isAdmin && thObj.id !== "retro" && thObj.id !== "cyber") {
+            e.stopPropagation();
+            if (this.dataset.busy === "1") return;
+            this.dataset.busy = "1";
+
+            const nextUnlocked = !isUnlocked;
+            this.setAttribute("data-unlocked", nextUnlocked ? "1" : "0");
+            this.classList.toggle("locked", !nextUnlocked);
+            const toggleBtnEl = this.querySelector("[data-action='toggle-lock']");
+            if (toggleBtnEl) {
+              toggleBtnEl.textContent = nextUnlocked ? "✓" : "🔒";
+              toggleBtnEl.className = `card-admin-toggle-badge ${nextUnlocked ? "unlocked" : "locked"}`;
+              toggleBtnEl.title = nextUnlocked ? "Zárolás (Admin)" : "Feloldás (Admin)";
+            }
+
+            let curThemes = [...(stats.unlockedThemes || ["retro", "cyber"])];
+            let newChosenTheme = stats.chosenTheme || currentTheme || "retro";
+            if (isUnlocked) {
+              curThemes = curThemes.filter((id) => id !== thId);
+              if (newChosenTheme === thId) {
+                newChosenTheme = "retro";
+                themeGrid.querySelectorAll(".theme-pick-card").forEach((c) => c.classList.remove("active"));
+                const retroCard = themeGrid.querySelector('[data-theme-id="retro"]');
+                if (retroCard) retroCard.classList.add("active");
+                if (typeof applyTheme === "function") applyTheme("retro");
+              }
+            } else {
+              if (!curThemes.includes(thId)) curThemes.push(thId);
+            }
+            stats.unlockedThemes = curThemes;
+            stats.chosenTheme = newChosenTheme;
+
+            triggerHaptic("impact");
+            if (typeof hangKatt !== "undefined") playSound(hangKatt);
+            try {
+              await adminForceUpdatePlayerCustomRewards(
+                stats.username,
+                { unlockedThemes: curThemes, chosenTheme: newChosenTheme },
+                isUnlocked
+                  ? `🔒 ${thObj.name} téma zárolva (${stats.username})!`
+                  : `🔓 ${thObj.name} téma feloldva (${stats.username})!`,
+                true
+              );
+            } finally {
+              delete this.dataset.busy;
+            }
+            return;
+          }
+
+          // Ha zárolt elemre kattintunk
+          if (!isUnlocked) {
+            if (isAdmin && thObj.id !== "retro" && thObj.id !== "cyber") {
+              this.setAttribute("data-unlocked", "1");
+              this.classList.remove("locked");
               const toggleBtnEl = this.querySelector("[data-action='toggle-lock']");
               if (toggleBtnEl) {
-                toggleBtnEl.textContent = nextUnlocked ? "✓" : "🔒";
-                toggleBtnEl.className = `card-admin-toggle-badge ${nextUnlocked ? "unlocked" : "locked"}`;
-                toggleBtnEl.title = nextUnlocked ? "Zárolás (Admin)" : "Feloldás (Admin)";
+                toggleBtnEl.textContent = "✓";
+                toggleBtnEl.className = "card-admin-toggle-badge unlocked";
+                toggleBtnEl.title = "Zárolás (Admin)";
               }
 
               let curThemes = [...(stats.unlockedThemes || ["retro", "cyber"])];
-              let newChosenTheme = stats.chosenTheme || currentTheme || "retro";
-              if (isUnlocked) {
-                curThemes = curThemes.filter((id) => id !== thId);
-                if (newChosenTheme === thId) {
-                  newChosenTheme = "retro";
-                  themeGrid.querySelectorAll(".theme-pick-card").forEach((c) => c.classList.remove("active"));
-                  const retroCard = themeGrid.querySelector('[data-theme-id="retro"]');
-                  if (retroCard) retroCard.classList.add("active");
-                  if (isOwnProfile && typeof applyTheme === "function") applyTheme("retro");
-                }
-              } else {
-                if (!curThemes.includes(thId)) curThemes.push(thId);
-              }
+              if (!curThemes.includes(thId)) curThemes.push(thId);
               stats.unlockedThemes = curThemes;
-              stats.chosenTheme = newChosenTheme;
+              stats.chosenTheme = thId;
 
+              themeGrid.querySelectorAll(".theme-pick-card").forEach((c) => c.classList.remove("active"));
+              this.classList.add("active");
+
+              if (typeof applyTheme === "function") {
+                applyTheme(thId);
+              }
               triggerHaptic("impact");
               if (typeof hangKatt !== "undefined") playSound(hangKatt);
               try {
                 await adminForceUpdatePlayerCustomRewards(
                   stats.username,
-                  { unlockedThemes: curThemes, chosenTheme: newChosenTheme },
-                  isUnlocked
-                    ? `🔒 ${thObj.name} téma zárolva (${stats.username})!`
-                    : `🔓 ${thObj.name} téma feloldva (${stats.username})!`,
+                  { unlockedThemes: curThemes, chosenTheme: thId },
+                  `⚡ ${thObj.name} téma feloldva és beállítva (${stats.username})!`,
                   true
                 );
               } finally {
                 delete this.dataset.busy;
               }
               return;
+            } else {
+              const reqAch = thObj.achId
+                ? ACHIEVEMENTS.find((a) => a.id === thObj.achId)
+                : null;
+              showToast(
+                `🔒 Ez a téma még zárolva van! Feloldáshoz: ${reqAch?.title || "Mérföldkő"}`,
+                "warning",
+              );
+              triggerHaptic("error");
+              if (typeof sorEffekt !== "undefined") playSound(sorEffekt);
+              return;
             }
+          }
 
-            // Ha zárolt elemre kattintunk
-            if (!isUnlocked) {
-              if (isAdmin && thObj.id !== "retro" && thObj.id !== "cyber") {
-                this.setAttribute("data-unlocked", "1");
-                this.classList.remove("locked");
-                const toggleBtnEl = this.querySelector("[data-action='toggle-lock']");
-                if (toggleBtnEl) {
-                  toggleBtnEl.textContent = "✓";
-                  toggleBtnEl.className = "card-admin-toggle-badge unlocked";
-                  toggleBtnEl.title = "Zárolás (Admin)";
-                }
+          // Feloldott téma beállítása KLIENS OLDALON (bármely profilon kattintunk)
+          if (typeof applyTheme === "function") {
+            applyTheme(thId);
+          }
+          localStorage.setItem("crashdown_theme", thId);
 
-                let curThemes = [...(stats.unlockedThemes || ["retro", "cyber"])];
-                if (!curThemes.includes(thId)) curThemes.push(thId);
-                stats.unlockedThemes = curThemes;
-                stats.chosenTheme = thId;
+          const themeSelectEl = document.getElementById("themeSelect");
+          if (themeSelectEl) themeSelectEl.value = thId;
 
-                themeGrid.querySelectorAll(".theme-pick-card").forEach((c) => c.classList.remove("active"));
-                this.classList.add("active");
+          const loggedInUser = window.authService?.getCurrentUser();
+          if (loggedInUser && loggedInUser.displayName) {
+            syncPlayerCustomization(loggedInUser.displayName, { chosenTheme: thId }).catch(() => {});
+          }
 
-                if (isOwnProfile && typeof applyTheme === "function") {
-                  applyTheme(thId);
-                }
-                triggerHaptic("impact");
-                if (typeof hangKatt !== "undefined") playSound(hangKatt);
-                try {
-                  await adminForceUpdatePlayerCustomRewards(
-                    stats.username,
-                    { unlockedThemes: curThemes, chosenTheme: thId },
-                    `⚡ ${thObj.name} téma feloldva és beállítva (${stats.username})!`,
-                    true
-                  );
-                } finally {
-                  delete this.dataset.busy;
-                }
-                return;
-              } else {
-                const reqAch = thObj.achId
-                  ? ACHIEVEMENTS.find((a) => a.id === thObj.achId)
-                  : null;
-                showToast(
-                  `🔒 Ez a téma még zárolva van! Feloldáshoz: ${reqAch?.title || "Mérföldkő"}`,
-                  "warning",
-                );
-                triggerHaptic("error");
-                if (typeof sorEffekt !== "undefined") playSound(sorEffekt);
-                return;
-              }
-            }
+          themeGrid
+            .querySelectorAll(".theme-pick-card")
+            .forEach((c) => c.classList.remove("active"));
+          this.classList.add("active");
 
-            // Elem beállítása aktívnak
-            if (isOwnProfile) {
-              if (typeof applyTheme === "function") {
-                applyTheme(thId);
-              }
-              await syncPlayerCustomization(stats.username, { chosenTheme: thId });
-            } else if (isAdmin) {
-              stats.chosenTheme = thId;
-              stats.activeTheme = thId;
-              await syncPlayerCustomization(stats.username, { chosenTheme: thId });
-            }
-
-            themeGrid
-              .querySelectorAll(".theme-pick-card")
-              .forEach((c) => c.classList.remove("active"));
-            this.classList.add("active");
-
-            showToast(`🎨 Új játéktéma beállítva (${stats.username}): ${thObj.name}!`, "success");
-            playSound(sikeresKatt);
-            triggerHaptic("success");
-            if (typeof updateThemeSelectUI === "function") updateThemeSelectUI();
-          });
+          showToast(`🎨 Új játéktéma beállítva: ${thObj.name}!`, "success");
+          if (typeof playSound !== "undefined" && typeof sikeresKatt !== "undefined") playSound(sikeresKatt);
+          triggerHaptic("success");
+          if (typeof updateThemeSelectUI === "function") updateThemeSelectUI();
         });
-    } else {
-      themeSection.style.display = "none";
-    }
+      });
   }
 
   // 5. Név színének választása (kártyás nézet)
