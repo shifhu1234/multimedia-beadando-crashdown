@@ -211,6 +211,7 @@ async function syncPlayerCustomization(username, updates) {
 }
 
 async function openPlayerProfileModal(username) {
+  window.currentlyViewedProfileUser = username;
   let allScores = [];
   if (window.leaderboardService) {
     allScores = await window.leaderboardService.getScores();
@@ -794,6 +795,224 @@ async function openPlayerProfileModal(username) {
   if (modal) modal.classList.remove("hidden");
 }
 
+/**
+ * Valós idejű profil-frissítés, ha a megtekintett játékos éppen módosította
+ * a rangcímét, névszínét vagy profilképét
+ */
+function refreshOpenProfileModalRealtime(username) {
+  const modal = document.getElementById("playerProfileModal");
+  if (!modal || modal.classList.contains("hidden")) return;
+  if (
+    !window.currentlyViewedProfileUser ||
+    window.currentlyViewedProfileUser.toLowerCase() !== username.toLowerCase()
+  ) {
+    return;
+  }
+
+  const localProfiles = JSON.parse(
+    localStorage.getItem("crashdown_player_profiles") || "{}",
+  );
+  const pMatchKey = Object.keys(localProfiles).find(
+    (k) => k.toLowerCase() === username.toLowerCase(),
+  );
+  const onlineProfile = pMatchKey ? localProfiles[pMatchKey] : null;
+
+  let allScores = [];
+  try {
+    allScores = JSON.parse(localStorage.getItem("toplista") || "[]");
+  } catch (e) {}
+
+  const stats = getPlayerProfileStats(username, allScores, onlineProfile);
+  if (!stats) return;
+
+  const nameEl = document.getElementById("profilePlayerName");
+  const avatarEl = document.getElementById("profileAvatar");
+  const titleEl = document.getElementById("profilePlayerTitle");
+
+  if (nameEl) {
+    nameEl.textContent = stats.username;
+    const nameColorCatalog =
+      typeof NAME_COLORS_CATALOG !== "undefined" ? NAME_COLORS_CATALOG : [];
+    nameColorCatalog.forEach((c) => nameEl.classList.remove(c.className));
+    if (stats.activeNameColor && stats.activeNameColor.className) {
+      nameEl.classList.add(stats.activeNameColor.className);
+    }
+  }
+
+  if (avatarEl && stats.activeAvatar) {
+    avatarEl.textContent = stats.activeAvatar.symbol;
+    avatarEl.title = `Profilkép: ${stats.activeAvatar.name}`;
+  }
+
+  if (titleEl && stats.activeTitle) {
+    titleEl.textContent = stats.activeTitle.name;
+    titleEl.classList.remove(
+      "title-special-gold",
+      "title-special-cosmic",
+      "title-special-flame",
+      "title-special-rainbow",
+    );
+    if (stats.activeTitle.specialClass) {
+      titleEl.classList.add(stats.activeTitle.specialClass);
+    }
+  }
+}
+
+// ==================== JÁTÉKOSOK (PLAYERS & PRESENCE) MODAL ====================
+let currentPlayersSearchQuery = "";
+
+async function openPlayersModal() {
+  const modal = document.getElementById("playersModal");
+  if (!modal) return;
+  modal.classList.remove("hidden");
+  await updatePlayersModalUI();
+  const searchInput = document.getElementById("playerSearchInput");
+  if (searchInput) {
+    searchInput.value = "";
+    currentPlayersSearchQuery = "";
+    searchInput.focus();
+  }
+}
+
+function closePlayersModal() {
+  const modal = document.getElementById("playersModal");
+  if (modal) modal.classList.add("hidden");
+}
+
+async function updatePlayersModalUI() {
+  const modal = document.getElementById("playersModal");
+  if (!modal || modal.classList.contains("hidden")) return;
+
+  const container = document.getElementById("playersListContainer");
+  if (!container) return;
+
+  let players = [];
+  if (
+    window.leaderboardService &&
+    typeof window.leaderboardService.getAllRegisteredPlayers === "function"
+  ) {
+    players = await window.leaderboardService.getAllRegisteredPlayers();
+  } else {
+    const local = JSON.parse(
+      localStorage.getItem("crashdown_player_profiles") || "{}",
+    );
+    players = Object.keys(local)
+      .map((k) => local[k])
+      .filter((p) => p && p.username);
+  }
+
+  const presenceData = window.onlinePresenceData || {};
+
+  // Szűrés a keresőmező alapján
+  const q = currentPlayersSearchQuery.trim().toLowerCase();
+  let filtered = players;
+  if (q) {
+    filtered = players.filter((p) =>
+      String(p.username || "")
+        .toLowerCase()
+        .includes(q),
+    );
+  }
+
+  // Rendezés: online játékosok elöl, utána legjobb pontszám szerint csökkenő
+  filtered.sort((a, b) => {
+    const aKey = encodeURIComponent(
+      String(a.username || "").trim().toLowerCase(),
+    ).replace(/\./g, "%2E");
+    const bKey = encodeURIComponent(
+      String(b.username || "").trim().toLowerCase(),
+    ).replace(/\./g, "%2E");
+    const aOnline = presenceData[aKey]?.online === true;
+    const bOnline = presenceData[bKey]?.online === true;
+    if (aOnline !== bOnline) return bOnline ? 1 : -1;
+    return (b.bestScore || 0) - (a.bestScore || 0);
+  });
+
+  // Online számlálók
+  let onlineCount = 0;
+  players.forEach((p) => {
+    const safeKey = encodeURIComponent(
+      String(p.username || "").trim().toLowerCase(),
+    ).replace(/\./g, "%2E");
+    if (presenceData[safeKey]?.online === true) onlineCount++;
+  });
+
+  const onlineBadge = document.getElementById("onlinePlayersCountBadge");
+  const totalBadge = document.getElementById("totalPlayersCountBadge");
+  if (onlineBadge) onlineBadge.textContent = `🟢 ${onlineCount} online`;
+  if (totalBadge)
+    totalBadge.textContent = `${players.length} regisztrált játékos`;
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="players-empty-notice">
+        ${q ? "Nincs a keresésnek megfelelő játékos." : "Még nincsenek regisztrált játékosok."}
+      </div>
+    `;
+    return;
+  }
+
+  const nameColorCatalog =
+    typeof NAME_COLORS_CATALOG !== "undefined" ? NAME_COLORS_CATALOG : [];
+  const avatarsList =
+    typeof PROFILE_AVATARS !== "undefined" ? PROFILE_AVATARS : [];
+  const titlesList =
+    typeof PROFILE_TITLES !== "undefined" ? PROFILE_TITLES : [];
+
+  container.innerHTML = filtered
+    .map((p) => {
+      const safeKey = encodeURIComponent(
+        String(p.username || "").trim().toLowerCase(),
+      ).replace(/\./g, "%2E");
+      const isOnline = presenceData[safeKey]?.online === true;
+      const avObj =
+        avatarsList.find((a) => a.id === p.chosenAvatar) ||
+        avatarsList[0] || { symbol: "👤" };
+      const titleObj = titlesList.find((t) => t.id === p.chosenTitle);
+      const nameColorObj = nameColorCatalog.find(
+        (c) => c.id === p.chosenNameColor,
+      );
+
+      const nameClass = nameColorObj?.className || "";
+      const titleClass = titleObj?.specialClass || "";
+      const titleText = titleObj?.name || "Kezdő Blokktörő";
+      const bestScoreText = (p.bestScore || 0).toLocaleString();
+
+      return `
+      <div class="player-roster-card lb-clickable" data-player-name="${p.username}" title="Kattints a profil megtekintéséhez!">
+        <div class="player-roster-left">
+          <div class="player-roster-avatar-wrap">
+            <span class="player-roster-avatar">${avObj.symbol}</span>
+            <span class="presence-dot ${isOnline ? "online" : "offline"}" title="${isOnline ? "Online" : "Offline"}"></span>
+          </div>
+          <div class="player-roster-info">
+            <div class="player-roster-name-row">
+              <strong class="player-roster-name ${nameClass}">${p.username}</strong>
+              <span class="presence-label ${isOnline ? "online" : "offline"}">${isOnline ? "Online" : "Offline"}</span>
+            </div>
+            <div class="player-roster-title ${titleClass}">${titleText}</div>
+          </div>
+        </div>
+        <div class="player-roster-right">
+          <span class="player-roster-score">${bestScoreText} p</span>
+          <span class="player-roster-matches">${p.totalMatches || 0} meccs</span>
+        </div>
+      </div>
+    `;
+    })
+    .join("");
+
+  container.querySelectorAll(".player-roster-card").forEach((card) => {
+    card.addEventListener("click", function () {
+      const uName = this.getAttribute("data-player-name");
+      if (uName) {
+        closePlayersModal();
+        openPlayerProfileModal(uName);
+      }
+    });
+  });
+}
+
 // ==================== AUTH MODAL KEZELÉS ====================
 let isRegisterMode = false;
 
@@ -1040,6 +1259,19 @@ async function toplistaMegjelenites() {
   const toplistaLista = document.getElementById("toplistaLista");
   if (!toplistaLista) return;
   toplistaLista.innerHTML = "";
+
+  const selColor = document.getElementById("lbFilterColor");
+  if (selColor && selColor.value !== currentLeaderboardColorFilter) {
+    selColor.value = currentLeaderboardColorFilter;
+  }
+  const selMode = document.getElementById("lbFilterMode");
+  if (selMode && selMode.value !== currentLeaderboardModeFilter) {
+    selMode.value = currentLeaderboardModeFilter;
+  }
+  const selTime = document.getElementById("lbFilterTime");
+  if (selTime && selTime.value !== currentLeaderboardTimeFilter) {
+    selTime.value = currentLeaderboardTimeFilter;
+  }
 
   if (currentLeaderboardColorFilter !== "all") {
     toplista = toplista.filter(

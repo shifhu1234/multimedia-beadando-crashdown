@@ -2,23 +2,23 @@
    CRASHDOWN ARCADE - AUDIO & HAPTIC FEEDBACK SYSTEM
    ================================================================ */
 
-const hatterZene = new Audio('hopes_and_dreams.mp3');
+const hatterZene = new Audio('audio/hopes_and_dreams.mp3');
 hatterZene.loop = true;
 hatterZene.load();
 
-const tntKatt = new Audio('minecraft_tnt_effect.mp3');
+const tntKatt = new Audio('audio/minecraft_tnt_effect.mp3');
 tntKatt.load();
 
-const sorEffekt = new Audio('minecraft_anvil_effect.mp3');
+const sorEffekt = new Audio('audio/minecraft_anvil_effect.mp3');
 sorEffekt.load();
 
-const timeEffekt = new Audio('minecraft_brewing_effect.mp3');
+const timeEffekt = new Audio('audio/minecraft_brewing_effect.mp3');
 timeEffekt.load();
 
-const doublerKatt = new Audio('minecraft_xp_effect.mp3');
+const doublerKatt = new Audio('audio/minecraft_xp_effect.mp3');
 doublerKatt.load();
 
-const sikeresKatt = new Audio('minecraft_item_pickup_effect.mp3');
+const sikeresKatt = new Audio('audio/minecraft_item_pickup_effect.mp3');
 sikeresKatt.load();
 
 const BASE_VOLUMES = {
@@ -44,7 +44,7 @@ function applyAudioSettings() {
 
     const volIcon = document.getElementById('toggleVol');
     if (volIcon) {
-        volIcon.setAttribute('src', (toggledVOlume || masterVolume === 0) ? 'volume_off_icon.png' : 'volume_on_icon.png');
+        volIcon.setAttribute('src', (toggledVOlume || masterVolume === 0) ? 'images/volume_off_icon.png' : 'images/volume_on_icon.png');
     }
     const slider = document.getElementById('volumeSlider');
     const label = document.getElementById('volumeValue');

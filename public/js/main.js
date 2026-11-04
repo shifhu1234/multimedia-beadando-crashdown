@@ -119,6 +119,7 @@ const closePlayerProfileModalBtn = document.getElementById('closePlayerProfileMo
 const playerProfileModal = document.getElementById('playerProfileModal');
 
 function closePlayerProfileModal() {
+    window.currentlyViewedProfileUser = null;
     if (playerProfileModal) playerProfileModal.classList.add('hidden');
 }
 
@@ -126,6 +127,40 @@ if (closePlayerProfileModalBtn) closePlayerProfileModalBtn.addEventListener('cli
 if (playerProfileModal) {
     playerProfileModal.addEventListener('click', (e) => {
         if (e.target === playerProfileModal) closePlayerProfileModal();
+    });
+}
+
+// Játékosok (Roster & Jelenlét) Modal eseménykezelők
+const openPlayersModalBtn = document.getElementById('openPlayersModalBtn');
+const closePlayersModalBtn = document.getElementById('closePlayersModalBtn');
+const playersModal = document.getElementById('playersModal');
+const playerSearchInput = document.getElementById('playerSearchInput');
+
+if (openPlayersModalBtn) {
+    openPlayersModalBtn.addEventListener('click', () => {
+        if (typeof openPlayersModal === 'function') openPlayersModal();
+    });
+}
+if (closePlayersModalBtn) {
+    closePlayersModalBtn.addEventListener('click', () => {
+        if (typeof closePlayersModal === 'function') closePlayersModal();
+    });
+}
+if (playersModal) {
+    playersModal.addEventListener('click', (e) => {
+        if (e.target === playersModal) {
+            if (typeof closePlayersModal === 'function') closePlayersModal();
+        }
+    });
+}
+if (playerSearchInput) {
+    playerSearchInput.addEventListener('input', function () {
+        if (typeof currentPlayersSearchQuery !== 'undefined') {
+            currentPlayersSearchQuery = this.value;
+        }
+        if (typeof updatePlayersModalUI === 'function') {
+            updatePlayersModalUI();
+        }
     });
 }
 
@@ -318,7 +353,31 @@ if (changePasswordForm) {
     });
 }
 
-// Ranglista szűrő chip események
+// Ranglista szűrő események (kompakt dropdown toolbar)
+const lbFilterColor = document.getElementById('lbFilterColor');
+const lbFilterMode = document.getElementById('lbFilterMode');
+const lbFilterTime = document.getElementById('lbFilterTime');
+
+if (lbFilterColor) {
+    lbFilterColor.addEventListener('change', function () {
+        currentLeaderboardColorFilter = this.value;
+        toplistaMegjelenites();
+    });
+}
+if (lbFilterMode) {
+    lbFilterMode.addEventListener('change', function () {
+        currentLeaderboardModeFilter = this.value;
+        toplistaMegjelenites();
+    });
+}
+if (lbFilterTime) {
+    lbFilterTime.addEventListener('change', function () {
+        currentLeaderboardTimeFilter = this.value;
+        toplistaMegjelenites();
+    });
+}
+
+// Ranglista szűrő chip események (kompatibilitás céljából)
 document.querySelectorAll('.filter-chip').forEach(btn => {
     btn.addEventListener('click', function () {
         const filterType = this.getAttribute('data-filter-type') || 'color';
@@ -355,6 +414,7 @@ document.addEventListener('keydown', (e) => {
         closeChangePasswordModal();
         closeAchievementsModal();
         closePlayerProfileModal();
+        if (typeof closePlayersModal === 'function') closePlayersModal();
     }
 });
 

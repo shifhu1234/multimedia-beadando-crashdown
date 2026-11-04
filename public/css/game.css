@@ -649,9 +649,10 @@ select:disabled {
 /* Canvas Keret */
 .canvas-wrapper {
     position: relative;
-    width: 456px;
-    height: 456px;
-    max-width: 100%;
+    width: 100%;
+    max-width: 456px;
+    height: auto;
+    max-height: 456px;
     aspect-ratio: 1 / 1;
     padding: 8px;
     border-radius: var(--radius-lg);
@@ -664,6 +665,7 @@ select:disabled {
     flex-shrink: 0;
     transition: box-shadow 0.35s ease, border-color 0.35s ease, background 0.35s ease;
     box-sizing: border-box;
+    overflow: hidden;
 }
 
 /* 1. Csak 2x Frenzy izzás */
@@ -833,7 +835,8 @@ select:disabled {
 #crashdownCanvas {
     width: 100%;
     max-width: 440px;
-    height: auto;
+    height: 100%;
+    max-height: 440px;
     aspect-ratio: 1 / 1;
     border-radius: 10px;
     background-color: #0d1017;
@@ -845,7 +848,7 @@ select:disabled {
 /* Canvas Overlay */
 .canvas-overlay {
     position: absolute;
-    inset: 11px;
+    inset: 8px;
     border-radius: 10px;
     background: rgba(13, 16, 23, 0.94);
     display: flex;
@@ -855,6 +858,8 @@ select:disabled {
     text-align: center;
     transform: translateZ(0);
     transition: opacity 0.15s ease, visibility 0.15s ease;
+    box-sizing: border-box;
+    overflow-y: auto;
 }
 
 .canvas-overlay.hidden {
@@ -1106,58 +1111,60 @@ select:disabled {
     font-weight: 600;
 }
 
-.leaderboard-filters-wrap {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    flex-shrink: 0;
-}
-
-.filter-row {
+/* ==================== EGYSZERŰSÍTETT RANGLISTA SZŰRŐ SÁV ==================== */
+.leaderboard-filter-toolbar {
     display: flex;
     align-items: center;
     gap: 6px;
     width: 100%;
-}
-
-.filter-row-label {
-    font-size: 0.68rem;
-    font-weight: 700;
-    color: var(--text-secondary);
-    min-width: 44px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
     flex-shrink: 0;
+    margin-bottom: 2px;
 }
 
-.filter-chip-group {
-    display: flex;
-    gap: 4px;
+.lb-filter-box {
     flex: 1;
     min-width: 0;
-    flex-wrap: wrap;
-}
-
-.filter-chip {
+    display: flex;
+    align-items: center;
     background: var(--bg-card);
     border: 1px solid var(--border-subtle);
-    color: var(--text-secondary);
-    padding: 2px 7px;
-    border-radius: 5px;
-    font-size: 0.65rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.12s ease;
-    white-space: nowrap;
-    flex: 0 0 auto;
-    text-align: center;
+    border-radius: var(--radius-sm);
+    padding: 0 4px 0 6px;
+    height: 32px;
+    transition: all 0.15s ease;
 }
 
-.filter-chip:hover { color: #fff; border-color: var(--border-hover); }
-.filter-chip.active {
-    background: var(--color-blue);
-    color: #fff;
+.lb-filter-box:focus-within {
     border-color: var(--color-blue);
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
+}
+
+.lb-filter-icon {
+    font-size: 0.75rem;
+    margin-right: 4px;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.lb-select-input {
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-primary);
+    font-size: 0.68rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    padding-right: 2px;
+}
+
+.lb-select-input option {
+    background: #1e2433;
+    color: #ffffff;
+    font-size: 0.75rem;
 }
 
 .leaderboard-list {
@@ -1168,6 +1175,7 @@ select:disabled {
     flex-direction: column;
     gap: 6px;
     overflow-y: auto;
+    overflow-x: visible;
     flex: 1;
     min-height: 0;
 }
@@ -1192,6 +1200,7 @@ select:disabled {
     cursor: pointer;
     transition: transform 0.1s ease, border-color 0.1s ease, background 0.1s ease;
     gap: 8px;
+    overflow: visible;
 }
 
 .leaderboard-item:hover {
@@ -1210,7 +1219,7 @@ select:disabled {
     gap: 7px;
     min-width: 0;
     flex: 1;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .lb-rank {
@@ -1227,13 +1236,15 @@ select:disabled {
 .rank-3 .lb-rank { color: #fb923c; }
 
 .lb-name {
-    font-weight: 600;
+    font-weight: 700;
     color: var(--text-primary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     min-width: 0;
     flex: 1;
+    padding: 2px 6px 2px 2px;
+    line-height: 1.25;
 }
 
 .lb-right {

@@ -377,9 +377,46 @@ class AuthService {
         if (typeof toplistaMegjelenites === 'function') {
             toplistaMegjelenites();
         }
+
+        this.updatePresence(true);
+    }
+
+    updatePresence(isOnline) {
+        if (!this.currentUser || !window.leaderboardService || !window.leaderboardService.db) return;
+        const username = this.currentUser.displayName;
+        if (!username) return;
+        const safeKey = encodeURIComponent(username.trim().toLowerCase()).replace(/\./g, '%2E');
+        try {
+            const presRef = window.leaderboardService.db.ref('presence/' + safeKey);
+            if (isOnline) {
+                if (typeof firebase !== 'undefined' && firebase.database) {
+                    presRef.onDisconnect().set({
+                        online: false,
+                        username: username,
+                        lastSeen: firebase.database.ServerValue.TIMESTAMP
+                    });
+                    presRef.set({
+                        online: true,
+                        username: username,
+                        lastSeen: firebase.database.ServerValue.TIMESTAMP
+                    });
+                }
+            } else {
+                if (typeof firebase !== 'undefined' && firebase.database) {
+                    presRef.set({
+                        online: false,
+                        username: username,
+                        lastSeen: firebase.database.ServerValue.TIMESTAMP
+                    });
+                }
+            }
+        } catch (e) {}
     }
 
     async logout() {
+        if (this.currentUser) {
+            this.updatePresence(false);
+        }
         if (this.auth) {
             try { await this.auth.signOut(); } catch (e) {}
         }
@@ -567,12 +604,31 @@ class LeaderboardService {
                         if (typeof toplistaMegjelenites === 'function') {
                             toplistaMegjelenites();
                         }
+                        // Ha valaki épp néz egy profilt, frissítsük azt is azonnal valós időben
+                        if (window.currentlyViewedProfileUser && typeof refreshOpenProfileModalRealtime === 'function') {
+                            refreshOpenProfileModalRealtime(window.currentlyViewedProfileUser);
+                        }
+                        // Ha nyitva van a Játékosok lista modal, frissítsük
+                        if (typeof updatePlayersModalUI === 'function') {
+                            updatePlayersModalUI();
+                        }
                     } catch (e) {
                         console.warn('Hiba profilok valós idejű frissítésekor:', e);
                     }
                 }
             }, (error) => {
                 console.warn('Firebase valós idejű profil olvasási hiba:', error);
+            });
+
+            // Valós idejű jelenlét (online / offline) követése
+            const presenceRef = this.db.ref('presence');
+            presenceRef.on('value', (snapshot) => {
+                window.onlinePresenceData = snapshot.val() || {};
+                if (typeof updatePlayersModalUI === 'function') {
+                    updatePlayersModalUI();
+                }
+            }, (error) => {
+                console.warn('Firebase valós idejű jelenlét olvasási hiba:', error);
             });
         } catch (err) {
             console.warn('Firebase figyelő hiba:', err);
@@ -784,6 +840,29 @@ class LeaderboardService {
                 console.warn('Firebase testreszabás mentési hiba:', e);
             }
         }
+    }
+
+    async getAllRegisteredPlayers() {
+        if (this.db) {
+            try {
+                const snap = await this.db.ref('profiles').once('value');
+                if (snap.exists()) {
+                    const data = snap.val();
+                    const players = [];
+                    Object.keys(data).forEach(key => {
+                        const p = data[key];
+                        if (p && p.username) {
+                            players.push(p);
+                        }
+                    });
+                    return players;
+                }
+            } catch (e) {
+                console.warn('Hiba a regisztrált játékosok lekérésekor:', e);
+            }
+        }
+        const local = JSON.parse(localStorage.getItem('crashdown_player_profiles') || '{}');
+        return Object.keys(local).map(k => local[k]).filter(p => p && p.username);
     }
 }
 

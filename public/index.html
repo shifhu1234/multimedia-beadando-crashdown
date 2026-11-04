@@ -31,7 +31,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="firebase-config.js?v=3.0"></script>
+    <script src="js/firebase-config.js?v=3.8"></script>
   </head>
   <body>
     <script>
@@ -301,7 +301,7 @@
                 title="Hang némítása / visszakapcsolása (M)"
               >
                 <img
-                  src="volume_on_icon.png"
+                  src="images/volume_on_icon.png"
                   id="toggleVol"
                   alt="Hangerő"
                   width="20"
@@ -459,145 +459,44 @@
             <h2>Ranglista</h2>
             <span id="leaderboardSyncTag" class="status-indicator"></span>
           </div>
-          <span class="badge-subtle" id="leaderboardScopeBadge"
-            >Globális Online</span
-          >
+          <button id="openPlayersModalBtn" class="btn-user-profile-badge" title="Regisztrált játékosok és online jelenlét megtekintése">
+            <span>👥 Játékosok</span>
+          </button>
         </div>
 
-        <div class="leaderboard-filters-wrap">
-          <div class="filter-row">
-            <span class="filter-row-label">Színek:</span>
-            <div class="filter-chip-group" id="colorFilterGroup">
-              <button
-                class="filter-chip active"
-                data-filter-type="color"
-                data-filter="all"
-              >
-                Mind
-              </button>
-              <button
-                class="filter-chip"
-                data-filter-type="color"
-                data-filter="2"
-              >
-                2 szín
-              </button>
-              <button
-                class="filter-chip"
-                data-filter-type="color"
-                data-filter="3"
-              >
-                3 szín
-              </button>
-              <button
-                class="filter-chip"
-                data-filter-type="color"
-                data-filter="4"
-              >
-                4 szín
-              </button>
-              <button
-                class="filter-chip"
-                data-filter-type="color"
-                data-filter="5"
-              >
-                5 szín
-              </button>
-            </div>
+        <div class="leaderboard-filter-toolbar">
+          <div class="lb-filter-box">
+            <span class="lb-filter-icon">🎨</span>
+            <select id="lbFilterColor" class="lb-select-input" aria-label="Színek száma szűrő">
+              <option value="all">Minden szín</option>
+              <option value="2">2 szín</option>
+              <option value="3">3 szín</option>
+              <option value="4">4 szín</option>
+              <option value="5">5 szín</option>
+            </select>
           </div>
-          <div class="filter-row">
-            <span class="filter-row-label">Mód:</span>
-            <div class="filter-chip-group" id="modeFilterGroup">
-              <button
-                class="filter-chip active"
-                data-filter-type="mode"
-                data-filter="all"
-              >
-                Mind
-              </button>
-              <button
-                class="filter-chip"
-                data-filter-type="mode"
-                data-filter="normal"
-              >
-                Normál
-              </button>
-              <button
-                class="filter-chip"
-                data-filter-type="mode"
-                data-filter="no_powerups"
-              >
-                Nyers
-              </button>
-              <button
-                class="filter-chip"
-                data-filter-type="mode"
-                data-filter="chaos"
-              >
-                Káosz
-              </button>
-              <button
-                class="filter-chip"
-                data-filter-type="mode"
-                data-filter="time_rush"
-              >
-                Időhajsza
-              </button>
-              <button
-                class="filter-chip"
-                data-filter-type="mode"
-                data-filter="bomb_frenzy"
-              >
-                Robbanás
-              </button>
-            </div>
+          <div class="lb-filter-box">
+            <span class="lb-filter-icon">🎯</span>
+            <select id="lbFilterMode" class="lb-select-input" aria-label="Játékmód szűrő">
+              <option value="all">Minden mód</option>
+              <option value="normal">Normál</option>
+              <option value="chaos">Káosz</option>
+              <option value="bomb_frenzy">Robbanás</option>
+              <option value="time_rush">Időhajsza</option>
+              <option value="no_powerups">Nyers</option>
+            </select>
           </div>
-          <div class="filter-row">
-            <span class="filter-row-label">Idő:</span>
-            <div class="filter-chip-group" id="timeFilterGroup">
-              <button
-                class="filter-chip active"
-                data-filter-type="time"
-                data-filter="all"
-              >
-                Mind
-              </button>
-              <button
-                class="filter-chip"
-                data-filter-type="time"
-                data-filter="30"
-              >
-                30s
-              </button>
-              <button
-                class="filter-chip"
-                data-filter-type="time"
-                data-filter="60"
-              >
-                1p
-              </button>
-              <button
-                class="filter-chip"
-                data-filter-type="time"
-                data-filter="90"
-              >
-                90s
-              </button>
-              <button
-                class="filter-chip"
-                data-filter-type="time"
-                data-filter="120"
-              >
-                2p
-              </button>
-              <button
-                class="filter-chip"
-                data-filter-type="time"
-                data-filter="180"
-              >
-                3p
-              </button>
-            </div>
+          <div class="lb-filter-box">
+            <span class="lb-filter-icon">⏱️</span>
+            <select id="lbFilterTime" class="lb-select-input" aria-label="Játékidő szűrő">
+              <option value="all">Minden idő</option>
+              <option value="30">30 mp</option>
+              <option value="60">1 perc</option>
+              <option value="90">90 mp</option>
+              <option value="120">2 perc</option>
+              <option value="150">2.5 perc</option>
+              <option value="180">3 perc</option>
+            </select>
           </div>
         </div>
 
@@ -1011,6 +910,31 @@
               </button>
             </form>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== REGISZTRÁLT JÁTÉKOSOK & JELENLÉT MODAL ==================== -->
+    <div id="playersModal" class="modal-backdrop hidden">
+      <div class="auth-modal-card players-modal-card">
+        <div class="auth-modal-header">
+          <div class="players-modal-header-info">
+            <h3>👥 Játékosok & Jelenlét</h3>
+            <div class="players-modal-counters">
+              <span id="onlinePlayersCountBadge" class="players-presence-pill online">🟢 0 online</span>
+              <span id="totalPlayersCountBadge" class="players-presence-pill total">0 regisztrált</span>
+            </div>
+          </div>
+          <button id="closePlayersModalBtn" class="modal-close-x" title="Bezárás">&times;</button>
+        </div>
+
+        <div class="players-modal-search-bar">
+          <span class="players-search-icon">🔍</span>
+          <input type="text" id="playerSearchInput" class="players-search-input" placeholder="Játékos keresése név szerint..." autocomplete="off" />
+        </div>
+
+        <div id="playersListContainer" class="players-roster-list">
+          <!-- Dinamikusan renderelve ui.js-ből -->
         </div>
       </div>
     </div>
