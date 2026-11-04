@@ -352,4 +352,24 @@ body {
     .leaderboard-panel {
         min-height: 480px;
     }
+
+    .leaderboard-filter-toolbar {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        gap: 4px !important;
+        width: 100% !important;
+    }
+
+    .lb-filter-box {
+        flex: 1 1 0 !important;
+        min-width: 0 !important;
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        padding: 0 4px !important;
+        height: 32px !important;
+    }
 }

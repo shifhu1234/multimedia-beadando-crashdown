@@ -1113,24 +1113,30 @@ select:disabled {
 
 /* ==================== EGYSZERŰSÍTETT RANGLISTA SZŰRŐ SÁV ==================== */
 .leaderboard-filter-toolbar {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 4px;
     width: 100%;
     flex-shrink: 0;
     margin-bottom: 2px;
 }
 
 .lb-filter-box {
-    flex: 1;
+    flex: 1 1 0;
     min-width: 0;
-    display: flex;
-    align-items: center;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
     background: var(--bg-card);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-sm);
-    padding: 0 4px 0 6px;
+    padding: 0 4px;
     height: 32px;
+    box-sizing: border-box;
+    overflow: hidden;
     transition: all 0.15s ease;
 }
 
@@ -1141,24 +1147,29 @@ select:disabled {
 
 .lb-filter-icon {
     font-size: 0.75rem;
-    margin-right: 4px;
+    margin-right: 3px;
     flex-shrink: 0;
     line-height: 1;
+    display: inline-flex;
+    align-items: center;
 }
 
 .lb-select-input {
-    width: 100%;
-    min-width: 0;
-    height: 100%;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--text-primary);
-    font-size: 0.68rem;
-    font-weight: 700;
-    cursor: pointer;
-    font-family: inherit;
-    padding-right: 2px;
+    width: 100% !important;
+    min-width: 0 !important;
+    flex: 1 !important;
+    height: 100% !important;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    color: var(--text-primary) !important;
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    font-family: inherit !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
 }
 
 .lb-select-input option {
@@ -1193,13 +1204,13 @@ select:disabled {
     background: var(--bg-card);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-sm);
-    padding: 5px 10px;
+    padding: 5px 8px;
     height: 42px;
     flex-shrink: 0;
     font-size: 0.8rem;
     cursor: pointer;
     transition: transform 0.1s ease, border-color 0.1s ease, background 0.1s ease;
-    gap: 8px;
+    gap: 6px;
     overflow: visible;
 }
 
@@ -1216,7 +1227,7 @@ select:disabled {
 .lb-left {
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 4px;
     min-width: 0;
     flex: 1;
     overflow: visible;
@@ -1225,7 +1236,7 @@ select:disabled {
 .lb-rank {
     font-weight: 800;
     font-family: var(--font-mono);
-    width: 20px;
+    width: 18px;
     text-align: center;
     color: var(--text-secondary);
     flex-shrink: 0;
@@ -1235,6 +1246,16 @@ select:disabled {
 .rank-2 .lb-rank { color: #e2e8f0; }
 .rank-3 .lb-rank { color: #fb923c; }
 
+.lb-avatar {
+    font-size: 0.95rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-right: 0px;
+}
+
 .lb-name {
     font-weight: 700;
     color: var(--text-primary);
@@ -1243,8 +1264,8 @@ select:disabled {
     text-overflow: ellipsis;
     min-width: 0;
     flex: 1;
-    padding: 2px 6px 2px 2px;
-    line-height: 1.25;
+    padding: 2px 4px 2px 0px;
+    line-height: 1.3;
 }
 
 .lb-right {

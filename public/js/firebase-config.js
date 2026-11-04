@@ -746,6 +746,81 @@ class LeaderboardService {
         return { success: true, updated: wasUpdated, isNew: wasAdded, isRecord: true };
     }
 
+    async deleteScoreRecord(elem) {
+        if (!elem) return false;
+        let currentScores = await this.getScores();
+        const targetName = String(elem.name || '').trim().toLowerCase();
+        const targetScore = parseInt(elem.score, 10) || 0;
+        const targetTimestamp = elem.timestamp;
+        const targetKey = elem.firebaseKey;
+
+        if (this.isOnline && this.db) {
+            try {
+                if (targetKey) {
+                    await this.db.ref('leaderboard/' + targetKey).remove();
+                } else {
+                    const snap = await this.db.ref('leaderboard').once('value');
+                    const data = snap.val();
+                    if (data) {
+                        for (const k of Object.keys(data)) {
+                            const item = data[k];
+                            if (String(item.name || '').trim().toLowerCase() === targetName &&
+                                (parseInt(item.score, 10) || 0) === targetScore &&
+                                (!targetTimestamp || item.timestamp === targetTimestamp)) {
+                                await this.db.ref('leaderboard/' + k).remove();
+                                break;
+                            }
+                        }
+                    }
+                }
+            } catch (err) {
+                console.warn('Nem sikerült az online pontszám törlése:', err);
+            }
+        }
+
+        // Lokális toplista frissítése
+        currentScores = currentScores.filter(s => {
+            if (targetKey && s.firebaseKey) return s.firebaseKey !== targetKey;
+            const matches = String(s.name || '').trim().toLowerCase() === targetName &&
+                            (parseInt(s.score, 10) || 0) === targetScore &&
+                            (!targetTimestamp || s.timestamp === targetTimestamp);
+            return !matches;
+        });
+
+        localStorage.setItem('toplista', JSON.stringify(currentScores));
+        this.notifySubscribers(currentScores);
+
+        // A játékos maradt pontszámainak vizsgálata a profil frissítéséhez
+        const remainingForUser = currentScores.filter(s => String(s.name || '').trim().toLowerCase() === targetName);
+        const newBestScore = remainingForUser.length > 0 
+            ? Math.max(...remainingForUser.map(s => parseInt(s.score, 10) || 0))
+            : 0;
+
+        // Profil adatainak lekérése és frissítése
+        let profile = await this.getPlayerProfile(elem.name);
+        if (!profile) {
+            const localProfiles = JSON.parse(localStorage.getItem('crashdown_player_profiles') || '{}');
+            profile = localProfiles[elem.name] || localProfiles[targetName];
+        }
+
+        if (profile) {
+            profile.bestScore = newBestScore;
+            if (Array.isArray(profile.history)) {
+                profile.history = profile.history.filter(h => !(
+                    (parseInt(h.score, 10) || 0) === targetScore &&
+                    (!targetTimestamp || h.timestamp === targetTimestamp)
+                ));
+            }
+            const pKey = 'crashdown_player_profiles';
+            const localProfiles = JSON.parse(localStorage.getItem(pKey) || '{}');
+            localProfiles[elem.name] = profile;
+            localStorage.setItem(pKey, JSON.stringify(localProfiles));
+            await this.savePlayerProfile(elem.name, profile);
+        }
+
+        return true;
+    }
+
     async resetLeaderboard(adminConfirmation) {
         if (adminConfirmation !== 'CONFIRM_PURGE_LEADERBOARD') {
             console.warn('[LeaderboardService] resetLeaderboard hívása megtagadva: nincs admin jóváhagyás.');

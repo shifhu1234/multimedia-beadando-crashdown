@@ -6,6 +6,159 @@ let currentLeaderboardColorFilter = "all";
 let currentLeaderboardModeFilter = "all";
 let currentLeaderboardTimeFilter = "all";
 let pendingScore = null;
+let openedProfileFromPlayersModal = false;
+
+// ==================== ADMINISZTRÁTOR JOGOSULTSÁG ====================
+const ADMIN_EMAIL = "n.gabikaa03@gmail.com";
+
+function isAdminUser() {
+  const user = window.authService?.getCurrentUser();
+  return !!(
+    user &&
+    user.email &&
+    user.email.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase()
+  );
+}
+
+/**
+ * Adminisztrátori jogosultsággal mérföldkövek és testreszabások force unlockolása és lockolása
+ */
+async function adminForceUpdateUserAchievements(targetUsername, newAchievementsList) {
+  if (!isAdminUser() || !targetUsername) return;
+
+  let profile = null;
+  if (window.leaderboardService && typeof window.leaderboardService.getPlayerProfile === "function") {
+    profile = await window.leaderboardService.getPlayerProfile(targetUsername);
+  }
+  if (!profile) {
+    const key = "crashdown_player_profiles";
+    const localProfiles = JSON.parse(localStorage.getItem(key) || "{}");
+    profile = localProfiles[targetUsername] || { username: targetUsername };
+  }
+
+  profile.achievements = newAchievementsList;
+
+  // Ha visszazárunk elemeket, és az épp aktív cím/avatar/szín zárolttá vált, alaphelyzetbe állítjuk
+  const achSet = new Set(newAchievementsList);
+  if (profile.chosenTitle) {
+    const tObj = typeof PROFILE_TITLES !== "undefined" ? PROFILE_TITLES.find(t => t.id === profile.chosenTitle) : null;
+    if (tObj && tObj.achId && !achSet.has(tObj.achId)) {
+      profile.chosenTitle = "title_beginner";
+    }
+  }
+  if (profile.chosenAvatar) {
+    const aObj = typeof PROFILE_AVATARS !== "undefined" ? PROFILE_AVATARS.find(a => a.id === profile.chosenAvatar) : null;
+    if (aObj && aObj.achId && !achSet.has(aObj.achId)) {
+      profile.chosenAvatar = "avatar_default";
+    }
+  }
+  if (profile.chosenNameColor) {
+    const cObj = typeof NAME_COLORS_CATALOG !== "undefined" ? NAME_COLORS_CATALOG.find(c => c.id === profile.chosenNameColor) : null;
+    if (cObj && cObj.achId && !achSet.has(cObj.achId)) {
+      profile.chosenNameColor = "name_white";
+    }
+  }
+
+  // Lokális mentés
+  const profilesKey = "crashdown_player_profiles";
+  const localProfiles = JSON.parse(localStorage.getItem(profilesKey) || "{}");
+  localProfiles[targetUsername] = profile;
+  localStorage.setItem(profilesKey, JSON.stringify(localProfiles));
+
+  // Ha a bejelentkezett admin a célfelhasználó
+  const currentUser = window.authService?.getCurrentUser();
+  if (currentUser && currentUser.displayName && currentUser.displayName.toLowerCase() === targetUsername.toLowerCase()) {
+    const uKey = "crashdown_achievements_" + targetUsername.trim().toLowerCase();
+    localStorage.setItem(uKey, JSON.stringify(newAchievementsList));
+    localStorage.setItem("crashdown_achievements", JSON.stringify(newAchievementsList));
+    if (typeof updateThemeSelectUI === "function") updateThemeSelectUI();
+  }
+
+  // Firebase profil mentés
+  if (window.leaderboardService && typeof window.leaderboardService.savePlayerProfile === "function") {
+    await window.leaderboardService.savePlayerProfile(targetUsername, profile);
+  }
+
+  showToast(`⚡ ${targetUsername} profilja frissítve (${newAchievementsList.length} db mérföldkő)!`, "success");
+
+  // Profil és Játékosok lista azonnali frissítése
+  await openPlayerProfileModal(targetUsername);
+  if (typeof updatePlayersModalUI === "function") {
+    updatePlayersModalUI();
+  }
+}
+
+function renderProfileAdminPanel(container, targetUsername, achSet) {
+  const allAchs = typeof ACHIEVEMENTS !== "undefined" ? ACHIEVEMENTS : [];
+  const totalCount = allAchs.length;
+  const unlockedCount = allAchs.filter(a => achSet.has(a.id)).length;
+
+  container.innerHTML = `
+    <div class="admin-header-row">
+      <div class="admin-panel-badge">
+        <span>⚡ ADMIN KEZELŐPULT: <strong>${targetUsername}</strong></span>
+      </div>
+      <div class="admin-actions-bar">
+        <button id="adminUnlockAllBtn" class="admin-btn admin-btn-unlock-all" title="Minden mérföldkő és testreszabás feloldása">
+          🔓 Mindent Felold (${totalCount})
+        </button>
+        <button id="adminLockAllBtn" class="admin-btn admin-btn-lock-all" title="Minden mérföldkő visszazárása alaphelyzetbe">
+          🔒 Mindent Visszazár
+        </button>
+      </div>
+    </div>
+    <div style="font-size: 0.72rem; color: #cbd5e1; display: flex; justify-content: space-between; align-items: center; margin: 2px 0;">
+      <span>Mérföldkövek és jutalmak egyéni ki/bekapcsolása:</span>
+      <strong style="color: #6ee7b7;">${unlockedCount} / ${totalCount} feloldva</strong>
+    </div>
+    <div class="admin-achievements-container">
+      ${allAchs.map(a => {
+        const isUnlocked = achSet.has(a.id);
+        const rewards = typeof getAchievementRewards === 'function' ? getAchievementRewards(a.id) : [];
+        const rewTexts = rewards.map(r => r.text).join(', ');
+        return `
+          <div class="admin-ach-row">
+            <div class="admin-ach-info">
+              <span>${a.icon}</span>
+              <span class="admin-ach-name" title="${a.desc}"><strong>${a.title}</strong></span>
+              ${rewTexts ? `<span class="admin-ach-reward-tag">(${rewTexts})</span>` : ''}
+            </div>
+            <button class="admin-toggle-btn ${isUnlocked ? 'active' : 'locked'}" data-ach-id="${a.id}" data-target-user="${targetUsername}" title="Kattints a státusz váltásához">
+              ${isUnlocked ? '✅ Feloldva' : '🔒 Zárolva'}
+            </button>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+
+  document.getElementById("adminUnlockAllBtn")?.addEventListener("click", async () => {
+    if (confirm(`Biztosan fel szeretnéd oldani az összes (${totalCount} db) mérföldkövet és jutalmat ${targetUsername} számára?`)) {
+      await adminForceUpdateUserAchievements(targetUsername, allAchs.map(a => a.id));
+    }
+  });
+
+  document.getElementById("adminLockAllBtn")?.addEventListener("click", async () => {
+    if (confirm(`Biztosan vissza szeretnéd zárni az összes mérföldkövet ${targetUsername} profilján?`)) {
+      await adminForceUpdateUserAchievements(targetUsername, []);
+    }
+  });
+
+  container.querySelectorAll(".admin-toggle-btn").forEach(btn => {
+    btn.addEventListener("click", async function() {
+      const achId = this.getAttribute("data-ach-id");
+      const user = this.getAttribute("data-target-user");
+      const isCurrentlyUnlocked = achSet.has(achId);
+      const newSet = new Set(achSet);
+      if (isCurrentlyUnlocked) {
+        newSet.delete(achId);
+      } else {
+        newSet.add(achId);
+      }
+      await adminForceUpdateUserAchievements(user, Array.from(newSet));
+    });
+  });
+}
 
 // ==================== TOAST RENDSZER (MAXIMUM 3 DARAB) ====================
 function showToast(message, type = "info") {
@@ -285,6 +438,18 @@ async function openPlayerProfileModal(username) {
     );
     if (stats.activeTitle.specialClass) {
       titleEl.classList.add(stats.activeTitle.specialClass);
+    }
+  }
+
+  // Adminisztrátori kezelőpanel inicializálása (ha n.gabikaa03@gmail.com)
+  const adminSection = document.getElementById("profileAdminSection");
+  if (adminSection) {
+    if (isAdminUser()) {
+      adminSection.style.display = "flex";
+      renderProfileAdminPanel(adminSection, stats.username, achSet);
+    } else {
+      adminSection.style.display = "none";
+      adminSection.innerHTML = "";
     }
   }
 
@@ -1006,6 +1171,7 @@ async function updatePlayersModalUI() {
     card.addEventListener("click", function () {
       const uName = this.getAttribute("data-player-name");
       if (uName) {
+        window.openedProfileFromPlayersModal = true;
         closePlayersModal();
         openPlayerProfileModal(uName);
       }
@@ -1144,6 +1310,10 @@ function updateAuthUI(user) {
           nameLabel.classList.add(myStats.activeNameColor.className);
         }
       } catch (e) {}
+
+      if (isAdminUser()) {
+        nameLabel.innerHTML = `${user.displayName} <span class="admin-panel-badge" style="font-size: 0.55rem; padding: 1px 5px; vertical-align: middle; margin-left: 4px;">⚡ ADMIN</span>`;
+      }
     }
     try {
       const myStats = getPlayerProfileStats(user.displayName);
@@ -1368,6 +1538,31 @@ async function toplistaMegjelenites() {
 
     rightDiv.appendChild(scoreSpan);
     rightDiv.appendChild(colorTag);
+
+    if (isAdminUser()) {
+      const delBtn = document.createElement("button");
+      delBtn.className = "lb-admin-delete-btn";
+      delBtn.title = `Eredmény törlése (Admin) - ${elem.name} (${elem.score} p)`;
+      delBtn.innerHTML = "🗑️";
+      delBtn.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        if (confirm(`Biztosan törölni szeretnéd ezt az eredményt a ranglistáról?\n\nJátékos: ${elem.name}\nPontszám: ${elem.score} p\nKategória: ${elem.color} szín • ${modBadge} • ${durText}`)) {
+          if (window.leaderboardService && typeof window.leaderboardService.deleteScoreRecord === "function") {
+            await window.leaderboardService.deleteScoreRecord(elem);
+          } else {
+            let toplista = JSON.parse(localStorage.getItem("toplista")) || [];
+            toplista = toplista.filter(s => !(s.name === elem.name && String(s.score) === String(elem.score)));
+            localStorage.setItem("toplista", JSON.stringify(toplista));
+          }
+          showToast(`🗑️ Eredmény törölve és profil statisztikák újraszámolva!`, "success");
+          await toplistaMegjelenites();
+          if (typeof updatePlayersModalUI === "function") {
+            updatePlayersModalUI();
+          }
+        }
+      });
+      rightDiv.appendChild(delBtn);
+    }
 
     listaElem.appendChild(leftDiv);
     listaElem.appendChild(rightDiv);

@@ -121,6 +121,12 @@ const playerProfileModal = document.getElementById('playerProfileModal');
 function closePlayerProfileModal() {
     window.currentlyViewedProfileUser = null;
     if (playerProfileModal) playerProfileModal.classList.add('hidden');
+    if (window.openedProfileFromPlayersModal) {
+        window.openedProfileFromPlayersModal = false;
+        if (typeof openPlayersModal === 'function') {
+            openPlayersModal();
+        }
+    }
 }
 
 if (closePlayerProfileModalBtn) closePlayerProfileModalBtn.addEventListener('click', closePlayerProfileModal);
@@ -422,6 +428,9 @@ document.addEventListener('keydown', (e) => {
 if (window.authService) {
     window.authService.onAuthStateChanged(user => {
         updateAuthUI(user);
+        if (typeof toplistaMegjelenites === 'function') {
+            toplistaMegjelenites();
+        }
     });
 }
 
