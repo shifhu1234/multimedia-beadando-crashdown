@@ -1,0 +1,53 @@
+/* ================================================================
+   CRASHDOWN ARCADE - VITE + REACT + PIXIJS MASTER STYLESHEET
+   ================================================================ */
+
+@import './variables.css';
+@import './themes.css';
+@import './layout.css';
+@import './game.css';
+@import './modals.css';
+
+/* React root transzparens konténer a natív flexbox/sticky és reszponzív rács megtartásához */
+#root {
+    display: contents;
+}
+
+/* Modernizált finomhangolások és hardveresen gyorsított animációk */
+.brand-text-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.engine-tech-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    font-size: 0.56rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    background: rgba(56, 189, 248, 0.14);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    color: #7dd3fc;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.15);
+    user-select: none;
+}
+
+.modal-backdrop:not(.hidden) .auth-modal-card {
+    animation: modalCardPopIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalCardPopIn {
+    0% {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}

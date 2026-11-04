@@ -1,0 +1,375 @@
+/* ================================================================
+   CRASHDOWN ARCADE - LAYOUT & RESPONSIVE ARCHITECTURE
+   ================================================================ */
+
+/* Globális görgősáv a kiválasztott színtéma színével (minden elemen dinamikus) */
+*, html {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-blue) var(--bg-input);
+}
+
+*::-webkit-scrollbar, html::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+*::-webkit-scrollbar-track, html::-webkit-scrollbar-track {
+    background: var(--bg-input);
+}
+
+*::-webkit-scrollbar-thumb, html::-webkit-scrollbar-thumb {
+    background: var(--color-blue);
+    border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
+    background: var(--color-blue-dark);
+}
+
+body {
+    overflow: visible;
+}
+
+/* Közös alap panel stílusok */
+.app-shell {
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+    z-index: 10;
+}
+
+.panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.45);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow: hidden;
+}
+
+/* ==================== DESKTOP ÉS LAPTOP NÉZET (>= 980px) ==================== */
+@media (min-width: 980px) {
+    html {
+        height: 100vh;
+        max-height: 100vh;
+        overflow: hidden;
+    }
+
+    body {
+        height: 100vh;
+        max-height: 100vh;
+        overflow: hidden;
+        margin: 0;
+        padding: 6px 12px 10px 12px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        box-sizing: border-box;
+    }
+
+    .top-nav-bar {
+        position: relative;
+        top: 0;
+        max-width: 1144px;
+        width: 100%;
+        height: 32px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin: 0 0 6px 0;
+        padding: 0;
+        z-index: 50;
+        flex-shrink: 0;
+    }
+
+    /* Asztali nézetben a mobil tab navigáció szigorúan rejtett */
+    .mobile-nav {
+        display: none !important;
+    }
+
+    .app-shell {
+        display: grid;
+        grid-template-columns: minmax(260px, 310px) 464px minmax(260px, 330px);
+        grid-template-rows: auto;
+        gap: 14px;
+        width: 1144px;
+        max-width: calc(100vw - 24px);
+        align-items: stretch;
+        justify-content: center;
+        margin-top: 0;
+        height: calc(100vh - 46px);
+        max-height: 615px;
+    }
+
+    .panel {
+        height: 100%;
+        max-height: 615px;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    .controls-panel {
+        height: 100%;
+        max-height: 615px;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        overflow: hidden;
+    }
+
+    .game-settings-box {
+        flex-shrink: 0;
+    }
+
+    .game-extra-box {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .game-stage {
+        height: 100%;
+        max-height: 595px;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    .hud-bar {
+        order: 1;
+    }
+
+    .canvas-wrapper {
+        order: 2;
+    }
+
+    .stage-actions {
+        order: 3;
+    }
+}
+
+/* Ha a böngésző ablaka alacsony vagy a felhasználó belenagyított */
+@media (min-width: 980px) and (max-height: 640px) {
+    html {
+        height: auto;
+        min-height: 100vh;
+        overflow-y: auto !important;
+        overflow-x: hidden;
+    }
+
+    body {
+        height: auto;
+        min-height: 100vh;
+        overflow: visible;
+        justify-content: flex-start;
+        padding: 8px 0 24px 0;
+    }
+
+    .top-nav-bar {
+        position: relative;
+        top: 0;
+        margin-bottom: 8px;
+    }
+
+    .app-shell {
+        margin-top: 0;
+        height: auto;
+        max-height: none;
+    }
+
+    .panel,
+    .controls-panel,
+    .game-stage {
+        height: auto;
+        max-height: none;
+    }
+}
+
+/* ==================== MOBIL ÉS TABLET RESZPONZÍV NÉZET (< 980px) ==================== */
+@media (max-width: 979px) {
+    html {
+        overflow-x: hidden;
+        overflow-y: auto;
+        min-height: 100vh;
+    }
+
+    body {
+        overflow: visible;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-bottom: 24px;
+    }
+
+    .top-nav-bar {
+        position: sticky;
+        top: 0;
+        background: #141824;
+        border-bottom: 1px solid var(--border-subtle);
+        padding: 6px 10px;
+        flex-direction: column;
+        gap: 6px;
+        max-width: 480px;
+        width: 100%;
+        z-index: 100;
+    }
+
+    .user-profile-bar {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .mobile-nav {
+        display: flex;
+        width: 100%;
+        gap: 6px;
+    }
+
+    .mobile-tab-btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        height: 38px;
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        background: var(--bg-card);
+        color: var(--text-secondary);
+        font-size: 0.82rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+
+    .mobile-tab-btn.active {
+        background: var(--color-blue);
+        color: #ffffff;
+        border-color: var(--color-blue);
+        box-shadow: 0 2px 0 var(--color-blue-dark);
+    }
+
+    .app-shell {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: 480px;
+        gap: 12px;
+        padding: 8px 12px;
+    }
+
+    /* Mobilon tabos elrendezés: csak az aktív panel látható */
+    .controls-panel,
+    .game-stage,
+    .leaderboard-panel {
+        display: none !important;
+        width: 100% !important;
+        height: auto !important;
+        max-height: none !important;
+    }
+
+    .controls-panel.active,
+    .game-stage.active,
+    .leaderboard-panel.active {
+        display: flex !important;
+    }
+
+    /* Mobilon a vászon és kerete reszponzívan skálázódik */
+    .game-stage {
+        padding: 0;
+    }
+
+    .hud-bar {
+        order: 1;
+        width: 100%;
+        height: 92px !important;
+        min-height: 92px !important;
+        padding: 5px 8px 4px 8px !important;
+    }
+
+    .hud-main-row {
+        grid-template-columns: minmax(75px, 85px) 1fr minmax(75px, 85px) !important;
+        gap: 4px !important;
+        height: 56px !important;
+    }
+
+    .hud-center-buffs {
+        overflow: visible !important;
+        gap: 4px !important;
+        width: 100% !important;
+    }
+
+    .buff-pill {
+        width: 100% !important;
+        max-width: 135px !important;
+        min-width: 0 !important;
+        font-size: 0.62rem !important;
+        padding: 1px 5px !important;
+    }
+
+    .canvas-wrapper {
+        order: 2;
+        width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 1 / 1 !important;
+        max-width: 440px !important;
+        max-height: 440px !important;
+        padding: 8px !important;
+        margin: 0 auto !important;
+        box-sizing: border-box !important;
+    }
+
+    #crashdownCanvas {
+        width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 1 / 1 !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+        display: block !important;
+    }
+
+    .stage-actions {
+        order: 3;
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 6px !important;
+        margin-top: 4px !important;
+    }
+
+    .legend-card {
+        max-height: 280px;
+    }
+
+    .leaderboard-panel {
+        min-height: 480px;
+    }
+
+    .leaderboard-filter-toolbar {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        gap: 4px !important;
+        width: 100% !important;
+    }
+
+    .lb-filter-box {
+        flex: 1 1 0 !important;
+        min-width: 0 !important;
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        padding: 0 4px !important;
+        height: 32px !important;
+    }
+}

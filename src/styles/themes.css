@@ -1,0 +1,213 @@
+/* ================================================================
+   CRASHDOWN ARCADE - TÉMÁK ÉS SZÍNVILÁG (THEMES)
+   ================================================================ */
+
+/* 1. Retro Arcade (Alapértelmezett zöldes arcade) */
+:root.theme-retro, html.theme-retro, body.theme-retro {
+    --bg-main: #0c140e;
+    --bg-panel: #132017;
+    --bg-card: #192a1f;
+    --bg-input: #0e1711;
+    --border-subtle: rgba(74, 222, 128, 0.2);
+    --border-hover: rgba(74, 222, 128, 0.4);
+    --color-blue: #10b981;
+    --color-blue-dark: #059669;
+    background-color: var(--bg-main);
+    background-image: 
+        radial-gradient(rgba(74, 222, 128, 0.08) 1px, transparent 1px),
+        radial-gradient(circle at 50% 0%, #152b1e 0%, transparent 70%);
+}
+
+/* 2. Cyber Neon (Kék/Lila techno) */
+:root.theme-cyber, html.theme-cyber, body.theme-cyber {
+    --bg-main: #0b0f19;
+    --bg-panel: #131929;
+    --bg-card: #1b233a;
+    --bg-input: #0e1320;
+    --border-subtle: rgba(56, 189, 248, 0.18);
+    --border-hover: rgba(56, 189, 248, 0.4);
+    --color-blue: #0284c7;
+    --color-blue-dark: #0369a1;
+    background-color: var(--bg-main);
+    background-image: 
+        radial-gradient(rgba(56, 189, 248, 0.09) 1px, transparent 1px),
+        radial-gradient(circle at 50% 0%, #172554 0%, transparent 70%);
+}
+
+/* 3. Candy Pop (Édes rózsaszín / pasztell) */
+:root.theme-candy, html.theme-candy, body.theme-candy {
+    --bg-main: #191222;
+    --bg-panel: #231a31;
+    --bg-card: #2e2240;
+    --bg-input: #1a1325;
+    --border-subtle: rgba(244, 114, 182, 0.22);
+    --border-hover: rgba(244, 114, 182, 0.45);
+    --color-blue: #ec4899;
+    --color-blue-dark: #be185d;
+    background-color: var(--bg-main);
+    background-image: 
+        radial-gradient(rgba(244, 114, 182, 0.1) 1px, transparent 1px),
+        radial-gradient(circle at 50% 0%, #3b183a 0%, transparent 70%);
+}
+
+/* 4. Deep Space (Mélyűr kozmikus kék / indigo) */
+:root.theme-space, html.theme-space, body.theme-space {
+    --bg-main: #060814;
+    --bg-panel: #0d1226;
+    --bg-card: #131c38;
+    --bg-input: #090c1c;
+    --border-subtle: rgba(129, 140, 248, 0.2);
+    --border-hover: rgba(129, 140, 248, 0.4);
+    --color-blue: #6366f1;
+    --color-blue-dark: #4338ca;
+    background-color: var(--bg-main);
+    background-image: 
+        radial-gradient(rgba(129, 140, 248, 0.1) 1px, transparent 1px),
+        radial-gradient(circle at 50% 0%, #1e1b4b 0%, transparent 70%);
+}
+
+/* 5. Sunset Synthwave (Naplemente narancs és lila) */
+:root.theme-sunset, html.theme-sunset, body.theme-sunset {
+    --bg-main: #180d19;
+    --bg-panel: #241426;
+    --bg-card: #311b34;
+    --bg-input: #1b0e1d;
+    --border-subtle: rgba(251, 146, 60, 0.22);
+    --border-hover: rgba(251, 146, 60, 0.45);
+    --color-blue: #f97316;
+    --color-blue-dark: #c2410c;
+    background-color: var(--bg-main);
+    background-image: 
+        radial-gradient(rgba(251, 146, 60, 0.1) 1px, transparent 1px),
+        radial-gradient(circle at 50% 0%, #431407 0%, transparent 70%);
+}
+
+/* 6. Emerald Forest (Smaragd erdő) */
+:root.theme-forest, html.theme-forest, body.theme-forest {
+    --bg-main: #09150f;
+    --bg-panel: #102118;
+    --bg-card: #162d21;
+    --bg-input: #0c1b13;
+    --border-subtle: rgba(52, 211, 153, 0.2);
+    --border-hover: rgba(52, 211, 153, 0.42);
+    --color-blue: #059669;
+    --color-blue-dark: #047857;
+    background-color: var(--bg-main);
+    background-image: 
+        radial-gradient(rgba(52, 211, 153, 0.08) 1px, transparent 1px),
+        radial-gradient(circle at 50% 0%, #064e3b 0%, transparent 70%);
+}
+
+/* 7. Vulkán Láva (Tüzes vörös és pernye) */
+:root.theme-lava, html.theme-lava, body.theme-lava {
+    --bg-main: #170909;
+    --bg-panel: #230e0e;
+    --bg-card: #301414;
+    --bg-input: #1b0a0a;
+    --border-subtle: rgba(239, 68, 68, 0.24);
+    --border-hover: rgba(239, 68, 68, 0.5);
+    --color-blue: #ef4444;
+    --color-blue-dark: #b91c1c;
+    background-color: var(--bg-main);
+    background-image: 
+        radial-gradient(rgba(239, 68, 68, 0.1) 1px, transparent 1px),
+        radial-gradient(circle at 50% 0%, #450a0a 0%, transparent 70%);
+}
+
+/* 8. Monokróm Noir (Elegáns sötét szürke és acél) */
+:root.theme-noir, html.theme-noir, body.theme-noir {
+    --bg-main: #0b0c10;
+    --bg-panel: #14161d;
+    --bg-card: #1d202b;
+    --bg-input: #0f1015;
+    --border-subtle: rgba(255, 255, 255, 0.12);
+    --border-hover: rgba(255, 255, 255, 0.26);
+    --color-blue: #94a3b8;
+    --color-blue-dark: #475569;
+    background-color: var(--bg-main);
+    background-image: 
+        radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+        radial-gradient(circle at 50% 0%, #1e293b 0%, transparent 70%);
+}
+
+/* 9. Mélytengeri Misztikum (Cián és tengerkék) */
+:root.theme-ocean, html.theme-ocean, body.theme-ocean {
+    --bg-main: #061118;
+    --bg-panel: #0c1c27;
+    --bg-card: #122837;
+    --bg-input: #081721;
+    --border-subtle: rgba(6, 182, 212, 0.22);
+    --border-hover: rgba(6, 182, 212, 0.44);
+    --color-blue: #0891b2;
+    --color-blue-dark: #0e7490;
+    background-color: var(--bg-main);
+    background-image: 
+        radial-gradient(rgba(6, 182, 212, 0.09) 1px, transparent 1px),
+        radial-gradient(circle at 50% 0%, #164e63 0%, transparent 70%);
+}
+
+/* 10. Sarki Fény (Aurora Borealis - Türkiz és lila) */
+:root.theme-aurora, html.theme-aurora, body.theme-aurora {
+    --bg-main: #051419;
+    --bg-panel: #0c1f27;
+    --bg-card: #112a35;
+    --bg-input: #08181f;
+    --border-subtle: rgba(45, 212, 191, 0.24);
+    --border-hover: rgba(45, 212, 191, 0.52);
+    --color-blue: #2dd4bf;
+    --color-blue-dark: #0f766e;
+    background-color: var(--bg-main);
+    background-image: 
+        radial-gradient(rgba(45, 212, 191, 0.1) 1px, transparent 1px),
+        radial-gradient(circle at 50% 0%, #134e4a 0%, transparent 70%);
+}
+
+/* 11. Retró Synthwave (80s Vaporwave rózsaszín & cián) */
+:root.theme-vaporwave, html.theme-vaporwave, body.theme-vaporwave {
+    --bg-main: #140b1e;
+    --bg-panel: #1e112d;
+    --bg-card: #2b1740;
+    --bg-input: #170d23;
+    --border-subtle: rgba(244, 63, 94, 0.24);
+    --border-hover: rgba(6, 182, 212, 0.5);
+    --color-blue: #f43f5e;
+    --color-blue-dark: #be123c;
+    background-color: var(--bg-main);
+    background-image: 
+        radial-gradient(rgba(244, 63, 94, 0.1) 1px, transparent 1px),
+        radial-gradient(circle at 50% 0%, #3b0764 0%, transparent 70%);
+}
+
+/* 12. SPECIÁLIS TÉMA: Kozmikus Void (Sötét anyagos misztikus lila) */
+:root.theme-cosmic_void, html.theme-cosmic_void, body.theme-cosmic_void {
+    --bg-main: #090514;
+    --bg-panel: #130a27;
+    --bg-card: #1d0f3a;
+    --bg-input: #0e071c;
+    --border-subtle: rgba(192, 132, 252, 0.3);
+    --border-hover: rgba(192, 132, 252, 0.65);
+    --color-blue: #a855f7;
+    --color-blue-dark: #7e22ce;
+    background-color: var(--bg-main);
+    background-image: 
+        radial-gradient(rgba(192, 132, 252, 0.14) 1px, transparent 1px),
+        radial-gradient(circle at 50% 0%, #3b0764 0%, #090514 80%);
+    box-shadow: inset 0 0 100px rgba(168, 85, 247, 0.08);
+}
+
+/* 13. SPECIÁLIS TÉMA: Birodalmi Arany (Császári ragyogó arany és borostyán) */
+:root.theme-golden, html.theme-golden, body.theme-golden {
+    --bg-main: #140e04;
+    --bg-panel: #211708;
+    --bg-card: #30210b;
+    --bg-input: #181106;
+    --border-subtle: rgba(245, 158, 11, 0.32);
+    --border-hover: rgba(251, 191, 36, 0.7);
+    --color-blue: #f59e0b;
+    --color-blue-dark: #b45309;
+    background-color: var(--bg-main);
+    background-image: 
+        radial-gradient(rgba(251, 191, 36, 0.16) 1px, transparent 1px),
+        radial-gradient(circle at 50% 0%, #451a03 0%, #140e04 80%);
+    box-shadow: inset 0 0 100px rgba(245, 158, 11, 0.09);
+}
