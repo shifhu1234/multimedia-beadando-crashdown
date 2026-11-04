@@ -64,6 +64,8 @@ function updateScoreUI(instant = false) {
   if (pontSzam >= 50000) checkAchievement("score_50k");
   if (pontSzam >= 75000) checkAchievement("score_75k");
   if (pontSzam >= 100000) checkAchievement("score_100k");
+  if (pontSzam >= 150000) checkAchievement("score_150k");
+  if (pontSzam >= 250000) checkAchievement("score_250k");
   const colorSelect = document.getElementById("colorSelect");
   if (colorSelect && colorSelect.value === "5" && pontSzam >= 2000)
     checkAchievement("master_5_color");
@@ -225,7 +227,15 @@ async function openPlayerProfileModal(username) {
   const badgesListEl = document.getElementById("profileAchievementsList");
   const badgeSummaryEl = document.getElementById("profileBadgeSummary");
 
-  if (nameEl) nameEl.textContent = stats.username;
+  if (nameEl) {
+    nameEl.textContent = stats.username;
+    const nameColorCatalog =
+      typeof NAME_COLORS_CATALOG !== "undefined" ? NAME_COLORS_CATALOG : [];
+    nameColorCatalog.forEach((c) => nameEl.classList.remove(c.className));
+    if (stats.activeNameColor && stats.activeNameColor.className) {
+      nameEl.classList.add(stats.activeNameColor.className);
+    }
+  }
   if (avatarEl) {
     avatarEl.textContent = stats.activeAvatar.symbol;
     avatarEl.title = `Profilkép: ${stats.activeAvatar.name}`;
@@ -393,6 +403,112 @@ async function openPlayerProfileModal(username) {
     }
   }
 
+  const nameColorSection = document.getElementById("profileNameColorSection");
+  const nameColorGrid = document.getElementById("profileNameColorGrid");
+  const nameColorCatalog =
+    typeof NAME_COLORS_CATALOG !== "undefined" ? NAME_COLORS_CATALOG : [];
+
+  if (nameColorSection && nameColorGrid) {
+    if (isOwnProfile) {
+      nameColorSection.style.display = "block";
+      nameColorGrid.innerHTML = nameColorCatalog
+        .map((col) => {
+          const unlocked = !col.achId || achSet.has(col.achId);
+          const isSelected =
+            stats.activeNameColor && stats.activeNameColor.id === col.id;
+          const reqAch = col.achId
+            ? ACHIEVEMENTS.find((a) => a.id === col.achId)
+            : null;
+          const lockTitle = reqAch
+            ? `Zárolva: ${reqAch.title} (${reqAch.desc}) szükséges hozzá!`
+            : "";
+          return `
+            <div class="name-color-pick-card ${unlocked ? "" : "locked"} ${isSelected ? "active" : ""}"
+                 data-color-id="${col.id}"
+                 data-unlocked="${unlocked ? "1" : "0"}"
+                 title="${unlocked ? col.name : lockTitle}">
+                ${!unlocked ? '<span class="avatar-lock-icon">🔒</span>' : ""}
+                <span class="name-color-preview-text ${col.className}">Aa</span>
+                <span class="name-color-label">${col.name}${col.isSpecial ? " (speciális)" : ""}</span>
+            </div>
+          `;
+        })
+        .join("");
+
+      nameColorGrid
+        .querySelectorAll(".name-color-pick-card")
+        .forEach((card) => {
+          card.addEventListener("click", function () {
+            const colId = this.getAttribute("data-color-id");
+            const isUnlocked = this.getAttribute("data-unlocked") === "1";
+            if (!isUnlocked) {
+              const colObj = nameColorCatalog.find((c) => c.id === colId);
+              const reqAch = colObj?.achId
+                ? ACHIEVEMENTS.find((a) => a.id === colObj.achId)
+                : null;
+              showToast(
+                `🔒 Ez a név szín még zárolva van! Feloldáshoz: ${reqAch?.title || "Teljesíts több mérföldkövet"}`,
+                "warning",
+              );
+              triggerHaptic("error");
+              if (typeof sorEffekt !== "undefined") playSound(sorEffekt);
+              return;
+            }
+
+            const colObj = nameColorCatalog.find((c) => c.id === colId);
+            if (!colObj) return;
+
+            localStorage.setItem("crashdown_chosen_name_color", colId);
+            stats.chosenNameColor = colId;
+            stats.activeNameColor = colObj;
+
+            try {
+              const profiles = JSON.parse(
+                localStorage.getItem("crashdown_player_profiles") || "{}",
+              );
+              if (!profiles[stats.username]) {
+                profiles[stats.username] = { ...stats };
+              }
+              profiles[stats.username].chosenNameColor = colId;
+              localStorage.setItem(
+                "crashdown_player_profiles",
+                JSON.stringify(profiles),
+              );
+            } catch (e) {}
+
+            if (nameEl) {
+              nameColorCatalog.forEach((c) =>
+                nameEl.classList.remove(c.className),
+              );
+              nameEl.classList.add(colObj.className);
+            }
+
+            const currentUserNameLabel = document.getElementById(
+              "currentUserNameLabel",
+            );
+            if (currentUserNameLabel) {
+              nameColorCatalog.forEach((c) =>
+                currentUserNameLabel.classList.remove(c.className),
+              );
+              currentUserNameLabel.classList.add(colObj.className);
+            }
+
+            nameColorGrid
+              .querySelectorAll(".name-color-pick-card")
+              .forEach((c) => c.classList.remove("active"));
+            this.classList.add("active");
+
+            showToast(`🎨 Új név szín beállítva: ${colObj.name}!`, "success");
+            playSound(sikeresKatt);
+            triggerHaptic("success");
+            toplistaMegjelenites();
+          });
+        });
+    } else {
+      nameColorSection.style.display = "none";
+    }
+  }
+
   if (bestScoreEl) bestScoreEl.textContent = stats.bestScore.toLocaleString();
   if (matchesEl) matchesEl.textContent = `${stats.totalMatches} meccs`;
 
@@ -513,48 +629,20 @@ async function openPlayerProfileModal(username) {
       item.addEventListener("mouseenter", () => {
         const unlocked = achSet.has(a.id);
 
-        // Kapcsolódó jutalmak felkutatása (profilkép, rangcím, téma)
-        const linkedAv =
-          typeof PROFILE_AVATARS !== "undefined"
-            ? PROFILE_AVATARS.find((av) => av.achId === a.id)
-            : null;
-        const linkedTitle =
-          typeof PROFILE_TITLES !== "undefined"
-            ? PROFILE_TITLES.find((t) => t.achId === a.id)
-            : null;
-        const linkedTheme =
-          typeof THEMES_CATALOG !== "undefined"
-            ? THEMES_CATALOG.find((th) => th.achId === a.id)
-            : null;
-
-        const rewardRows = [];
-        if (linkedAv) {
-          rewardRows.push(
-            `<div class="reward-line"><span>Profilkép</span> <span class="reward-sym">${linkedAv.symbol}</span></div>`,
-          );
-        }
-        if (linkedTitle) {
-          const cleanTitle = linkedTitle.name
-            .replace(/^[^\w\s\u00C0-\u017F]+/, "")
-            .trim();
-          rewardRows.push(
-            `<div class="reward-line"><span>Rangcím:</span> <span class="reward-sym">${cleanTitle}</span></div>`,
-          );
-        }
-        if (linkedTheme) {
-          rewardRows.push(
-            `<div class="reward-line"><span>Téma</span> <span class="reward-sym">${linkedTheme.name}</span></div>`,
-          );
-        }
+        // Egységes jutalmak lekérése: Profilkép, Rangcím, Téma, Név szín
+        const rewList =
+          typeof getAchievementRewards === "function"
+            ? getAchievementRewards(a.id)
+            : [];
 
         let rewardHtml = "";
-        if (rewardRows.length > 0) {
+        if (rewList.length > 0) {
           rewardHtml = `
-                        <div class="b-tooltip-reward">
-                            <div class="reward-heading">Jutalmak:</div>
-                            ${rewardRows.join("")}
-                        </div>
-                    `;
+            <div class="b-tooltip-reward">
+              <div class="reward-heading">Jutalmak:</div>
+              ${rewList.map((r) => `<div class="reward-line">${r.text}</div>`).join("")}
+            </div>
+          `;
         }
 
         floatingTip.innerHTML = `
@@ -785,7 +873,18 @@ function updateAuthUI(user) {
     if (changePwBtn) changePwBtn.style.display = "inline-flex";
     if (logoutBtnEl) logoutBtnEl.style.display = "inline-flex";
 
-    if (nameLabel) nameLabel.textContent = user.displayName;
+    if (nameLabel) {
+      nameLabel.textContent = user.displayName;
+      const nameColorCatalog =
+        typeof NAME_COLORS_CATALOG !== "undefined" ? NAME_COLORS_CATALOG : [];
+      nameColorCatalog.forEach((c) => nameLabel.classList.remove(c.className));
+      try {
+        const myStats = getPlayerProfileStats(user.displayName);
+        if (myStats?.activeNameColor?.className) {
+          nameLabel.classList.add(myStats.activeNameColor.className);
+        }
+      } catch (e) {}
+    }
     try {
       const myStats = getPlayerProfileStats(user.displayName);
       if (avatarDot)
@@ -940,6 +1039,14 @@ async function toplistaMegjelenites() {
     nameSpan.className = "lb-name";
     nameSpan.textContent = rawName;
     nameSpan.title = rawName;
+
+    try {
+      const pStats = getPlayerProfileStats(elem.name, toplista);
+      if (pStats && pStats.activeNameColor && pStats.activeNameColor.className) {
+        nameSpan.classList.add(pStats.activeNameColor.className);
+      }
+    } catch (e) {}
+
     leftDiv.appendChild(nameSpan);
 
     const rightDiv = document.createElement("div");

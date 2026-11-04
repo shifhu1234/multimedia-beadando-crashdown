@@ -79,7 +79,7 @@ function getSzinek(mennyit) {
 function aktivaldPontduplazot(seconds = 5) {
     isDoublePointsActive = true;
     doublePointsRemainingTime = seconds;
-    regisztraljPowerupHasznalatot();
+    regisztraljPowerupHasznalatot('doubler');
 
     const banner = document.getElementById('doublePointsBanner');
     const badge = document.getElementById('frenzyTimerBadge');
@@ -120,7 +120,7 @@ function deaktivaldPontduplazot() {
 function aktivaldFagyasztast(seconds = 4) {
     isFrozen = true;
     freezeRemainingTime = seconds;
-    regisztraljPowerupHasznalatot();
+    regisztraljPowerupHasznalatot('freeze');
 
     const overlay = document.getElementById('freezeOverlay');
     const badge = document.getElementById('freezeTimerBadge');
@@ -165,7 +165,7 @@ function pluszIdoPowerUp() {
 }
 
 function magnesPowerUp() {
-    regisztraljPowerupHasznalatot();
+    regisztraljPowerupHasznalatot('magnet');
     playSound(doublerKatt);
     triggerHaptic('heavy');
     screenShake = 5;
@@ -240,12 +240,13 @@ function magnesPowerUp() {
 
 function regisztraljKomboLepest() {
     comboStreak++;
-    comboMultiplier = Math.min(5, 1 + Math.floor(comboStreak / 2));
+    comboMultiplier = Math.min(6, 1 + Math.floor(comboStreak / 2));
 
     if (comboMultiplier >= 2) checkAchievement('combo_x2');
     if (comboMultiplier >= 3) checkAchievement('combo_x3');
     if (comboMultiplier >= 4) checkAchievement('combo_x4');
     if (comboMultiplier >= 5) checkAchievement('combo_x5');
+    if (comboMultiplier >= 6) checkAchievement('lightning_combo_6');
 
     if (comboResetTimeout) clearTimeout(comboResetTimeout);
     comboResetTimeout = setTimeout(() => {
@@ -590,7 +591,7 @@ function handleClick(event) {
         setComboStatus(`⇅ Teljes oszlop kilőve! (+${gained}p)`, true);
         ellenorizdPalyaAllapot();
     } else if (targetColor === 'darkgreen') {
-        regisztraljPowerupHasznalatot();
+        regisztraljPowerupHasznalatot('tnt');
         playSound(tntKatt);
         triggerHaptic('heavy');
         checkAchievement('tnt_boom');
@@ -611,7 +612,7 @@ function handleClick(event) {
         setComboStatus(`💥 3×3-as TNT robbanás! (+${gained}p)`, true);
         ellenorizdPalyaAllapot();
     } else if (targetColor === '#14b8a6') {
-        regisztraljPowerupHasznalatot();
+        regisztraljPowerupHasznalatot('colorbomb');
         playSound(tntKatt);
         triggerHaptic('medium');
         const activeColors = [];
@@ -733,6 +734,7 @@ function handleClick(event) {
             checkAchievement('first_match');
             if (torlendoNegyzetek.length >= 8) checkAchievement('mega_clear');
             if (torlendoNegyzetek.length >= 12) checkAchievement('hyper_clear');
+            if (torlendoNegyzetek.length >= 16) checkAchievement('massive_clear_16');
 
             recentSuccessfulClicks.push(Date.now());
             recentSuccessfulClicks = recentSuccessfulClicks.filter(t => Date.now() - t <= 10000);
