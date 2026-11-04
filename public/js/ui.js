@@ -79,207 +79,19 @@ async function adminForceUpdateUserAchievements(targetUsername, newAchievementsL
     await window.leaderboardService.savePlayerProfile(targetUsername, profile);
   }
 
-  showToast(`⚡ ${targetUsername} profilja frissítve (${newAchievementsList.length} db mérföldkő)!`, "success");
+  showToast(`⚡ ${targetUsername} jelvényei frissítve (${newAchievementsList.length} db)!`, "success");
 
-  // Profil és Játékosok lista azonnali frissítése
-  await openPlayerProfileModal(targetUsername);
+  // Profil és Játékosok lista azonnali frissítése (görgetési pozíció megtartásával)
+  const pArea = document.querySelector(".profile-content-area");
+  const prevScroll = pArea ? pArea.scrollTop : 0;
+  await openPlayerProfileModal(targetUsername, false);
+  const pAreaAfter = document.querySelector(".profile-content-area");
+  if (pAreaAfter) {
+    pAreaAfter.scrollTop = prevScroll;
+  }
   if (typeof updatePlayersModalUI === "function") {
     updatePlayersModalUI();
   }
-}
-
-let currentAdminCategoryFilter = "all";
-
-function renderProfileAdminPanel(container, targetUsername, achSet) {
-  const allAchs = typeof ACHIEVEMENTS !== "undefined" ? ACHIEVEMENTS : [];
-  const totalCount = allAchs.length;
-  const unlockedCount = allAchs.filter(a => achSet.has(a.id)).length;
-
-  container.innerHTML = `
-    <div class="admin-header-row">
-      <div class="admin-panel-badge">
-        <span>⚡ ADMINISZTRÁTORI KEZELŐPULT</span>
-      </div>
-      <div class="admin-actions-bar">
-        <button id="adminUnlockAllBtn" class="admin-btn admin-btn-unlock-all" title="Minden mérföldkő és testreszabás azonnali feloldása">
-          🔓 Mindent Felold (${totalCount})
-        </button>
-        <button id="adminLockAllBtn" class="admin-btn admin-btn-lock-all" title="Minden mérföldkő visszazárása alaphelyzetbe">
-          🔒 Mindent Visszazár
-        </button>
-      </div>
-    </div>
-
-    <div class="admin-info-bar">
-      <span>🎯 Célpont játékos: <strong style="color: #ffffff;">${targetUsername}</strong></span>
-      <span style="color: #6ee7b7; font-weight: 800;">📊 ${unlockedCount} / ${totalCount} feloldva</span>
-    </div>
-
-    <!-- Kategória szűrő fülek a kártyákhoz -->
-    <div class="admin-filter-bar">
-      <button class="admin-filter-chip ${currentAdminCategoryFilter === 'all' ? 'active' : ''}" data-cat="all">🏆 Összes (${totalCount})</button>
-      <button class="admin-filter-chip ${currentAdminCategoryFilter === 'title' ? 'active' : ''}" data-cat="title">👑 Rangcímek</button>
-      <button class="admin-filter-chip ${currentAdminCategoryFilter === 'color' ? 'active' : ''}" data-cat="color">🎨 Név színek</button>
-      <button class="admin-filter-chip ${currentAdminCategoryFilter === 'avatar' ? 'active' : ''}" data-cat="avatar">👤 Profilképek</button>
-      <button class="admin-filter-chip ${currentAdminCategoryFilter === 'theme' ? 'active' : ''}" data-cat="theme">🌈 Témák</button>
-    </div>
-
-    <!-- Tágas, átlátható kártyás elrendezésű rács -->
-    <div class="admin-cards-grid" id="adminCardsGrid">
-      ${allAchs.map(a => {
-        const isUnlocked = achSet.has(a.id);
-        const rewards = typeof getAchievementRewards === 'function' ? getAchievementRewards(a.id) : [];
-        const rewTypes = rewards.map(r => r.type);
-        
-        let categories = ['all'];
-        if (rewTypes.includes('title')) categories.push('title');
-        if (rewTypes.includes('color')) categories.push('color');
-        if (rewTypes.includes('avatar')) categories.push('avatar');
-        if (rewTypes.includes('theme')) categories.push('theme');
-
-        const isVisible = currentAdminCategoryFilter === 'all' || categories.includes(currentAdminCategoryFilter);
-
-        return `
-          <div class="admin-ach-card ${isUnlocked ? 'unlocked' : 'locked'}" 
-               data-ach-id="${a.id}" 
-               data-categories="${categories.join(' ')}"
-               style="display: ${isVisible ? 'flex' : 'none'};">
-            <span class="admin-card-status-pill">${isUnlocked ? '✅ Kész' : '🔒 Zárt'}</span>
-            <div class="admin-card-icon">${a.icon}</div>
-            <strong class="admin-card-title">${a.title}</strong>
-            <button class="admin-card-btn" 
-                    data-ach-id="${a.id}" 
-                    data-target-user="${targetUsername}">
-              ${isUnlocked ? '🔒 Zárás' : '🔓 Feloldás'}
-            </button>
-          </div>
-        `;
-      }).join('')}
-    </div>
-  `;
-
-  // Globális gombok eseménykezelői
-  document.getElementById("adminUnlockAllBtn")?.addEventListener("click", async () => {
-    if (confirm(`Biztosan fel szeretnéd oldani az összes (${totalCount} db) mérföldkövet és testreszabást ${targetUsername} számára?`)) {
-      await adminForceUpdateUserAchievements(targetUsername, allAchs.map(a => a.id));
-    }
-  });
-
-  document.getElementById("adminLockAllBtn")?.addEventListener("click", async () => {
-    if (confirm(`Biztosan vissza szeretnéd zárni az összes mérföldkövet ${targetUsername} profilján?`)) {
-      await adminForceUpdateUserAchievements(targetUsername, []);
-    }
-  });
-
-  // Kategória szűrő fülek eseménykezelői
-  container.querySelectorAll(".admin-filter-chip").forEach(chip => {
-    chip.addEventListener("click", function () {
-      container.querySelectorAll(".admin-filter-chip").forEach(c => c.classList.remove("active"));
-      this.classList.add("active");
-      currentAdminCategoryFilter = this.getAttribute("data-cat");
-      const grid = document.getElementById("adminCardsGrid");
-      if (!grid) return;
-      grid.querySelectorAll(".admin-ach-card").forEach(card => {
-        const cardCats = (card.getAttribute("data-categories") || "").split(" ");
-        if (currentAdminCategoryFilter === "all" || cardCats.includes(currentAdminCategoryFilter)) {
-          card.style.display = "flex";
-        } else {
-          card.style.display = "none";
-        }
-      });
-    });
-  });
-
-  // Tooltip lebegő ablak bekötése az admin kártyákra (ugyanúgy mint a normál jelvényeknél)
-  const floatingTip = document.getElementById("profileBadgeFloatingTooltip");
-  if (floatingTip) {
-    container.querySelectorAll(".admin-ach-card").forEach(card => {
-      const achId = card.getAttribute("data-ach-id");
-      const a = allAchs.find(x => x.id === achId);
-      if (!a) return;
-
-      const showTip = () => {
-        const unlocked = achSet.has(a.id);
-        const rewList = typeof getAchievementRewards === "function" ? getAchievementRewards(a.id) : [];
-
-        let rewardHtml = "";
-        if (rewList.length > 0) {
-          rewardHtml = `
-            <div class="b-tooltip-reward">
-              <div class="reward-heading">Jutalmak:</div>
-              ${rewList.map((r) => `<div class="reward-line">${r.text}</div>`).join("")}
-            </div>
-          `;
-        }
-
-        floatingTip.innerHTML = `
-          <div class="b-tooltip-header">
-            <span class="b-tooltip-title">${a.icon} ${a.title}</span>
-            <span class="b-tooltip-status ${unlocked ? "unlocked" : "locked"}">${unlocked ? "Megszerezve" : "Zárolva"}</span>
-          </div>
-          <p class="b-tooltip-desc">${a.desc}</p>
-          ${rewardHtml}
-        `;
-
-        floatingTip.style.display = "block";
-        floatingTip.style.opacity = "1";
-
-        const tipHeight = floatingTip.offsetHeight || 110;
-        const rect = card.getBoundingClientRect();
-        const tipWidth = 240;
-        let tipLeft = rect.left + rect.width / 2 - tipWidth / 2;
-        tipLeft = Math.max(12, Math.min(window.innerWidth - tipWidth - 12, tipLeft));
-
-        if (rect.top - tipHeight - 8 > 10) {
-          floatingTip.style.top = `${rect.top - tipHeight - 8}px`;
-        } else {
-          floatingTip.style.top = `${rect.bottom + 8}px`;
-        }
-        floatingTip.style.left = `${tipLeft}px`;
-      };
-
-      const hideTip = () => {
-        floatingTip.style.display = "none";
-        floatingTip.style.opacity = "0";
-      };
-
-      card.addEventListener("mouseenter", showTip);
-      card.addEventListener("mouseleave", hideTip);
-      card.addEventListener("click", (e) => {
-        if (!e.target.closest(".admin-card-btn")) {
-          showTip();
-        }
-      });
-    });
-
-    const hideAllTips = () => {
-      floatingTip.style.display = "none";
-      floatingTip.style.opacity = "0";
-    };
-    container.querySelector(".admin-cards-grid")?.addEventListener("scroll", hideAllTips, { passive: true });
-  }
-
-  // Egyéni kártya feloldás / visszazárás gombok
-  container.querySelectorAll(".admin-card-btn").forEach(btn => {
-    btn.addEventListener("click", async function (e) {
-      e.stopPropagation();
-      const floatingTipEl = document.getElementById("profileBadgeFloatingTooltip");
-      if (floatingTipEl) {
-        floatingTipEl.style.display = "none";
-        floatingTipEl.style.opacity = "0";
-      }
-      const achId = this.getAttribute("data-ach-id");
-      const user = this.getAttribute("data-target-user");
-      const isCurrentlyUnlocked = achSet.has(achId);
-      const newSet = new Set(achSet);
-      if (isCurrentlyUnlocked) {
-        newSet.delete(achId);
-      } else {
-        newSet.add(achId);
-      }
-      await adminForceUpdateUserAchievements(user, Array.from(newSet));
-    });
-  });
 }
 
 // ==================== TOAST RENDSZER (MAXIMUM 3 DARAB) ====================
@@ -485,8 +297,18 @@ async function syncPlayerCustomization(username, updates) {
   }
 }
 
-async function openPlayerProfileModal(username) {
+async function openPlayerProfileModal(username, resetScroll = true) {
   window.currentlyViewedProfileUser = username;
+
+  if (resetScroll) {
+    const modalEl = document.getElementById("playerProfileModal");
+    if (modalEl) modalEl.scrollTop = 0;
+    const cardEl = modalEl?.querySelector(".modal-card");
+    if (cardEl) cardEl.scrollTop = 0;
+    const contentArea = modalEl?.querySelector(".profile-content-area");
+    if (contentArea) contentArea.scrollTop = 0;
+  }
+
   let allScores = [];
   if (window.leaderboardService) {
     allScores = await window.leaderboardService.getScores();
@@ -563,17 +385,6 @@ async function openPlayerProfileModal(username) {
     }
   }
 
-  // Adminisztrátori kezelőpanel inicializálása (ha n.gabikaa03@gmail.com)
-  const adminSection = document.getElementById("profileAdminSection");
-  if (adminSection) {
-    if (isAdminUser()) {
-      adminSection.style.display = "flex";
-      renderProfileAdminPanel(adminSection, stats.username, achSet);
-    } else {
-      adminSection.style.display = "none";
-      adminSection.innerHTML = "";
-    }
-  }
 
   // 5. Név színének választása (kártyás nézet)
   const nameColorSection = document.getElementById("profileNameColorSection");
@@ -938,15 +749,59 @@ async function openPlayerProfileModal(username) {
       .join("");
   }
 
+  const isAdmin = isAdminUser();
+  const adminBadgeActions = document.getElementById("profileAdminBadgeActions");
+  if (adminBadgeActions) {
+    if (isAdmin) {
+      adminBadgeActions.style.display = "inline-flex";
+      const unlockAllBtn = document.getElementById("profileAdminUnlockAllBtn");
+      const lockAllBtn = document.getElementById("profileAdminLockAllBtn");
+
+      if (unlockAllBtn) {
+        unlockAllBtn.onclick = async (e) => {
+          e.stopPropagation();
+          if (
+            confirm(
+              `Biztosan fel szeretnéd oldani az összes (${ACHIEVEMENTS.length} db) jelvényt ${stats.username} számára?`,
+            )
+          ) {
+            await adminForceUpdateUserAchievements(
+              stats.username,
+              ACHIEVEMENTS.map((a) => a.id),
+            );
+          }
+        };
+      }
+
+      if (lockAllBtn) {
+        lockAllBtn.onclick = async (e) => {
+          e.stopPropagation();
+          if (
+            confirm(
+              `Biztosan vissza szeretnéd zárni az összes jelvényt ${stats.username} profilján?`,
+            )
+          ) {
+            await adminForceUpdateUserAchievements(stats.username, []);
+          }
+        };
+      }
+    } else {
+      adminBadgeActions.style.display = "none";
+    }
+  }
+
   if (badgesListEl) {
     badgesListEl.innerHTML = ACHIEVEMENTS.map((a) => {
       const unlocked = achSet.has(a.id);
       return `
-                <div class="profile-badge-item ${unlocked ? "unlocked" : "locked"}" data-ach-id="${a.id}">
-                    <span class="profile-badge-icon">${a.icon}</span>
-                    <span class="profile-badge-name">${a.title}</span>
-                </div>
-            `;
+        <div class="profile-badge-item ${unlocked ? "unlocked" : "locked"} ${isAdmin ? "admin-clickable" : ""}" 
+             data-ach-id="${a.id}"
+             title="${isAdmin ? (unlocked ? 'Kattints a visszazáráshoz (Admin)' : 'Kattints a feloldáshoz (Admin)') : ''}">
+          ${isAdmin ? `<span class="badge-admin-dot ${unlocked ? 'unlocked' : 'locked'}">${unlocked ? '✓' : '🔒'}</span>` : ''}
+          <span class="profile-badge-icon">${a.icon}</span>
+          <span class="profile-badge-name">${a.title}</span>
+        </div>
+      `;
     }).join("");
 
     const floatingTip = document.getElementById("profileBadgeFloatingTooltip");
@@ -974,14 +829,19 @@ async function openPlayerProfileModal(username) {
           `;
         }
 
+        const adminHint = isAdmin
+          ? `<div class="b-tooltip-admin-hint">⚡ Kattints a ${unlocked ? "visszazáráshoz" : "feloldáshoz"}!</div>`
+          : "";
+
         floatingTip.innerHTML = `
-                    <div class="b-tooltip-header">
-                        <span class="b-tooltip-title">${a.icon} ${a.title}</span>
-                        <span class="b-tooltip-status ${unlocked ? "unlocked" : "locked"}">${unlocked ? "Megszerezve" : "Zárolva"}</span>
-                    </div>
-                    <p class="b-tooltip-desc">${a.desc}</p>
-                    ${rewardHtml}
-                `;
+          <div class="b-tooltip-header">
+            <span class="b-tooltip-title">${a.icon} ${a.title}</span>
+            <span class="b-tooltip-status ${unlocked ? "unlocked" : "locked"}">${unlocked ? "Megszerezve" : "Zárolva"}</span>
+          </div>
+          <p class="b-tooltip-desc">${a.desc}</p>
+          ${rewardHtml}
+          ${adminHint}
+        `;
 
         floatingTip.style.display = "block";
         floatingTip.style.opacity = "1";
@@ -1011,9 +871,27 @@ async function openPlayerProfileModal(username) {
         }
       });
 
-      // Mobilon kattintásra is nyitható és bezárható
-      item.addEventListener("click", (e) => {
+      // Adminisztrátori kattintás: mérföldkő ki/be kapcsolása
+      item.addEventListener("click", async (e) => {
         e.stopPropagation();
+        if (isAdmin) {
+          if (floatingTip) {
+            floatingTip.style.display = "none";
+            floatingTip.style.opacity = "0";
+          }
+          const nextSet = new Set(achSet);
+          if (nextSet.has(achId)) {
+            nextSet.delete(achId);
+          } else {
+            nextSet.add(achId);
+          }
+          triggerHaptic("impact");
+          if (typeof hangKatt !== "undefined") playSound(hangKatt);
+          await adminForceUpdateUserAchievements(
+            stats.username,
+            Array.from(nextSet),
+          );
+        }
       });
     });
 
@@ -1079,7 +957,16 @@ async function openPlayerProfileModal(username) {
   }
 
   const modal = document.getElementById("playerProfileModal");
-  if (modal) modal.classList.remove("hidden");
+  if (modal) {
+    modal.classList.remove("hidden");
+    if (resetScroll) {
+      modal.scrollTop = 0;
+      const cardEl = modal.querySelector(".modal-card");
+      if (cardEl) cardEl.scrollTop = 0;
+      const contentArea = modal.querySelector(".profile-content-area");
+      if (contentArea) contentArea.scrollTop = 0;
+    }
+  }
 }
 
 /**
@@ -1431,7 +1318,7 @@ function updateAuthUI(user) {
       } catch (e) {}
 
       if (isAdminUser()) {
-        nameLabel.innerHTML = `${user.displayName} <span class="admin-panel-badge" style="font-size: 0.55rem; padding: 1px 5px; vertical-align: middle; margin-left: 4px;">⚡ ADMIN</span>`;
+        nameLabel.innerHTML = `${user.displayName} <span class="top-nav-admin-badge">⚡ ADMIN</span>`;
       }
     }
     try {

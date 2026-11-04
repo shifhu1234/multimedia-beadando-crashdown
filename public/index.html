@@ -686,9 +686,6 @@
         </div>
 
         <div class="profile-content-area">
-          <!-- Adminisztrátori Kezelőfelület (Kizárólag n.gabikaa03@gmail.com számára) -->
-          <div id="profileAdminSection" class="profile-admin-panel" style="display: none;"></div>
-
           <!-- 1. Alapstatisztikák Kártyák (Legjobb pont ... Átlagpont) -->
           <div class="profile-stats-grid">
             <div class="profile-stat-box">
@@ -837,7 +834,13 @@
           <div class="profile-section">
             <div class="profile-section-header">
               <h4 class="profile-section-title">🎖️ Elért Jelvények</h4>
-              <span id="profileBadgeSummary" class="auth-hint-text"></span>
+              <div class="profile-badges-header-right">
+                <span id="profileBadgeSummary" class="auth-hint-text"></span>
+                <div id="profileAdminBadgeActions" class="profile-admin-badge-actions" style="display: none;">
+                  <button id="profileAdminUnlockAllBtn" type="button" class="admin-inline-btn admin-inline-unlock" title="Összes jelvény feloldása">🔓 Mind felold</button>
+                  <button id="profileAdminLockAllBtn" type="button" class="admin-inline-btn admin-inline-lock" title="Összes jelvény visszazárása">🔒 Mind zár</button>
+                </div>
+              </div>
             </div>
             <div id="profileAchievementsList" class="profile-badges-mini-grid">
               <!-- Dinamikusan renderelve script.js-ből -->
