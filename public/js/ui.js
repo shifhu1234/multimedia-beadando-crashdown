@@ -258,11 +258,6 @@ async function adminForceUpdatePlayerCustomRewards(targetUsername, updates = {},
   }, 400);
 }
 
-  window._adminActionTimer = setTimeout(() => {
-    window.isPerformingAdminAction = false;
-  }, 400);
-}
-
 // ==================== TOAST RENDSZER (MAXIMUM 3 DARAB) ====================
 function showToast(message, type = "info") {
   const container = document.getElementById("toastContainer");
