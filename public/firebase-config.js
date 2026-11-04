@@ -181,10 +181,10 @@ class AuthService {
         }
 
         // 2. Tartalék helyi regisztráció ha a hálózat nem elérhető
-        return this.registerLocally(email, password, displayName);
+        return await this.registerLocally(email, password, displayName);
     }
 
-    registerLocally(email, password, displayName) {
+    async registerLocally(email, password, displayName) {
         let users = JSON.parse(localStorage.getItem('crashdown_local_users') || '[]');
         const existing = users.find(u => u.email.toLowerCase() === email.toLowerCase());
         if (existing) {
