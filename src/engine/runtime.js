@@ -1033,20 +1033,20 @@ const sorok = 10;
 const oszlopok = 10;
 const negyzetMeret = LOGICAL_SIZE / oszlopok; // 44px
 
-// 13 Színtéma palettái (Klasszikus és Speciális témák)
+// 13 Színtéma palettái (Klasszikus és Speciális témák - ütközésmentesített egyedi színekkel)
 const THEME_PALETTES = {
   retro: ["#ef4444", "#10b981", "#f59e0b", "#06b6d4", "#8b5cf6"],
   cyber: ["#FF2E4C", "#22C55E", "#FACC15", "#3B82F6", "#D946EF"],
   candy: ["#fb7185", "#34d399", "#fde047", "#38bdf8", "#c084fc"],
   space: ["#f43f5e", "#10b981", "#eab308", "#4f46e5", "#ec4899"],
-  sunset: ["#f43f5e", "#fb923c", "#facc15", "#a855f7", "#6366f1"],
-  forest: ["#10b981", "#84cc16", "#14b8a6", "#059669", "#0284c7"],
-  lava: ["#dc2626", "#ea580c", "#f59e0b", "#7f1d1d", "#f97316"],
+  sunset: ["#f43f5e", "#fb923c", "#facc15", "#a855f7", "#4f46e5"],
+  forest: ["#10b981", "#84cc16", "#0d9488", "#059669", "#047857"],
+  lava: ["#dc2626", "#ea580c", "#f59e0b", "#7f1d1d", "#b91c1c"],
   noir: ["#e2e8f0", "#94a3b8", "#64748b", "#475569", "#334155"],
-  ocean: ["#06b6d4", "#0284c7", "#3b82f6", "#0d9488", "#6366f1"],
+  ocean: ["#06b6d4", "#38bdf8", "#3b82f6", "#0d9488", "#4f46e5"],
   aurora: ["#2dd4bf", "#a855f7", "#38bdf8", "#10b981", "#ec4899"],
   vaporwave: ["#06b6d4", "#f43f5e", "#a855f7", "#3b82f6", "#fb7185"],
-  cosmic_void: ["#c084fc", "#818cf8", "#38bdf8", "#a855f7", "#f472b6"],
+  cosmic_void: ["#c084fc", "#818cf8", "#38bdf8", "#a855f7", "#ec4899"],
   golden: ["#f59e0b", "#eab308", "#fbbf24", "#d97706", "#fef08a"],
 };
 
@@ -1200,6 +1200,8 @@ const COLOR_STYLES = {
   "#84cc16": { top: "#a3e635", bottom: "#4d7c0f", border: "#ecfccb" },
   "#059669": { top: "#10b981", bottom: "#047857", border: "#a7f3d0" },
   "#dc2626": { top: "#ef4444", bottom: "#991b1b", border: "#fecaca" },
+  "#b91c1c": { top: "#dc2626", bottom: "#7f1d1d", border: "#fca5a5" },
+  "#047857": { top: "#10b981", bottom: "#065f46", border: "#a7f3d0" },
   "#ea580c": { top: "#f97316", bottom: "#9a3412", border: "#ffedd5" },
   "#7f1d1d": { top: "#b91c1c", bottom: "#450a0a", border: "#fca5a5" },
   "#e2e8f0": { top: "#f8fafc", bottom: "#cbd5e1", border: "#ffffff" },
@@ -6883,12 +6885,18 @@ function handleClick(event) {
         regisztraljPowerupHasznalatot();
         playSound(doublerKatt);
         triggerHaptic('medium');
+        grid[y][x].color = 'white';
+        grid[y][x].marked = true;
+        spawnCellParticles(x, y, '#818cf8', 12);
+
+        const powerUpColors = new Set(['cyan', 'pink', '#f97316', 'darkgreen', '#14b8a6', '#6366f1', '#581845', '#0284c7', '#e11d48']);
         const positions = [];
         const colors = [];
         for (let i = 0; i < sorok; i++) {
             for (let j = 0; j < oszlopok; j++) {
+                if (i === y && j === x) continue;
                 const col = grid[i][j].color;
-                if (col !== 'white' && negyzetSzinek.includes(col)) {
+                if (col !== 'white' && !powerUpColors.has(col)) {
                     positions.push({ x: j, y: i });
                     colors.push(col);
                 }
@@ -6902,8 +6910,6 @@ function handleClick(event) {
             grid[pos.y][pos.x].color = colors[idx];
             spawnCellParticles(pos.x, pos.y, colors[idx], 2);
         });
-        grid[y][x].color = 'white';
-        grid[y][x].marked = true;
         shockwaves.push({
             x: x * negyzetMeret + negyzetMeret / 2,
             y: y * negyzetMeret + negyzetMeret / 2,
