@@ -1712,19 +1712,24 @@
 
 .presence-label {
   font-size: 0.6rem;
-  font-weight: 700;
-  padding: 1px 5px;
-  border-radius: 4px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.2;
 }
 
 .presence-label.online {
-  color: #34d399;
-  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(16, 185, 129, 0.4);
 }
 
 .presence-label.offline {
   color: #94a3b8;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .player-roster-title {
@@ -1739,8 +1744,10 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  justify-content: center;
   gap: 2px;
   flex-shrink: 0;
+  min-width: 85px;
 }
 
 .player-roster-score {
@@ -2088,9 +2095,101 @@
 }
 
 @media (max-width: 600px) {
+  .profile-admin-panel {
+    padding: 10px 8px !important;
+    gap: 8px !important;
+    border-radius: var(--radius-md) !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .admin-header-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .admin-panel-badge {
+    font-size: 0.74rem !important;
+    text-align: center !important;
+    justify-content: center !important;
+    padding: 4px 6px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .admin-actions-bar {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    width: 100% !important;
+    gap: 6px !important;
+  }
+
+  .admin-btn {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 8px 4px !important;
+    font-size: 0.72rem !important;
+    box-sizing: border-box !important;
+  }
+
+  .admin-info-bar {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 4px !important;
+    font-size: 0.72rem !important;
+    padding: 6px 8px !important;
+  }
+
+  .admin-filter-bar {
+    gap: 4px !important;
+    padding: 2px 0 6px 0 !important;
+    width: 100% !important;
+  }
+
+  .admin-filter-chip {
+    font-size: 0.65rem !important;
+    padding: 4px 8px !important;
+  }
+
   .admin-cards-grid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 8px;
-    max-height: 320px;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 6px !important;
+    max-height: 280px !important;
+    padding: 4px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .admin-ach-card {
+    padding: 8px 4px !important;
+    min-height: 110px !important;
+    gap: 4px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .admin-card-icon {
+    font-size: 1.45rem !important;
+  }
+
+  .admin-card-title {
+    font-size: 0.7rem !important;
+  }
+
+  .admin-card-status-pill {
+    font-size: 0.52rem !important;
+    padding: 1px 4px !important;
+    top: 3px !important;
+    right: 3px !important;
+  }
+
+  .admin-card-btn {
+    font-size: 0.66rem !important;
+    padding: 5px 2px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 }

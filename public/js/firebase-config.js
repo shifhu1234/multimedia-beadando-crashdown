@@ -27,6 +27,42 @@ if (typeof firebase !== 'undefined') {
 }
 
 // ==================== AUTH SERVICE ====================
+function getHungarianAuthErrorMessage(err, context = 'login') {
+    if (!err) return 'Ismeretlen hiba történt a művelet során.';
+    const code = err.code || '';
+    switch (code) {
+        case 'auth/invalid-credential':
+        case 'auth/invalid-login-credentials':
+            return 'Helytelen e-mail cím vagy jelszó!';
+        case 'auth/user-not-found':
+            return 'Nem található fiók ezzel az e-mail címmel!';
+        case 'auth/wrong-password':
+            return 'Helytelen jelszó!';
+        case 'auth/email-already-in-use':
+            return 'Ez az e-mail cím már regisztrálva van! Jelentkezz be!';
+        case 'auth/invalid-email':
+            return 'Érvénytelen e-mail cím formátum! Kérjük ellenőrizd az e-mail címed.';
+        case 'auth/weak-password':
+            return 'Túl gyenge jelszó! A jelszónak legalább 6 karakter hosszúnak kell lennie.';
+        case 'auth/missing-password':
+            return 'Kérjük, add meg a jelszavad!';
+        case 'auth/too-many-requests':
+            return 'Túl sok sikertelen próbálkozás történt! Kérjük, várj pár percet a következő próbálkozás előtt.';
+        case 'auth/user-disabled':
+            return 'Ez a felhasználói fiók fel van függesztve vagy le van tiltva.';
+        case 'auth/network-request-failed':
+            return 'Hálózati hiba történt! Kérjük, ellenőrizd az internetkapcsolatodat.';
+        case 'auth/requires-recent-login':
+            return 'Biztonsági okokból kérjük, jelentkezz be újra a módosítás előtt!';
+        case 'auth/operation-not-allowed':
+            return 'Az e-mail/jelszó bejelentkezés jelenleg nincs engedélyezve a rendszerben.';
+        default:
+            return context === 'register' 
+                ? 'Nem sikerült létrehozni a fiókot. Kérjük, próbáld újra!' 
+                : 'Sikertelen bejelentkezés. Kérjük, ellenőrizd az adataidat és próbáld újra!';
+    }
+}
+
 class AuthService {
     constructor() {
         this.currentUser = null;
@@ -164,19 +200,7 @@ class AuthService {
                 }
             } catch (err) {
                 console.error('Firebase Auth regisztrációs hiba:', err.code, err.message);
-                if (err.code === 'auth/email-already-in-use') {
-                    return { success: false, error: 'Ez az e-mail cím már regisztrálva van!' };
-                }
-                if (err.code === 'auth/weak-password') {
-                    return { success: false, error: 'A jelszónak legalább 6 karakter hosszúnak kell lennie!' };
-                }
-                if (err.code === 'auth/invalid-email') {
-                    return { success: false, error: 'Érvénytelen e-mail formátum!' };
-                }
-                if (err.code === 'auth/operation-not-allowed') {
-                    return { success: false, error: 'Az Email/Password bejelentkezés nincs engedélyezve a Firebase konzolban!' };
-                }
-                return { success: false, error: `Hiba a regisztráció során: ${err.message}` };
+                return { success: false, error: getHungarianAuthErrorMessage(err, 'register') };
             }
         }
 
@@ -253,19 +277,7 @@ class AuthService {
                     }
                 }
 
-                if (err.code === 'auth/user-not-found') {
-                    return { success: false, error: 'Nincs ilyen e-mail címmel regisztrált fiók!' };
-                }
-                if (err.code === 'auth/wrong-password') {
-                    return { success: false, error: 'Helytelen jelszó!' };
-                }
-                if (err.code === 'auth/invalid-email') {
-                    return { success: false, error: 'Érvénytelen e-mail formátum!' };
-                }
-                if (err.code === 'auth/operation-not-allowed') {
-                    return { success: false, error: 'Az Email/Password bejelentkezés nincs engedélyezve a Firebase konzolban!' };
-                }
-                return { success: false, error: err.message || 'Hiba a bejelentkezés során.' };
+                return { success: false, error: getHungarianAuthErrorMessage(err, 'login') };
             }
         }
 
@@ -479,13 +491,7 @@ class AuthService {
                     this.setResetCooldown(email);
                     return { success: false, error: 'Túl sok kérés érkezett! Kérjük, várj 5 percet az újabb kérés előtt.' };
                 }
-                if (err.code === 'auth/user-not-found') {
-                    return { success: false, error: 'Nem található fiók ezzel az e-mail címmel!' };
-                }
-                if (err.code === 'auth/invalid-email') {
-                    return { success: false, error: 'Érvénytelen e-mail formátum!' };
-                }
-                return { success: false, error: err.message || 'Hiba a visszaállító levél küldésekor.' };
+                return { success: false, error: getHungarianAuthErrorMessage(err, 'reset') };
             }
         }
         return { success: false, error: 'A jelszóvisszaállítás csak online Firebase kapcsolattal érhető el.' };
@@ -501,13 +507,7 @@ class AuthService {
                 return { success: true, message: 'A jelszavad sikeresen megváltozott!' };
             } catch (err) {
                 console.error('Jelszómódosítási hiba:', err.code, err.message);
-                if (err.code === 'auth/requires-recent-login') {
-                    return { success: false, error: 'Biztonsági okokból jelentkezz be újra a jelszómódosítás előtt!' };
-                }
-                if (err.code === 'auth/weak-password') {
-                    return { success: false, error: 'A jelszó túl egyszerű, válassz erősebb jelszót!' };
-                }
-                return { success: false, error: err.message || 'Nem sikerült megváltoztatni a jelszót.' };
+                return { success: false, error: getHungarianAuthErrorMessage(err, 'updatePassword') };
             }
         }
 

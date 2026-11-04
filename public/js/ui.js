@@ -130,7 +130,6 @@ function renderProfileAdminPanel(container, targetUsername, achSet) {
         const isUnlocked = achSet.has(a.id);
         const rewards = typeof getAchievementRewards === 'function' ? getAchievementRewards(a.id) : [];
         const rewTypes = rewards.map(r => r.type);
-        const rewTexts = rewards.map(r => r.text);
         
         let categories = ['all'];
         if (rewTypes.includes('title')) categories.push('title');
@@ -147,10 +146,7 @@ function renderProfileAdminPanel(container, targetUsername, achSet) {
                style="display: ${isVisible ? 'flex' : 'none'};">
             <span class="admin-card-status-pill">${isUnlocked ? '✅ Kész' : '🔒 Zárt'}</span>
             <div class="admin-card-icon">${a.icon}</div>
-            <strong class="admin-card-title" title="${a.desc}">${a.title}</strong>
-            <div class="admin-card-rewards">
-              ${rewTexts.length > 0 ? rewTexts.map(rt => `<span class="admin-card-reward-tag" title="${rt}">${rt}</span>`).join('') : '<span style="color: #64748b;">Nincs jutalom</span>'}
-            </div>
+            <strong class="admin-card-title">${a.title}</strong>
             <button class="admin-card-btn" 
                     data-ach-id="${a.id}" 
                     data-target-user="${targetUsername}">
@@ -164,7 +160,7 @@ function renderProfileAdminPanel(container, targetUsername, achSet) {
 
   // Globális gombok eseménykezelői
   document.getElementById("adminUnlockAllBtn")?.addEventListener("click", async () => {
-    if (confirm(`Biztosan fel szeretnéd oldani az összes (${totalCount} db) mérföldkövet és jutalmat ${targetUsername} számára?`)) {
+    if (confirm(`Biztosan fel szeretnéd oldani az összes (${totalCount} db) mérföldkövet és testreszabást ${targetUsername} számára?`)) {
       await adminForceUpdateUserAchievements(targetUsername, allAchs.map(a => a.id));
     }
   });
@@ -194,10 +190,84 @@ function renderProfileAdminPanel(container, targetUsername, achSet) {
     });
   });
 
+  // Tooltip lebegő ablak bekötése az admin kártyákra (ugyanúgy mint a normál jelvényeknél)
+  const floatingTip = document.getElementById("profileBadgeFloatingTooltip");
+  if (floatingTip) {
+    container.querySelectorAll(".admin-ach-card").forEach(card => {
+      const achId = card.getAttribute("data-ach-id");
+      const a = allAchs.find(x => x.id === achId);
+      if (!a) return;
+
+      const showTip = () => {
+        const unlocked = achSet.has(a.id);
+        const rewList = typeof getAchievementRewards === "function" ? getAchievementRewards(a.id) : [];
+
+        let rewardHtml = "";
+        if (rewList.length > 0) {
+          rewardHtml = `
+            <div class="b-tooltip-reward">
+              <div class="reward-heading">Jutalmak:</div>
+              ${rewList.map((r) => `<div class="reward-line">${r.text}</div>`).join("")}
+            </div>
+          `;
+        }
+
+        floatingTip.innerHTML = `
+          <div class="b-tooltip-header">
+            <span class="b-tooltip-title">${a.icon} ${a.title}</span>
+            <span class="b-tooltip-status ${unlocked ? "unlocked" : "locked"}">${unlocked ? "Megszerezve" : "Zárolva"}</span>
+          </div>
+          <p class="b-tooltip-desc">${a.desc}</p>
+          ${rewardHtml}
+        `;
+
+        floatingTip.style.display = "block";
+        floatingTip.style.opacity = "1";
+
+        const tipHeight = floatingTip.offsetHeight || 110;
+        const rect = card.getBoundingClientRect();
+        const tipWidth = 240;
+        let tipLeft = rect.left + rect.width / 2 - tipWidth / 2;
+        tipLeft = Math.max(12, Math.min(window.innerWidth - tipWidth - 12, tipLeft));
+
+        if (rect.top - tipHeight - 8 > 10) {
+          floatingTip.style.top = `${rect.top - tipHeight - 8}px`;
+        } else {
+          floatingTip.style.top = `${rect.bottom + 8}px`;
+        }
+        floatingTip.style.left = `${tipLeft}px`;
+      };
+
+      const hideTip = () => {
+        floatingTip.style.display = "none";
+        floatingTip.style.opacity = "0";
+      };
+
+      card.addEventListener("mouseenter", showTip);
+      card.addEventListener("mouseleave", hideTip);
+      card.addEventListener("click", (e) => {
+        if (!e.target.closest(".admin-card-btn")) {
+          showTip();
+        }
+      });
+    });
+
+    const hideAllTips = () => {
+      floatingTip.style.display = "none";
+      floatingTip.style.opacity = "0";
+    };
+    container.querySelector(".admin-cards-grid")?.addEventListener("scroll", hideAllTips, { passive: true });
+  }
+
   // Egyéni kártya feloldás / visszazárás gombok
   container.querySelectorAll(".admin-card-btn").forEach(btn => {
     btn.addEventListener("click", async function (e) {
       e.stopPropagation();
+      const floatingTipEl = document.getElementById("profileBadgeFloatingTooltip");
+      if (floatingTipEl) {
+        floatingTipEl.style.display = "none";
+        floatingTipEl.style.opacity = "0";
+      }
       const achId = this.getAttribute("data-ach-id");
       const user = this.getAttribute("data-target-user");
       const isCurrentlyUnlocked = achSet.has(achId);
@@ -1087,7 +1157,6 @@ async function openPlayersModal() {
   if (searchInput) {
     searchInput.value = "";
     currentPlayersSearchQuery = "";
-    searchInput.focus();
   }
 }
 
@@ -1203,14 +1272,12 @@ async function updatePlayersModalUI() {
             <span class="presence-dot ${isOnline ? "online" : "offline"}" title="${isOnline ? "Online" : "Offline"}"></span>
           </div>
           <div class="player-roster-info">
-            <div class="player-roster-name-row">
-              <strong class="player-roster-name ${nameClass}">${p.username}</strong>
-              <span class="presence-label ${isOnline ? "online" : "offline"}">${isOnline ? "Online" : "Offline"}</span>
-            </div>
+            <strong class="player-roster-name ${nameClass}">${p.username}</strong>
             <div class="player-roster-title ${titleClass}">${titleText}</div>
           </div>
         </div>
         <div class="player-roster-right">
+          <span class="presence-label ${isOnline ? "online" : "offline"}">${isOnline ? "🟢 Online" : "⚪ Offline"}</span>
           <span class="player-roster-score">${bestScoreText} p</span>
           <span class="player-roster-matches">${p.totalMatches || 0} meccs</span>
         </div>
