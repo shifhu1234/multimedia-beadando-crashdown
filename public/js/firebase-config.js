@@ -621,6 +621,12 @@ class LeaderboardService {
                                 if (myUpdatedProfile.chosenAvatar) {
                                     localStorage.setItem('crashdown_chosen_avatar', myUpdatedProfile.chosenAvatar);
                                 }
+                                if (myUpdatedProfile.chosenTheme) {
+                                    localStorage.setItem('crashdown_theme', myUpdatedProfile.chosenTheme);
+                                    if (typeof applyTheme === 'function') {
+                                        applyTheme(myUpdatedProfile.chosenTheme);
+                                    }
+                                }
                                 if (typeof updateAuthUI === 'function') {
                                     updateAuthUI(currentUser);
                                 }
@@ -633,9 +639,11 @@ class LeaderboardService {
                         if (typeof toplistaMegjelenites === 'function') {
                             toplistaMegjelenites();
                         }
-                        // Ha valaki épp néz egy profilt, frissítsük azt is azonnal valós időben
+                        // Ha valaki épp néz egy profilt, frissítsük azt is azonnal valós időben (kivéve ha épp lokális admin kattintás zajlik)
                         if (window.currentlyViewedProfileUser && typeof refreshOpenProfileModalRealtime === 'function') {
-                            refreshOpenProfileModalRealtime(window.currentlyViewedProfileUser);
+                            if (!window.isPerformingAdminAction) {
+                                refreshOpenProfileModalRealtime(window.currentlyViewedProfileUser);
+                            }
                         }
                         // Ha nyitva van a Játékosok lista modal, frissítsük
                         if (typeof updatePlayersModalUI === 'function') {
@@ -898,10 +906,12 @@ class LeaderboardService {
                     unlockedTitles: profileData.unlockedTitles || ['title_beginner'],
                     unlockedColors: profileData.unlockedColors || ['name_white'],
                     unlockedAvatars: profileData.unlockedAvatars || ['avatar_default'],
+                    unlockedThemes: profileData.unlockedThemes || ['retro', 'cyber'],
                     history: (profileData.history || []).slice(0, 10),
                     chosenTitle: profileData.chosenTitle || null,
                     chosenAvatar: profileData.chosenAvatar || 'avatar_default',
                     chosenNameColor: profileData.chosenNameColor || 'name_white',
+                    chosenTheme: profileData.chosenTheme || null,
                     modifierStats: profileData.modifierStats || {},
                     durationStats: profileData.durationStats || {},
                     modes: profileData.modes || {},
@@ -931,7 +941,7 @@ class LeaderboardService {
         }
     }
 
-    async updatePlayerCustomizations(username, { chosenTitle, chosenAvatar, chosenNameColor, unlockedTitles, unlockedColors, unlockedAvatars }) {
+    async updatePlayerCustomizations(username, { chosenTitle, chosenAvatar, chosenNameColor, chosenTheme, unlockedTitles, unlockedColors, unlockedAvatars, unlockedThemes }) {
         if (!username) return;
         const safeKey = encodeURIComponent(username.trim().toLowerCase()).replace(/\./g, '%2E');
         if (this.isOnline && this.db) {
@@ -940,9 +950,11 @@ class LeaderboardService {
                 if (chosenTitle !== undefined) updates.chosenTitle = chosenTitle;
                 if (chosenAvatar !== undefined) updates.chosenAvatar = chosenAvatar;
                 if (chosenNameColor !== undefined) updates.chosenNameColor = chosenNameColor;
+                if (chosenTheme !== undefined) updates.chosenTheme = chosenTheme;
                 if (unlockedTitles !== undefined) updates.unlockedTitles = unlockedTitles;
                 if (unlockedColors !== undefined) updates.unlockedColors = unlockedColors;
                 if (unlockedAvatars !== undefined) updates.unlockedAvatars = unlockedAvatars;
+                if (unlockedThemes !== undefined) updates.unlockedThemes = unlockedThemes;
                 updates.updatedAt = new Date().toISOString();
 
                 await this.db.ref('profiles/' + safeKey).update(updates);

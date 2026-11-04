@@ -1137,6 +1137,7 @@ function saveUserAchievementToProfile(username, achId) {
     if (!Array.isArray(p.unlockedTitles)) p.unlockedTitles = ["title_beginner"];
     if (!Array.isArray(p.unlockedColors)) p.unlockedColors = ["name_white"];
     if (!Array.isArray(p.unlockedAvatars)) p.unlockedAvatars = ["avatar_default"];
+    if (!Array.isArray(p.unlockedThemes)) p.unlockedThemes = ["retro", "cyber"];
 
     if (typeof PROFILE_TITLES !== "undefined") {
       const matchTitle = PROFILE_TITLES.find((t) => t.achId === achId);
@@ -1155,6 +1156,13 @@ function saveUserAchievementToProfile(username, achId) {
       const matchAvatar = PROFILE_AVATARS.find((a) => a.achId === achId);
       if (matchAvatar && !p.unlockedAvatars.includes(matchAvatar.id)) {
         p.unlockedAvatars.push(matchAvatar.id);
+      }
+    }
+
+    if (typeof THEMES_CATALOG !== "undefined") {
+      const matchTheme = THEMES_CATALOG.find((th) => th.achId === achId);
+      if (matchTheme && !p.unlockedThemes.includes(matchTheme.id)) {
+        p.unlockedThemes.push(matchTheme.id);
       }
     }
 
@@ -1498,6 +1506,13 @@ function regisztraljPowerupHasznalatot(type = null) {
   }
 }
 
+function ensureArray(val, fallback = []) {
+  if (!val) return [...fallback];
+  if (Array.isArray(val)) return [...val];
+  if (typeof val === "object") return Object.values(val);
+  return [...fallback];
+}
+
 function getPlayerProfileStats(username, allScores = [], onlineProfile = null) {
   let profile = null;
   try {
@@ -1577,14 +1592,17 @@ function getPlayerProfileStats(username, allScores = [], onlineProfile = null) {
     ) {
       profile.achievements = [...onlineProfile.achievements];
     }
-    if (Array.isArray(onlineProfile.unlockedTitles)) {
-      profile.unlockedTitles = [...onlineProfile.unlockedTitles];
+    if (onlineProfile.unlockedTitles !== undefined && onlineProfile.unlockedTitles !== null) {
+      profile.unlockedTitles = ensureArray(onlineProfile.unlockedTitles, ["title_beginner"]);
     }
-    if (Array.isArray(onlineProfile.unlockedColors)) {
-      profile.unlockedColors = [...onlineProfile.unlockedColors];
+    if (onlineProfile.unlockedColors !== undefined && onlineProfile.unlockedColors !== null) {
+      profile.unlockedColors = ensureArray(onlineProfile.unlockedColors, ["name_white"]);
     }
-    if (Array.isArray(onlineProfile.unlockedAvatars)) {
-      profile.unlockedAvatars = [...onlineProfile.unlockedAvatars];
+    if (onlineProfile.unlockedAvatars !== undefined && onlineProfile.unlockedAvatars !== null) {
+      profile.unlockedAvatars = ensureArray(onlineProfile.unlockedAvatars, ["avatar_default"]);
+    }
+    if (onlineProfile.unlockedThemes !== undefined && onlineProfile.unlockedThemes !== null) {
+      profile.unlockedThemes = ensureArray(onlineProfile.unlockedThemes, ["retro", "cyber"]);
     }
     if (onlineProfile.chosenTitle)
       profile.chosenTitle = onlineProfile.chosenTitle;
@@ -1592,6 +1610,8 @@ function getPlayerProfileStats(username, allScores = [], onlineProfile = null) {
       profile.chosenAvatar = onlineProfile.chosenAvatar;
     if (onlineProfile.chosenNameColor)
       profile.chosenNameColor = onlineProfile.chosenNameColor;
+    if (onlineProfile.chosenTheme)
+      profile.chosenTheme = onlineProfile.chosenTheme;
     if ((onlineProfile.bestScore || 0) > (profile.bestScore || 0))
       profile.bestScore = onlineProfile.bestScore;
     if ((onlineProfile.totalMatches || 0) > (profile.totalMatches || 0))
@@ -1735,7 +1755,7 @@ function getPlayerProfileStats(username, allScores = [], onlineProfile = null) {
     typeof NAME_COLORS_CATALOG !== "undefined" ? NAME_COLORS_CATALOG : [];
 
   // Független feloldási listák inicializálása ha még nincsenek definiálva
-  if (!Array.isArray(profile.unlockedTitles)) {
+  if (profile.unlockedTitles === undefined || profile.unlockedTitles === null) {
     const initTitles = ["title_beginner"];
     PROFILE_TITLES.forEach((t) => {
       if (t.id === "title_beginner") return;
@@ -1746,12 +1766,14 @@ function getPlayerProfileStats(username, allScores = [], onlineProfile = null) {
       }
     });
     profile.unlockedTitles = Array.from(new Set(initTitles));
+  } else {
+    profile.unlockedTitles = ensureArray(profile.unlockedTitles, ["title_beginner"]);
   }
   if (!profile.unlockedTitles.includes("title_beginner")) {
     profile.unlockedTitles.unshift("title_beginner");
   }
 
-  if (!Array.isArray(profile.unlockedColors)) {
+  if (profile.unlockedColors === undefined || profile.unlockedColors === null) {
     const initColors = ["name_white"];
     nameColorCatalog.forEach((col) => {
       if (col.id === "name_white") return;
@@ -1760,12 +1782,14 @@ function getPlayerProfileStats(username, allScores = [], onlineProfile = null) {
       }
     });
     profile.unlockedColors = Array.from(new Set(initColors));
+  } else {
+    profile.unlockedColors = ensureArray(profile.unlockedColors, ["name_white"]);
   }
   if (!profile.unlockedColors.includes("name_white")) {
     profile.unlockedColors.unshift("name_white");
   }
 
-  if (!Array.isArray(profile.unlockedAvatars)) {
+  if (profile.unlockedAvatars === undefined || profile.unlockedAvatars === null) {
     const initAvatars = ["avatar_default"];
     PROFILE_AVATARS.forEach((av) => {
       if (av.id === "avatar_default") return;
@@ -1774,9 +1798,37 @@ function getPlayerProfileStats(username, allScores = [], onlineProfile = null) {
       }
     });
     profile.unlockedAvatars = Array.from(new Set(initAvatars));
+  } else {
+    profile.unlockedAvatars = ensureArray(profile.unlockedAvatars, ["avatar_default"]);
   }
   if (!profile.unlockedAvatars.includes("avatar_default")) {
     profile.unlockedAvatars.unshift("avatar_default");
+  }
+
+  const themesCatalog = typeof THEMES_CATALOG !== "undefined" ? THEMES_CATALOG : [];
+  if (profile.unlockedThemes === undefined || profile.unlockedThemes === null) {
+    const initThemes = ["retro", "cyber"];
+    themesCatalog.forEach((th) => {
+      if (th.id === "retro" || th.id === "cyber") return;
+      if (!th.achId || achSet.has(th.achId)) {
+        initThemes.push(th.id);
+      }
+    });
+    profile.unlockedThemes = Array.from(new Set(initThemes));
+  } else {
+    profile.unlockedThemes = ensureArray(profile.unlockedThemes, ["retro", "cyber"]);
+  }
+  if (!profile.unlockedThemes.includes("retro")) {
+    profile.unlockedThemes.unshift("retro");
+  }
+  if (!profile.unlockedThemes.includes("cyber")) {
+    profile.unlockedThemes.push("cyber");
+  }
+
+  // Aktív téma
+  profile.activeTheme = profile.chosenTheme || (typeof currentTheme !== "undefined" ? currentTheme : "retro");
+  if (!profile.unlockedThemes.includes(profile.activeTheme)) {
+    profile.activeTheme = "retro";
   }
 
   // Rangcím meghatározása: kizárólag a független unlockedTitles listától függ

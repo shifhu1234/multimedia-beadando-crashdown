@@ -1283,6 +1283,93 @@
   gap: 4px;
 }
 
+/* Téma választó rács a profilban */
+.profile-theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.theme-pick-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  position: relative;
+  text-align: left;
+}
+
+.theme-pick-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.theme-pick-card.active {
+  border-color: #818cf8;
+  background: rgba(99, 102, 241, 0.2);
+  box-shadow: 0 0 12px rgba(129, 140, 248, 0.35);
+}
+
+.theme-pick-card.locked {
+  opacity: 0.38;
+  cursor: not-allowed;
+  filter: grayscale(0.7);
+}
+
+.theme-pick-card.locked:hover {
+  transform: none;
+  border-color: var(--border-subtle);
+}
+
+.theme-pick-card.admin-manageable {
+  position: relative !important;
+}
+
+.theme-pick-card.locked.admin-manageable {
+  cursor: pointer !important;
+}
+
+.theme-pick-card.locked.admin-manageable:hover {
+  border-color: rgba(239, 68, 68, 0.6) !important;
+  opacity: 0.85 !important;
+  transform: translateY(-2px) !important;
+}
+
+.theme-palette-preview {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.theme-palette-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.theme-pick-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.25;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
 /* Rangcím választó rács a profilban (Kártyás elrendezés) */
 .profile-title-grid {
   display: grid;
@@ -1972,6 +2059,47 @@
 }
 
 @media (max-width: 600px) {
+  /* Rangcímek 2 oszlopban mobilon a helytakarékosságért */
+  .profile-title-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+  }
+
+  .title-pick-card {
+    padding: 7px 8px !important;
+    gap: 2px !important;
+  }
+
+  .title-pick-name {
+    font-size: 0.72rem !important;
+    gap: 4px !important;
+  }
+
+  .title-pick-special-tag {
+    font-size: 0.5rem !important;
+    padding: 1px 3px !important;
+  }
+
+  /* Témák 2 oszlopban mobilon */
+  .profile-theme-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+  }
+
+  .theme-pick-card {
+    padding: 7px 8px !important;
+    gap: 3px !important;
+  }
+
+  .theme-pick-name {
+    font-size: 0.7rem !important;
+  }
+
+  .theme-palette-dot {
+    width: 9px !important;
+    height: 9px !important;
+  }
+
   .top-nav-admin-badge {
     font-size: 0.52rem !important;
     padding: 1px 4px !important;
