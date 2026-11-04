@@ -41,7 +41,7 @@ class AuthService {
                 this.auth = firebase.auth();
                 console.log('Firebase Auth szolgáltatás aktív.');
                 
-                this.auth.onAuthStateChanged(user => {
+                this.auth.onAuthStateChanged(async user => {
                     if (user) {
                         this.currentUser = {
                             uid: user.uid,
@@ -49,9 +49,15 @@ class AuthService {
                             displayName: user.displayName || user.email.split('@')[0]
                         };
                         sessionStorage.setItem('crashdown_session_user', JSON.stringify(this.currentUser));
+                        await this.syncUserProfileSession(this.currentUser);
                     } else {
                         // Ellenőrizzük a helyi mentett felhasználót
                         this.currentUser = JSON.parse(sessionStorage.getItem('crashdown_session_user') || 'null');
+                        if (this.currentUser) {
+                            await this.syncUserProfileSession(this.currentUser);
+                        } else {
+                            this.clearUserSessionState();
+                        }
                     }
                     this.notifyAuthChanged();
                 });
@@ -152,6 +158,7 @@ class AuthService {
                     };
                     sessionStorage.setItem('crashdown_session_user', JSON.stringify(this.currentUser));
                     this.removeLocalUser(email);
+                    await this.syncUserProfileSession(this.currentUser);
                     this.notifyAuthChanged();
                     return { success: true, user: this.currentUser };
                 }
@@ -195,6 +202,7 @@ class AuthService {
 
         this.currentUser = { uid: newUser.uid, email: newUser.email, displayName: newUser.displayName };
         sessionStorage.setItem('crashdown_session_user', JSON.stringify(this.currentUser));
+        await this.syncUserProfileSession(this.currentUser);
         this.notifyAuthChanged();
         return { success: true, user: this.currentUser };
     }
@@ -212,6 +220,7 @@ class AuthService {
                     };
                     sessionStorage.setItem('crashdown_session_user', JSON.stringify(this.currentUser));
                     this.removeLocalUser(email);
+                    await this.syncUserProfileSession(this.currentUser);
                     this.notifyAuthChanged();
                     return { success: true, user: this.currentUser };
                 }
@@ -234,6 +243,7 @@ class AuthService {
                                 };
                                 sessionStorage.setItem('crashdown_session_user', JSON.stringify(this.currentUser));
                                 this.removeLocalUser(email);
+                                await this.syncUserProfileSession(this.currentUser);
                                 this.notifyAuthChanged();
                                 return { success: true, user: this.currentUser };
                             }
@@ -264,11 +274,109 @@ class AuthService {
         if (found) {
             this.currentUser = { uid: found.uid, email: found.email, displayName: found.displayName };
             sessionStorage.setItem('crashdown_session_user', JSON.stringify(this.currentUser));
+            await this.syncUserProfileSession(this.currentUser);
             this.notifyAuthChanged();
             return { success: true, user: this.currentUser };
         }
 
         return { success: false, error: 'Hibás e-mail cím vagy jelszó!' };
+    }
+
+    clearUserSessionState() {
+        try {
+            localStorage.removeItem('crashdown_chosen_title');
+            localStorage.removeItem('crashdown_chosen_avatar');
+            localStorage.removeItem('crashdown_chosen_name_color');
+            localStorage.removeItem('crashdown_achievements');
+            localStorage.removeItem('crashdown_powerup_count');
+            localStorage.removeItem('crashdown_powerup_tnt_count');
+            localStorage.removeItem('crashdown_powerup_magnet_count');
+            localStorage.removeItem('crashdown_powerup_freeze_count');
+            localStorage.removeItem('crashdown_powerup_doubler_count');
+            localStorage.removeItem('crashdown_powerup_colorbomb_count');
+        } catch (e) {}
+    }
+
+    async syncUserProfileSession(user) {
+        if (!user || !user.displayName) return;
+        const username = user.displayName;
+        const uLower = username.trim().toLowerCase();
+
+        this.clearUserSessionState();
+
+        let profile = null;
+        if (window.leaderboardService && typeof window.leaderboardService.getPlayerProfile === 'function') {
+            try {
+                profile = await window.leaderboardService.getPlayerProfile(username);
+            } catch (e) {}
+        }
+
+        if (!profile) {
+            try {
+                const localProfiles = JSON.parse(localStorage.getItem('crashdown_player_profiles') || '{}');
+                const matchKey = Object.keys(localProfiles).find(k => k.toLowerCase() === uLower);
+                if (matchKey) {
+                    profile = localProfiles[matchKey];
+                }
+            } catch (e) {}
+        }
+
+        if (profile) {
+            const achList = Array.isArray(profile.achievements) ? profile.achievements : [];
+            localStorage.setItem('crashdown_achievements_' + uLower, JSON.stringify(achList));
+            localStorage.setItem('crashdown_achievements', JSON.stringify(achList));
+
+            if (profile.chosenTitle) {
+                localStorage.setItem('crashdown_chosen_title', profile.chosenTitle);
+            }
+            localStorage.setItem('crashdown_chosen_avatar', profile.chosenAvatar || 'avatar_default');
+            localStorage.setItem('crashdown_chosen_name_color', profile.chosenNameColor || 'name_white');
+
+            try {
+                const localProfiles = JSON.parse(localStorage.getItem('crashdown_player_profiles') || '{}');
+                localProfiles[username] = { ...(localProfiles[username] || {}), ...profile };
+                localStorage.setItem('crashdown_player_profiles', JSON.stringify(localProfiles));
+            } catch (e) {}
+        } else {
+            const cleanProfile = {
+                username: username,
+                bestScore: 0,
+                totalMatches: 0,
+                totalPlaytimeSeconds: 0,
+                totalScore: 0,
+                achievements: [],
+                modes: {},
+                durations: {},
+                modifierStats: {},
+                durationStats: {},
+                history: [],
+                chosenTitle: null,
+                chosenAvatar: 'avatar_default',
+                chosenNameColor: 'name_white'
+            };
+
+            localStorage.setItem('crashdown_achievements_' + uLower, JSON.stringify([]));
+            localStorage.setItem('crashdown_achievements', JSON.stringify([]));
+            localStorage.setItem('crashdown_chosen_avatar', 'avatar_default');
+            localStorage.setItem('crashdown_chosen_name_color', 'name_white');
+
+            try {
+                const localProfiles = JSON.parse(localStorage.getItem('crashdown_player_profiles') || '{}');
+                localProfiles[username] = cleanProfile;
+                localStorage.setItem('crashdown_player_profiles', JSON.stringify(localProfiles));
+            } catch (e) {}
+
+            if (window.leaderboardService && typeof window.leaderboardService.savePlayerProfile === 'function') {
+                window.leaderboardService.savePlayerProfile(username, cleanProfile).catch(() => {});
+            }
+        }
+
+        if (typeof updateAchievementsUI === 'function') {
+            updateAchievementsUI();
+        }
+        if (typeof toplistaMegjelenites === 'function') {
+            toplistaMegjelenites();
+        }
     }
 
     async logout() {
@@ -277,6 +385,13 @@ class AuthService {
         }
         sessionStorage.removeItem('crashdown_session_user');
         this.currentUser = null;
+        this.clearUserSessionState();
+        if (typeof updateAchievementsUI === 'function') {
+            updateAchievementsUI();
+        }
+        if (typeof toplistaMegjelenites === 'function') {
+            toplistaMegjelenites();
+        }
         this.notifyAuthChanged();
         return { success: true };
     }
@@ -399,7 +514,9 @@ class LeaderboardService {
                 this.db.ref('.info/connected').on('value', (snap) => {
                     this.isOnline = snap.val() === true;
                     const cached = JSON.parse(localStorage.getItem('toplista') || '[]');
-                    this.notifySubscribers(cached);
+                    if (cached && cached.length > 0) {
+                        this.notifySubscribers(cached);
+                    }
                 });
 
                 this.listenForUpdates();
@@ -573,7 +690,11 @@ class LeaderboardService {
         return { success: true, updated: wasUpdated, isNew: wasAdded, isRecord: true };
     }
 
-    async resetLeaderboard() {
+    async resetLeaderboard(adminConfirmation) {
+        if (adminConfirmation !== 'CONFIRM_PURGE_LEADERBOARD') {
+            console.warn('[LeaderboardService] resetLeaderboard hívása megtagadva: nincs admin jóváhagyás.');
+            return;
+        }
         localStorage.removeItem('toplista');
         if (this.isOnline && this.db) {
             try {

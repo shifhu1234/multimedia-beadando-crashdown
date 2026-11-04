@@ -1092,8 +1092,14 @@ const PROFILE_TITLES = [
 let recentSuccessfulClicks = [];
 let currentAchievementFilter = "all";
 
-function getUnlockedAchievements() {
+function getUnlockedAchievements(username = null) {
   try {
+    const user = username || window.authService?.getCurrentUser()?.displayName;
+    if (user) {
+      const uKey = "crashdown_achievements_" + user.trim().toLowerCase();
+      const userRaw = localStorage.getItem(uKey);
+      if (userRaw) return JSON.parse(userRaw);
+    }
     const raw = localStorage.getItem("crashdown_achievements");
     return raw ? JSON.parse(raw) : [];
   } catch (e) {
@@ -1101,8 +1107,51 @@ function getUnlockedAchievements() {
   }
 }
 
+function saveUserAchievementToProfile(username, achId) {
+  if (!username || !achId) return;
+  try {
+    const key = "crashdown_player_profiles";
+    const profiles = JSON.parse(localStorage.getItem(key) || "{}");
+    const p = profiles[username] || {
+      username: username,
+      totalMatches: 0,
+      totalPlaytimeSeconds: 0,
+      totalScore: 0,
+      bestScore: 0,
+      achievements: [],
+      modes: {},
+      durations: {},
+      modifierStats: {},
+      durationStats: {},
+      history: [],
+      chosenTitle: null,
+      chosenAvatar: "avatar_default",
+      chosenNameColor: "name_white",
+    };
+
+    if (!p.achievements) p.achievements = [];
+    if (!p.achievements.includes(achId)) {
+      p.achievements.push(achId);
+    }
+
+    profiles[username] = p;
+    localStorage.setItem(key, JSON.stringify(profiles));
+
+    if (
+      window.databaseService &&
+      typeof window.databaseService.savePlayerProfile === "function"
+    ) {
+      window.databaseService.savePlayerProfile(username, p).catch(() => {});
+    }
+  } catch (e) {
+    console.error("Hiba az elért mérföldkő mentésekor:", e);
+  }
+}
+
 function checkAchievement(id) {
-  const list = getUnlockedAchievements();
+  const currentUser = window.authService?.getCurrentUser();
+  const username = currentUser?.displayName;
+  const list = getUnlockedAchievements(username);
   const set = new Set(list);
   if (set.has(id)) return;
 
@@ -1110,11 +1159,17 @@ function checkAchievement(id) {
   if (!ach) return;
 
   set.add(id);
-  localStorage.setItem("crashdown_achievements", JSON.stringify([...set]));
+  const updatedList = [...set];
 
-  const currentUser = window.authService?.getCurrentUser();
-  if (currentUser && currentUser.displayName) {
-    updatePlayerStatsRecord(currentUser.displayName, 0, "3", 0);
+  if (username) {
+    const uKey = "crashdown_achievements_" + username.trim().toLowerCase();
+    localStorage.setItem(uKey, JSON.stringify(updatedList));
+  }
+  localStorage.setItem("crashdown_achievements", JSON.stringify(updatedList));
+
+  // Kizárólag az elért mérföldkövet mentjük le, nem generálunk ál-mérkőzést és ál-játékidőt!
+  if (username) {
+    saveUserAchievementToProfile(username, id);
   }
 
   triggerHaptic("success");
@@ -1246,11 +1301,12 @@ function updatePlayerStatsRecord(
     if (!p.durationStats) p.durationStats = {};
 
     const numericScore = parseInt(score, 10) || 0;
-    const durSec = parseInt(durationSeconds, 10) || 60;
+    const durSec = durationSeconds !== undefined && durationSeconds !== null ? parseInt(durationSeconds, 10) : 0;
     const modKey = modifier || "normal";
     const cKey = String(colorCount || "3");
 
-    if (numericScore > 0 || durSec > 0) {
+    // Kizárólag valódi lezárult meccs esetén (durSec > 0) rögzítünk statisztikát!
+    if (durSec > 0) {
       p.totalMatches = (p.totalMatches || 0) + 1;
       p.totalPlaytimeSeconds = (p.totalPlaytimeSeconds || 0) + durSec;
       p.totalScore = (p.totalScore || 0) + numericScore;
@@ -1293,7 +1349,7 @@ function updatePlayerStatsRecord(
 
     const currentUser = window.authService?.getCurrentUser();
     if (currentUser && currentUser.displayName === username) {
-      p.achievements = getUnlockedAchievements();
+      p.achievements = getUnlockedAchievements(username);
       p.chosenTitle =
         localStorage.getItem("crashdown_chosen_title") || p.chosenTitle;
       p.chosenAvatar =
@@ -1306,67 +1362,70 @@ function updatePlayerStatsRecord(
         "name_white";
     }
 
-    // Mérkőzésszám mérföldkövek
-    if (p.totalMatches >= 5) checkAchievement("play_5_matches");
-    if (p.totalMatches >= 10) checkAchievement("matches_10");
-    if (p.totalMatches >= 20) checkAchievement("play_20_matches");
-    if (p.totalMatches >= 50) checkAchievement("matches_50");
-    if (p.totalMatches >= 100) checkAchievement("matches_100");
-    if (p.totalMatches >= 250) checkAchievement("matches_250");
-    if (p.totalMatches >= 500) checkAchievement("matches_500");
+    // Mérföldkő ellenőrzések CSAKIS valódi lefutott meccs esetén (durSec > 0)
+    if (durSec > 0) {
+      // Mérkőzésszám mérföldkövek
+      if (p.totalMatches >= 5) checkAchievement("play_5_matches");
+      if (p.totalMatches >= 10) checkAchievement("matches_10");
+      if (p.totalMatches >= 20) checkAchievement("play_20_matches");
+      if (p.totalMatches >= 50) checkAchievement("matches_50");
+      if (p.totalMatches >= 100) checkAchievement("matches_100");
+      if (p.totalMatches >= 250) checkAchievement("matches_250");
+      if (p.totalMatches >= 500) checkAchievement("matches_500");
 
-    // Játékidő mérföldkövek
-    if (p.totalPlaytimeSeconds >= 60) checkAchievement("play_time_1m");
-    if (p.totalPlaytimeSeconds >= 300) checkAchievement("play_time_5m");
-    if (p.totalPlaytimeSeconds >= 900) checkAchievement("play_time_15m");
-    if (p.totalPlaytimeSeconds >= 1800) checkAchievement("play_time_30m");
-    if (p.totalPlaytimeSeconds >= 3600) checkAchievement("play_time_1h");
-    if (p.totalPlaytimeSeconds >= 7200) checkAchievement("play_time_2h");
+      // Játékidő mérföldkövek
+      if (p.totalPlaytimeSeconds >= 60) checkAchievement("play_time_1m");
+      if (p.totalPlaytimeSeconds >= 300) checkAchievement("play_time_5m");
+      if (p.totalPlaytimeSeconds >= 900) checkAchievement("play_time_15m");
+      if (p.totalPlaytimeSeconds >= 1800) checkAchievement("play_time_30m");
+      if (p.totalPlaytimeSeconds >= 3600) checkAchievement("play_time_1h");
+      if (p.totalPlaytimeSeconds >= 7200) checkAchievement("play_time_2h");
 
-    // Összesített pontszám mérföldkövek
-    if (p.totalScore >= 100000) checkAchievement("total_score_100k");
-    if (p.totalScore >= 500000) checkAchievement("total_score_500k");
-    if (p.totalScore >= 1000000) checkAchievement("total_score_1m");
-    if (p.totalScore >= 5000000) checkAchievement("total_score_5m");
+      // Összesített pontszám mérföldkövek
+      if (p.totalScore >= 100000) checkAchievement("total_score_100k");
+      if (p.totalScore >= 500000) checkAchievement("total_score_500k");
+      if (p.totalScore >= 1000000) checkAchievement("total_score_1m");
+      if (p.totalScore >= 5000000) checkAchievement("total_score_5m");
 
-    // Pontszám rekord mérföldkövek
-    if (numericScore >= 500) checkAchievement("first_500");
-    if (numericScore >= 1500) checkAchievement("score_1500");
-    if (numericScore >= 5000) checkAchievement("score_5000");
-    if (numericScore >= 10000) checkAchievement("score_10k");
-    if (numericScore >= 25000) checkAchievement("score_25k");
-    if (numericScore >= 50000) checkAchievement("score_50k");
-    if (numericScore >= 75000) checkAchievement("score_75k");
-    if (numericScore >= 100000) checkAchievement("score_100k");
-    if (numericScore >= 150000) checkAchievement("score_150k");
-    if (numericScore >= 250000) checkAchievement("score_250k");
+      // Pontszám rekord mérföldkövek
+      if (numericScore >= 500) checkAchievement("first_500");
+      if (numericScore >= 1500) checkAchievement("score_1500");
+      if (numericScore >= 5000) checkAchievement("score_5000");
+      if (numericScore >= 10000) checkAchievement("score_10k");
+      if (numericScore >= 25000) checkAchievement("score_25k");
+      if (numericScore >= 50000) checkAchievement("score_5000");
+      if (numericScore >= 75000) checkAchievement("score_75k");
+      if (numericScore >= 100000) checkAchievement("score_100k");
+      if (numericScore >= 150000) checkAchievement("score_150k");
+      if (numericScore >= 250000) checkAchievement("score_250k");
 
-    // Mód szerinti győzelmek / jó eredmények
-    if (modKey === "chaos" && numericScore >= 5000)
-      checkAchievement("mode_chaos_win");
-    if (modKey === "bomb_frenzy" && numericScore >= 5000)
-      checkAchievement("mode_bomb_win");
-    if (modKey === "time_rush" && numericScore >= 5000)
-      checkAchievement("mode_time_win");
-    if (modKey === "no_powerups" && numericScore >= 3000)
-      checkAchievement("mode_raw_win");
+      // Mód szerinti győzelmek / jó eredmények
+      if (modKey === "chaos" && numericScore >= 5000)
+        checkAchievement("mode_chaos_win");
+      if (modKey === "bomb_frenzy" && numericScore >= 5000)
+        checkAchievement("mode_bomb_win");
+      if (modKey === "time_rush" && numericScore >= 5000)
+        checkAchievement("mode_time_win");
+      if (modKey === "no_powerups" && numericScore >= 3000)
+        checkAchievement("mode_raw_win");
 
-    // Időtartam rekordok
-    if (durSec === 30 && numericScore >= 5000) checkAchievement("sprint_5k");
-    if (durSec === 180 && numericScore >= 15000) checkAchievement("marathon_15k");
+      // Időtartam rekordok
+      if (durSec === 30 && numericScore >= 5000) checkAchievement("sprint_5k");
+      if (durSec === 180 && numericScore >= 15000) checkAchievement("marathon_15k");
 
-    // Változatosság mérföldkövek (minden mód, minden időtartam, minden színszám)
-    const all5Modes = ["normal", "chaos", "bomb_frenzy", "time_rush", "no_powerups"];
-    if (all5Modes.every((m) => p.modifierStats[m] && p.modifierStats[m].matches > 0)) {
-      checkAchievement("all_modes_played");
-    }
-    const allDurations = ["30", "60", "90", "180"];
-    if (allDurations.every((d) => p.durationStats[d] && p.durationStats[d].matches > 0)) {
-      checkAchievement("all_durations_played");
-    }
-    const allColors = ["2", "3", "4", "5"];
-    if (allColors.every((c) => p.modes[c] && p.modes[c].matches > 0)) {
-      checkAchievement("all_colors_played");
+      // Változatosság mérföldkövek (minden mód, minden időtartam, minden színszám)
+      const all5Modes = ["normal", "chaos", "bomb_frenzy", "time_rush", "no_powerups"];
+      if (all5Modes.every((m) => p.modifierStats[m] && p.modifierStats[m].matches > 0)) {
+        checkAchievement("all_modes_played");
+      }
+      const allDurations = ["30", "60", "90", "180"];
+      if (allDurations.every((d) => p.durationStats[d] && p.durationStats[d].matches > 0)) {
+        checkAchievement("all_durations_played");
+      }
+      const allColors = ["2", "3", "4", "5"];
+      if (allColors.every((c) => p.modes[c] && p.modes[c].matches > 0)) {
+        checkAchievement("all_colors_played");
+      }
     }
 
     profiles[username] = p;
@@ -1593,8 +1652,8 @@ function getPlayerProfileStats(username, allScores = [], onlineProfile = null) {
       .slice(0, 10);
   }
 
-  // Ha nincsenek szinkronizált mérföldkövei, a statisztikái alapján következtessük ki
-  if (!profile.achievements || profile.achievements.length === 0) {
+  // Ha nincsenek szinkronizált mérföldkövei, a statisztikái alapján következtessük ki (CSAK HA MÁR JÁTSZOTT!)
+  if ((!profile.achievements || profile.achievements.length === 0) && (profile.bestScore > 0 || profile.totalMatches > 0)) {
     const inferred = [];
     if (profile.bestScore >= 500) inferred.push("first_500");
     if (profile.bestScore >= 1500) inferred.push("score_1500");
@@ -1625,7 +1684,7 @@ function getPlayerProfileStats(username, allScores = [], onlineProfile = null) {
     currentUser.displayName &&
     currentUser.displayName.toLowerCase() === username.toLowerCase()
   ) {
-    profile.achievements = getUnlockedAchievements();
+    profile.achievements = getUnlockedAchievements(username);
     profile.chosenTitle =
       localStorage.getItem("crashdown_chosen_title") || profile.chosenTitle;
     profile.chosenAvatar =

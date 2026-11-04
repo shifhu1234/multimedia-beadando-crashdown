@@ -2,30 +2,6 @@
    CRASHDOWN ARCADE - MAIN APPLICATION BOOTSTRAP & EVENT LISTENERS
    ================================================================ */
 
-// Teljes adatbázis & tároló nullázás egyszeri lefutása (Reset to 0)
-(function resetAllDataToZero() {
-    const RESET_FLAG = 'crashdown_reset_zero_v2026_complete';
-    if (!localStorage.getItem(RESET_FLAG)) {
-        console.warn('Crashdown adatbázis és tároló teljes nullázása...');
-        try {
-            localStorage.removeItem('toplista');
-            localStorage.removeItem('crashdown_player_profiles');
-            localStorage.removeItem('crashdown_achievements');
-            localStorage.removeItem('crashdown_chosen_title');
-            localStorage.removeItem('crashdown_chosen_avatar');
-            localStorage.removeItem('crashdown_users');
-            localStorage.removeItem('crashdown_current_user');
-            localStorage.setItem(RESET_FLAG, 'true');
-        } catch (e) {}
-
-        setTimeout(() => {
-            if (window.leaderboardService && typeof window.leaderboardService.resetLeaderboard === 'function') {
-                window.leaderboardService.resetLeaderboard().catch(() => {});
-            }
-        }, 1200);
-    }
-})();
-
 // Fő gombok bekötése
 document.getElementById('startGameButton')?.addEventListener('click', startMatch);
 document.getElementById('startNewGame')?.addEventListener('click', ujJatekInditasaFunc);

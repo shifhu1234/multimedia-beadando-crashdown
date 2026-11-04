@@ -937,6 +937,13 @@ function updateAuthUI(user) {
     if (myProfileBtn) myProfileBtn.style.display = "none";
     if (changePwBtn) changePwBtn.style.display = "none";
     if (logoutBtnEl) logoutBtnEl.style.display = "none";
+    if (nameLabel) {
+      nameLabel.textContent = "";
+      const nameColorCatalog =
+        typeof NAME_COLORS_CATALOG !== "undefined" ? NAME_COLORS_CATALOG : [];
+      nameColorCatalog.forEach((c) => nameLabel.classList.remove(c.className));
+    }
+    if (avatarDot) avatarDot.textContent = "👤";
   }
 }
 
