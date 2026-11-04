@@ -673,6 +673,26 @@
   gap: 10px;
 }
 
+.profile-stats-grid .profile-stat-box:last-child:nth-child(odd) {
+  grid-column: span 2;
+}
+
+.profile-badge-summary-inline {
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+  color: #38bdf8;
+  margin-left: 6px;
+  letter-spacing: normal;
+  text-transform: none;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  padding: 2px 7px;
+  border-radius: 999px;
+  vertical-align: middle;
+  display: inline-block;
+}
+
 .profile-stat-box {
   display: flex;
   align-items: center;

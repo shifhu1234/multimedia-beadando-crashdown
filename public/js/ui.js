@@ -652,8 +652,12 @@ async function openPlayerProfileModal(username, resetScroll = true) {
   const currentUser = window.authService?.getCurrentUser();
   const isOwnProfile =
     currentUser &&
-    currentUser.displayName &&
-    currentUser.displayName.toLowerCase() === stats.username.toLowerCase();
+    ((currentUser.displayName &&
+      currentUser.displayName.trim().toLowerCase() ===
+        String(stats.username).trim().toLowerCase()) ||
+      (currentUser.email &&
+        currentUser.email.trim().toLowerCase() ===
+          String(stats.username).trim().toLowerCase()));
   if (currentUser && !isOwnProfile) {
     checkAchievement("inspect_profile");
   }
@@ -1609,7 +1613,7 @@ async function openPlayerProfileModal(username, resetScroll = true) {
   if (achCountEl)
     achCountEl.textContent = `${achList.length} / ${ACHIEVEMENTS.length}`;
   if (badgeSummaryEl)
-    badgeSummaryEl.textContent = `${achList.length} feloldva a ${ACHIEVEMENTS.length}-ből`;
+    badgeSummaryEl.textContent = `(${achList.length} / ${ACHIEVEMENTS.length})`;
 
   // Színmódok szerinti lebontás
   if (modesListEl) {
@@ -1860,7 +1864,7 @@ async function openPlayerProfileModal(username, resetScroll = true) {
             if (curAchCountEl)
               curAchCountEl.textContent = `${nextSet.size} / ${ACHIEVEMENTS.length}`;
             if (curBadgeSummaryEl)
-              curBadgeSummaryEl.textContent = `${nextSet.size} feloldva a ${ACHIEVEMENTS.length}-ből`;
+              curBadgeSummaryEl.textContent = `(${nextSet.size} / ${ACHIEVEMENTS.length})`;
 
             triggerHaptic("impact");
             if (typeof hangKatt !== "undefined") playSound(hangKatt);
@@ -1938,6 +1942,19 @@ async function openPlayerProfileModal(username, resetScroll = true) {
                 `;
         })
         .join("");
+    }
+  }
+
+  const pwSection = document.getElementById("profileChangePasswordSection");
+  if (pwSection) {
+    pwSection.style.display = isOwnProfile ? "flex" : "none";
+    if (isOwnProfile) {
+      const p1 = document.getElementById("newPasswordInput");
+      const p2 = document.getElementById("confirmNewPasswordInput");
+      const errEl = document.getElementById("changePasswordErrorMsg");
+      if (p1) p1.value = "";
+      if (p2) p2.value = "";
+      if (errEl) errEl.style.display = "none";
     }
   }
 
