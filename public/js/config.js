@@ -28,60 +28,60 @@ const THEME_PALETTES = {
 const THEMES_CATALOG = [
   { id: "retro", name: "Retro Játékterem", achId: null, isSpecial: false },
   { id: "cyber", name: "Kiber Neon", achId: null, isSpecial: false },
-  { id: "candy", name: "Cukorka Pop", achId: "first_500", isSpecial: false },
+  { id: "candy", name: "Cukorka Pop", achId: "ach_score_500", isSpecial: false },
   {
     id: "space",
     name: "Mélyűr Odüsszeia",
-    achId: "score_1500",
+    achId: "ach_score_1500",
     isSpecial: false,
   },
   {
     id: "sunset",
     name: "Naplemente Szintetizátor",
-    achId: "powerup_10",
+    achId: "ach_powerup_10",
     isSpecial: false,
   },
   {
     id: "forest",
     name: "Smaragd Vadon",
-    achId: "play_time_5m",
+    achId: "ach_play_time_1m",
     isSpecial: false,
   },
-  { id: "lava", name: "Tűzhányó Láva", achId: "powerup_25", isSpecial: false },
+  { id: "lava", name: "Tűzhányó Láva", achId: "ach_powerup_25", isSpecial: false },
   {
     id: "noir",
     name: "Éjféli Noir",
-    achId: "inspect_profile",
+    achId: "ach_inspect_profile",
     isSpecial: false,
   },
   {
     id: "ocean",
     name: "Mélytengeri Misztikum",
-    achId: "score_5000",
+    achId: "ach_play_time_45m",
     isSpecial: false,
   },
   {
     id: "aurora",
     name: "Sarki Fény (Aurora)",
-    achId: "powerup_100",
+    achId: "ach_powerup_100",
     isSpecial: false,
   },
   {
     id: "vaporwave",
     name: "80s Synthwave",
-    achId: "play_time_1h",
+    achId: "ach_play_time_1h",
     isSpecial: false,
   },
   {
     id: "cosmic_void",
     name: "Kozmikus Void (Speciális)",
-    achId: "score_75k",
+    achId: "ach_score_75k",
     isSpecial: true,
   },
   {
     id: "golden",
     name: "Birodalmi Arany (Speciális)",
-    achId: "score_100k",
+    achId: "ach_score_100k",
     isSpecial: true,
   },
 ];
@@ -90,22 +90,22 @@ const THEMES_CATALOG = [
 const NAME_COLORS_CATALOG = [
   // Alapértelmezett és normál egyszínű színek neon ragyogással
   { id: "name_white", name: "Hófehér", achId: null, isSpecial: false, className: "name-color-white", color: "#ffffff", desc: "Tiszta fényes fehér finom ragyogással" },
-  { id: "name_cyan", name: "Neon Cián", achId: "first_500", isSpecial: false, className: "name-color-cyan", color: "#38bdf8", desc: "Elektromos ciánkék neon ragyogás" },
-  { id: "name_green", name: "Smaragd Zöld", achId: "all_modes_played", isSpecial: false, className: "name-color-green", color: "#4ade80", desc: "Élénk zöld smaragd aura" },
-  { id: "name_gold", name: "Napfény Sárga", achId: "all_durations_played", isSpecial: false, className: "name-color-gold", color: "#facc15", desc: "Meleg aranyló sárga fény" },
-  { id: "name_orange", name: "Láng Narancs", achId: "all_colors_played", isSpecial: false, className: "name-color-orange", color: "#fb923c", desc: "Tüzes narancssárga ragyogás" },
-  { id: "name_pink", name: "Rózsaszín Pop", achId: "play_time_5m", isSpecial: false, className: "name-color-pink", color: "#f472b6", desc: "Vidám pasztell rózsaszín" },
-  { id: "name_purple", name: "Misztikus Lila", achId: "play_20_matches", isSpecial: false, className: "name-color-purple", color: "#c084fc", desc: "Mély varázslatos lila fény" },
-  { id: "name_red", name: "Rubin Vörös", achId: "doubler_collector_25", isSpecial: false, className: "name-color-red", color: "#f87171", desc: "Izzó rubinvörös kisugárzás" },
+  { id: "name_cyan", name: "Neon Cián", achId: "ach_score_15k", isSpecial: false, className: "name-color-cyan", color: "#38bdf8", desc: "Elektromos ciánkék neon ragyogás" },
+  { id: "name_green", name: "Smaragd Zöld", achId: "ach_all_modes_played", isSpecial: false, className: "name-color-green", color: "#4ade80", desc: "Élénk zöld smaragd aura" },
+  { id: "name_gold", name: "Napfény Sárga", achId: "ach_all_durations_played", isSpecial: false, className: "name-color-gold", color: "#facc15", desc: "Meleg aranyló sárga fény" },
+  { id: "name_orange", name: "Láng Narancs", achId: "ach_play_time_20m", isSpecial: false, className: "name-color-orange", color: "#fb923c", desc: "Tüzes narancssárga ragyogás" },
+  { id: "name_pink", name: "Rózsaszín Pop", achId: "ach_play_time_5m", isSpecial: false, className: "name-color-pink", color: "#f472b6", desc: "Vidám pasztell rózsaszín" },
+  { id: "name_purple", name: "Misztikus Lila", achId: "ach_total_score_250k", isSpecial: false, className: "name-color-purple", color: "#c084fc", desc: "Mély varázslatos lila fény" },
+  { id: "name_red", name: "Rubin Vörös", achId: "ach_doubler_collector_25", isSpecial: false, className: "name-color-red", color: "#f87171", desc: "Izzó rubinvörös kisugárzás" },
 
   // SPECIÁLIS név színek (átmenetesek 2-3 színnel, árnyékolással, animált ragyogással)
-  { id: "name_cyber_glow", name: "Kiber Aurora", achId: "score_10k", isSpecial: true, className: "name-special-cyber", color: "linear-gradient(135deg, #ffffff, #38bdf8, #c084fc, #f472b6)", desc: "Fehéres-kékes-rózsaszínes ragyogó kiber aura" },
-  { id: "name_golden_royalty", name: "Birodalmi Arany", achId: "total_score_5m", isSpecial: true, className: "name-special-gold", color: "linear-gradient(135deg, #fffbeb, #fde047, #f59e0b)", desc: "Fenséges arany és borostyán fényár" },
-  { id: "name_cosmic_nebula", name: "Kozmikus Nebula", achId: "score_250k", isSpecial: true, className: "name-special-cosmic", color: "linear-gradient(135deg, #e9d5ff, #a855f7, #38bdf8)", desc: "Mélyűri lila és cián csillagköd" },
-  { id: "name_inferno_flame", name: "Pokoli Tűzvihar", achId: "lightning_combo_6", isSpecial: true, className: "name-special-flame", color: "linear-gradient(135deg, #fef08a, #f97316, #ef4444)", desc: "Lángoló magma és vörös izzás" },
-  { id: "name_rainbow_prism", name: "Prizma Szivárvány", achId: "matches_500", isSpecial: true, className: "name-special-rainbow", color: "linear-gradient(90deg, #f43f5e, #fb923c, #facc15, #4ade80, #38bdf8, #a855f7)", desc: "Folyamatosan hullámzó prizma spektrum" },
-  { id: "name_toxic_plasma", name: "Mérgező Plazma", achId: "marathon_15k", isSpecial: true, className: "name-special-plasma", color: "linear-gradient(135deg, #ecfccb, #a3e635, #10b981)", desc: "Radioaktív neon lime plazmaörvény" },
-  { id: "name_void_amethyst", name: "Obszidián Void", achId: "total_score_1m", isSpecial: true, className: "name-special-void", color: "linear-gradient(135deg, #ffffff, #d8b4fe, #7c3aed)", desc: "Misztikus obszidián és sötét ametiszt ragyogás" }
+  { id: "name_cyber_glow", name: "Kiber Aurora", achId: "ach_play_time_3h", isSpecial: true, className: "name-special-cyber", color: "linear-gradient(135deg, #ffffff, #38bdf8, #c084fc, #f472b6)", desc: "Fehéres-kékes-rózsaszínes ragyogó kiber aura" },
+  { id: "name_golden_royalty", name: "Birodalmi Arany", achId: "ach_total_score_10m", isSpecial: true, className: "name-special-gold", color: "linear-gradient(135deg, #fffbeb, #fde047, #f59e0b)", desc: "Fenséges arany és borostyán fényár" },
+  { id: "name_cosmic_nebula", name: "Kozmikus Nebula", achId: "ach_score_300k", isSpecial: true, className: "name-special-cosmic", color: "linear-gradient(135deg, #e9d5ff, #a855f7, #38bdf8)", desc: "Mélyűri lila és cián csillagköd" },
+  { id: "name_inferno_flame", name: "Pokoli Tűzvihar", achId: "ach_combo_x7", isSpecial: true, className: "name-special-flame", color: "linear-gradient(135deg, #fef08a, #f97316, #ef4444)", desc: "Lángoló magma és vörös izzás" },
+  { id: "name_rainbow_prism", name: "Prizma Szivárvány", achId: "ach_matches_750", isSpecial: true, className: "name-special-rainbow", color: "linear-gradient(90deg, #f43f5e, #fb923c, #facc15, #4ade80, #38bdf8, #a855f7)", desc: "Folyamatosan hullámzó prizma spektrum" },
+  { id: "name_toxic_plasma", name: "Mérgező Plazma", achId: "ach_marathon_15k", isSpecial: true, className: "name-special-plasma", color: "linear-gradient(135deg, #ecfccb, #a3e635, #10b981)", desc: "Radioaktív neon lime plazmaörvény" },
+  { id: "name_void_amethyst", name: "Obszidián Void", achId: "ach_total_score_2m", isSpecial: true, className: "name-special-void", color: "linear-gradient(135deg, #ffffff, #d8b4fe, #7c3aed)", desc: "Misztikus obszidián és sötét ametiszt ragyogás" }
 ];
 
 // Játékmódok / Modifierek definíciói

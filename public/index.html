@@ -220,7 +220,10 @@
         <!-- Alsó Doboz: Téma választó (magyarosítva), Különleges Power-upok & Hangerő -->
         <div class="panel-card game-extra-box">
           <div class="theme-field-wrap">
-            <label for="themeSelect" class="control-label">Téma</label>
+            <div class="theme-label-row">
+              <label for="themeSelect" class="control-label">Téma</label>
+              <div id="themeSelectPalette" class="theme-select-palette" title="Aktív témapaletta"></div>
+            </div>
             <div class="select-wrapper">
               <select id="themeSelect">
                 <option value="retro" selected>Retro Játékterem</option>
@@ -393,7 +396,7 @@
               <!-- Játék beállítások előnézete indítás előtt -->
               <div id="overlaySettingsBox" class="overlay-settings-box">
                 <div class="overlay-setting-header">
-                  <span id="overlayModeBadge" class="overlay-mode-badge">🎯 Normál</span>
+                  <span id="overlayModeBadge" class="overlay-mode-badge overlay-chip">🎯 Normál</span>
                   <div class="overlay-setting-pills">
                     <span id="overlayTimeChip" class="overlay-chip">⏱️ 1 perc (60 mp)</span>
                     <span id="overlayColorChip" class="overlay-chip">🎨 3 szín</span>
@@ -806,10 +809,23 @@
             class="profile-section"
           >
             <div class="profile-section-header">
-              <h4 class="profile-section-title">🎨 Játéktéma Választása</h4>
-              <span class="auth-hint-text"
-                >13 egyedi témavilág (kliens oldali megjelenés)</span
-              >
+              <div>
+                <h4 class="profile-section-title">🎨 Játéktéma Választása</h4>
+                <span class="auth-hint-text"
+                  >13 egyedi témavilág (kliens oldali megjelenés)</span
+                >
+              </div>
+              <div class="section-sort-wrapper">
+                <label for="sortThemesSelect" class="sort-label">Rendezés:</label>
+                <select id="sortThemesSelect" class="section-sort-select">
+                  <option value="default">Alapértelmezett</option>
+                  <option value="alpha_asc">ABC (A → Z)</option>
+                  <option value="alpha_desc">ABC (Z → A)</option>
+                  <option value="unlocked_first">Feloldott elöl</option>
+                  <option value="locked_first">Zárolt elöl</option>
+                  <option value="special_first">Speciális elöl</option>
+                </select>
+              </div>
             </div>
             <div id="profileThemeGrid" class="profile-theme-grid">
               <!-- Dinamikusan renderelve ui.js-ből -->
@@ -823,10 +839,23 @@
             style="display: none"
           >
             <div class="profile-section-header">
-              <h4 class="profile-section-title">🎨 Név Színének Választása</h4>
-              <span class="auth-hint-text"
-                >Egyszínű neonok & Speciális színátmenetek</span
-              >
+              <div>
+                <h4 class="profile-section-title">🎨 Név Színének Választása</h4>
+                <span class="auth-hint-text"
+                  >Egyszínű neonok & Speciális színátmenetek</span
+                >
+              </div>
+              <div class="section-sort-wrapper">
+                <label for="sortNameColorsSelect" class="sort-label">Rendezés:</label>
+                <select id="sortNameColorsSelect" class="section-sort-select">
+                  <option value="default">Alapértelmezett</option>
+                  <option value="alpha_asc">ABC (A → Z)</option>
+                  <option value="alpha_desc">ABC (Z → A)</option>
+                  <option value="unlocked_first">Feloldott elöl</option>
+                  <option value="locked_first">Zárolt elöl</option>
+                  <option value="special_first">Speciális elöl</option>
+                </select>
+              </div>
             </div>
             <div id="profileNameColorGrid" class="profile-name-color-grid">
               <!-- Dinamikusan renderelve ui.js-ből -->
@@ -840,10 +869,23 @@
             style="display: none"
           >
             <div class="profile-section-header">
-              <h4 class="profile-section-title">🎖️ Rangcím Választása</h4>
-              <span class="auth-hint-text"
-                >Mérföldkövekkel feloldható rangcímek</span
-              >
+              <div>
+                <h4 class="profile-section-title">🎖️ Rangcím Választása</h4>
+                <span class="auth-hint-text"
+                  >Mérföldkövekkel feloldható rangcímek</span
+                >
+              </div>
+              <div class="section-sort-wrapper">
+                <label for="sortTitlesSelect" class="sort-label">Rendezés:</label>
+                <select id="sortTitlesSelect" class="section-sort-select">
+                  <option value="default">Alapértelmezett</option>
+                  <option value="alpha_asc">ABC (A → Z)</option>
+                  <option value="alpha_desc">ABC (Z → A)</option>
+                  <option value="unlocked_first">Feloldott elöl</option>
+                  <option value="locked_first">Zárolt elöl</option>
+                  <option value="special_first">Speciális elöl</option>
+                </select>
+              </div>
             </div>
             <div id="profileTitleGrid" class="profile-title-grid">
               <!-- Dinamikusan renderelve ui.js-ből -->
@@ -857,10 +899,23 @@
             style="display: none"
           >
             <div class="profile-section-header">
-              <h4 class="profile-section-title">🖼️ Profilkép választása</h4>
-              <span class="auth-hint-text"
-                >Mérföldkövekkel kinyitható szimbólumok</span
-              >
+              <div>
+                <h4 class="profile-section-title">🖼️ Profilkép választása</h4>
+                <span class="auth-hint-text"
+                  >Mérföldkövekkel kinyitható szimbólumok</span
+                >
+              </div>
+              <div class="section-sort-wrapper">
+                <label for="sortAvatarsSelect" class="sort-label">Rendezés:</label>
+                <select id="sortAvatarsSelect" class="section-sort-select">
+                  <option value="default">Alapértelmezett</option>
+                  <option value="alpha_asc">ABC (A → Z)</option>
+                  <option value="alpha_desc">ABC (Z → A)</option>
+                  <option value="unlocked_first">Feloldott elöl</option>
+                  <option value="locked_first">Zárolt elöl</option>
+                  <option value="special_first">Speciális elöl</option>
+                </select>
+              </div>
             </div>
             <div id="profileAvatarGrid" class="profile-avatar-grid">
               <!-- Dinamikusan renderelve ui.js-ből -->
@@ -870,9 +925,22 @@
           <!-- 8. Elért Jelvények -->
           <div class="profile-section">
             <div class="profile-section-header">
-              <h4 class="profile-section-title">🎖️ Elért Jelvények</h4>
-              <div class="profile-badges-header-right">
+              <div>
+                <h4 class="profile-section-title">🎖️ Elért Jelvények</h4>
                 <span id="profileBadgeSummary" class="auth-hint-text"></span>
+              </div>
+              <div class="profile-badges-header-right">
+                <div class="section-sort-wrapper">
+                  <label for="sortAchievementsSelect" class="sort-label">Rendezés:</label>
+                  <select id="sortAchievementsSelect" class="section-sort-select">
+                    <option value="default">Alapértelmezett</option>
+                    <option value="alpha_asc">ABC (A → Z)</option>
+                    <option value="alpha_desc">ABC (Z → A)</option>
+                    <option value="unlocked_first">Feloldott elöl</option>
+                    <option value="locked_first">Zárolt elöl</option>
+                    <option value="reward_first">Jutalmat adók elöl</option>
+                  </select>
+                </div>
                 <div id="profileAdminBadgeActions" class="profile-admin-badge-actions" style="display: none;">
                   <button id="profileAdminUnlockAllBtn" type="button" class="admin-inline-btn admin-inline-unlock" title="Összes jelvény feloldása">🔓 Mind felold</button>
                   <button id="profileAdminLockAllBtn" type="button" class="admin-inline-btn admin-inline-lock" title="Összes jelvény visszazárása">🔒 Mind zár</button>
@@ -991,11 +1059,11 @@
     <div id="toastContainer" class="toast-container"></div>
 
     <!-- Modularizált JavaScript modulok a villámgyors futásért és tiszta átláthatóságért -->
-    <script src="js/config.js?v=3.8"></script>
-    <script src="js/audio.js?v=3.8"></script>
-    <script src="js/achievements.js?v=3.8"></script>
-    <script src="js/ui.js?v=3.8"></script>
-    <script src="js/game.js?v=3.8"></script>
-    <script src="js/main.js?v=3.8"></script>
+    <script src="js/config.js?v=3.9"></script>
+    <script src="js/audio.js?v=3.9"></script>
+    <script src="js/achievements.js?v=3.9"></script>
+    <script src="js/ui.js?v=3.9"></script>
+    <script src="js/game.js?v=3.9"></script>
+    <script src="js/main.js?v=3.9"></script>
   </body>
 </html>

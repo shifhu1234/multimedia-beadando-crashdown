@@ -4,568 +4,732 @@
 
 // ==================== MÉRFÖLDKÖVEK & JELVÉNYEK (36 DB) ====================
 const ACHIEVEMENTS = [
-  // 1. Kezdő & Pontszám mérföldkövek
   {
-    id: "first_match",
+    id: "ach_first_click",
     icon: "🎯",
-    title: "Első Lépés",
-    desc: "Törölj ki egy legalább 3 blokkból álló csoportot!",
+    title: "Első Kattintás",
+    desc: "Töröld el az első érvényes blokkcsoportodat a pályán!",
   },
   {
-    id: "first_500",
+    id: "ach_score_200",
     icon: "⭐",
-    title: "Kezdő Pontgyűjtő",
-    desc: "Érj el legalább 500 pontot egy menetben!",
+    title: "Első Pontok",
+    desc: "Érj el legalább 200 pontot egy menetben!",
   },
   {
-    id: "score_1500",
+    id: "ach_score_800",
     icon: "🏅",
-    title: "Haladó Törő",
-    desc: "Érj el legalább 1 500 pontot egy meccsben!",
+    title: "Pontgyűjtő Felfedező",
+    desc: "Érj el legalább 800 pontot egy menetben!",
   },
   {
-    id: "score_5000",
-    icon: "🏆",
-    title: "Pontvadász",
-    desc: "Érj el legalább 5 000 pontot egyetlen játékban!",
+    id: "ach_matches_1",
+    icon: "🎮",
+    title: "Első Menet",
+    desc: "Fejezz be egy teljes mérkőzést az arénában!",
   },
   {
-    id: "score_10k",
-    icon: "👑",
-    title: "Crashdown Mester",
-    desc: "Lépd át a 10 000 pontos álomhatárt!",
+    id: "ach_play_time_15s",
+    icon: "⏱️",
+    title: "Kezdő Lépések",
+    desc: "Játssz legalább 15 másodpercet az arénában!",
   },
   {
-    id: "score_25k",
-    icon: "🌌",
-    title: "Galaktikus Bajnok",
-    desc: "Érj el szédítő 25 000 pontot egy menetben!",
-  },
-  {
-    id: "score_50k",
-    icon: "💎",
-    title: "Kozmikus Rekorder",
-    desc: "Lépd át a felfoghatatlan 50 000 pontos rekordot!",
-  },
-  {
-    id: "score_75k",
-    icon: "🌌",
-    title: "Kozmikus Legenda",
-    desc: "Érj el szédítő 75 000 pontot egy menetben!",
-  },
-  {
-    id: "score_100k",
-    icon: "👑",
-    title: "Halhatatlan Rekorder",
-    desc: "Lépd át a mitikus 100 000 pontos álomhatárt egy menetben!",
-  },
-
-  // 1.2 Összesített pontszám mérföldkövek
-  {
-    id: "total_score_100k",
-    icon: "💎",
-    title: "Pontgyűjtő Titán",
-    desc: "Gyűjts össze összesen legalább 100 000 összpontszámot a profilodon!",
-  },
-  {
-    id: "total_score_500k",
-    icon: "✨",
-    title: "Félmilliós Legenda",
-    desc: "Érj el összesen 500 000 pontot a játékaid során!",
-  },
-  {
-    id: "total_score_1m",
-    icon: "👑",
-    title: "Pontmilliomos",
-    desc: "Lépd át az 1 000 000 összesített rekord pontszámot!",
-  },
-
-  // 2. Kombók & Láncreakciók
-  {
-    id: "combo_x2",
+    id: "ach_combo_x2",
     icon: "⚡",
     title: "Kombó Kezdő",
     desc: "Érj el 2×-es kombó szorzót gyors egymásutánban!",
   },
   {
-    id: "combo_x3",
+    id: "ach_combo_x3",
     icon: "⚡",
     title: "Kombó Guru",
     desc: "Pörgesd fel a szorzót legalább 3×-os értékre!",
   },
   {
-    id: "combo_x4",
+    id: "ach_frenzy_active",
     icon: "🔥",
-    title: "Lángoló Kezek",
-    desc: "Érj el legalább 4×-es kombó szorzót játék közben!",
+    title: "Frenzy Láz",
+    desc: "Aktiválj legalább egy Frenzy 2× pontduplázó időszakot!",
   },
   {
-    id: "combo_x5",
-    icon: "🔥",
-    title: "Kombó Isten",
-    desc: "Érd el a maximális 5×-ös kombó csúcsot!",
-  },
-  {
-    id: "mega_clear",
-    icon: "💥",
-    title: "Mega Törlés",
-    desc: "Takaríts el egyetlen kattintással legalább 8 blokkot!",
-  },
-  {
-    id: "hyper_clear",
-    icon: "⚡",
-    title: "Kolosszus Törlés",
-    desc: "Takaríts el legalább 12 blokkot egyetlen kattintással!",
-  },
-
-  // 3. Power-Up Mester
-  {
-    id: "tnt_boom",
-    icon: "💣",
-    title: "TNT Szakértő",
-    desc: "Robbants fel egy 3×3-as TNT power-up blokkot!",
-  },
-  {
-    id: "freeze_time",
-    icon: "❄️",
-    title: "Jégvarázs",
-    desc: "Fagyaszd be az időt az Időfagyasztó Jégkockával!",
-  },
-  {
-    id: "magnet_pull",
-    icon: "🧲",
-    title: "Szuper Mágnes",
-    desc: "Ránts össze egy egész színt egy blokkba a Mágnessel!",
-  },
-  {
-    id: "color_bomb",
-    icon: "✦",
-    title: "Szín-kataklizma",
-    desc: "Tisztíts let egy teljes színt a Szín-bomba használatával!",
-  },
-  {
-    id: "frenzy_master",
-    icon: "⚡",
-    title: "Dupla vagy Semmi",
-    desc: "Aktiválj egy 2× Pontduplázó Frenzy időszakot!",
-  },
-  {
-    id: "time_bonus",
+    id: "ach_time_bonus_catch",
     icon: "⌛",
-    title: "Időutazó",
-    desc: "Gyűjts be egy +5 másodperces extra idő blokkot!",
-  },
-
-  // 4. Power-up Gyűjtő mérföldkövek
-  {
-    id: "powerup_5",
-    icon: "⚡",
-    title: "Power-up Kezdő",
-    desc: "Aktiválj összesen legalább 5 db power-upot!",
+    title: "Időmentő",
+    desc: "Gyűjts be egy +5s extra idő blokkot!",
   },
   {
-    id: "powerup_10",
-    icon: "✨",
-    title: "Power-up Gyűjtő",
-    desc: "Aktiválj összesen legalább 10 db power-upot!",
-  },
-  {
-    id: "powerup_25",
-    icon: "💥",
-    title: "Power-up Mester",
-    desc: "Aktiválj összesen legalább 25 db power-upot!",
-  },
-  {
-    id: "powerup_50",
-    icon: "👑",
-    title: "Power-up Titán",
-    desc: "Aktiválj összesen legalább 50 db power-upot!",
-  },
-  {
-    id: "powerup_100",
-    icon: "⚡",
-    title: "Power-up Fanatikus",
-    desc: "Aktiválj összesen legalább 100 db power-upot a meccseid alatt!",
-  },
-  {
-    id: "powerup_250",
-    icon: "💥",
-    title: "Power-up Vihar",
-    desc: "Aktiválj összesen legalább 250 db power-upot!",
-  },
-  {
-    id: "powerup_500",
-    icon: "🌟",
-    title: "Power-up Istenség",
-    desc: "Aktiválj félelmetes 500 db power-upot!",
-  },
-
-  // 5. Stratégia & Játékmenet
-  {
-    id: "perfect_clear",
-    icon: "✨",
-    title: "Tiszta Pálya",
-    desc: "Pucold le az utolsó szálig az egész táblát (0 blokk)!",
-  },
-  {
-    id: "shuffle_master",
+    id: "ach_shuffle_board",
     icon: "⟳",
-    title: "Új Esély",
-    desc: "Használd a Pálya keverése funkciót szorult helyzetben!",
+    title: "Újraelosztás",
+    desc: "Keverd újra a tábla blokkjait szorult helyzetben!",
   },
   {
-    id: "speed_demon",
-    icon: "🐆",
-    title: "Villám Kéz",
-    desc: "Kattints legalább 8 sikeres csoportra 10 másodpercen belül!",
+    id: "ach_powerup_first_any",
+    icon: "✨",
+    title: "Első Erőforrás",
+    desc: "Aktiválj bármilyen különleges power-up blokkot!",
   },
   {
-    id: "master_5_color",
-    icon: "🌈",
-    title: "Színkavalkád",
-    desc: "Érj el legalább 2 000 pontot az 5 színű mester módban!",
-  },
-
-  // 6. Közösség, Mérkőzések & Játékidő
-  {
-    id: "inspect_profile",
-    icon: "🔍",
-    title: "Kíváncsi Szemek",
-    desc: "Nézd meg egy másik játékos profilját a ranglistán!",
+    id: "ach_cleared_100_blocks",
+    icon: "💥",
+    title: "Százas Zúzó",
+    desc: "Pucolj el legalább 100 blokkot a játékaid során!",
   },
   {
-    id: "play_5_matches",
+    id: "ach_color_change_event",
+    icon: "🎨",
+    title: "Témaváltó",
+    desc: "Próbálj ki egy másik színtémát a játékban!",
+  },
+  {
+    id: "ach_sound_toggle",
+    icon: "🔊",
+    title: "Audiofil",
+    desc: "Állítsd be a játék hangerejét a csúszkával!",
+  },
+  {
+    id: "ach_history_check",
+    icon: "📜",
+    title: "Krónika Kutató",
+    desc: "Nézd meg a meccselőzményeidet a profilodon!",
+  },
+  {
+    id: "ach_score_500",
+    icon: "🍬",
+    title: "Édes Kezdet",
+    desc: "Érj el legalább 500 pontot egy menetben!",
+  },
+  {
+    id: "ach_score_1000",
+    icon: "🎖️",
+    title: "Ezer Pontos Határ",
+    desc: "Lépd át az 1 000 pontot egy menetben!",
+  },
+  {
+    id: "ach_score_1500",
+    icon: "🌌",
+    title: "Haladó Törő",
+    desc: "Érj el legalább 1 500 pontot egy meccsben!",
+  },
+  {
+    id: "ach_score_5000",
+    icon: "🏆",
+    title: "Pontvadász Bajnok",
+    desc: "Érj el legalább 5 000 pontot egyetlen menetben!",
+  },
+  {
+    id: "ach_score_7500",
+    icon: "👑",
+    title: "Arany Pontvadász",
+    desc: "Érj el legalább 7 500 pontot egy menetben!",
+  },
+  {
+    id: "ach_score_10k",
+    icon: "👑",
+    title: "Crashdown Mester",
+    desc: "Lépd át a 10 000 pontos álomhatárt!",
+  },
+  {
+    id: "ach_score_15k",
+    icon: "💎",
+    title: "Kristály Zúzó",
+    desc: "Érj el szédítő 15 000 pontot egy menetben!",
+  },
+  {
+    id: "ach_score_25k",
+    icon: "🌌",
+    title: "Galaktikus Bajnok",
+    desc: "Érj el legalább 25 000 pontot egyetlen meccsben!",
+  },
+  {
+    id: "ach_score_35k",
+    icon: "✨",
+    title: "Asztrális Csillag",
+    desc: "Lépd át a 35 000 pontos csúcseredményt!",
+  },
+  {
+    id: "ach_score_50k",
+    icon: "💎",
+    title: "Kozmikus Rekorder",
+    desc: "Lépd át a felfoghatatlan 50 000 pontos rekordot!",
+  },
+  {
+    id: "ach_score_60k",
+    icon: "💠",
+    title: "Gyémánt Fény",
+    desc: "Érj el legalább 60 000 pontot egy menetben!",
+  },
+  {
+    id: "ach_score_75k",
+    icon: "🔮",
+    title: "Kozmikus Legenda",
+    desc: "Érj el szédítő 75 000 pontot egy menetben!",
+  },
+  {
+    id: "ach_score_85k",
+    icon: "🪐",
+    title: "Csillagközi Pusztító",
+    desc: "Érj el félelmetes 85 000 pontot egy menetben!",
+  },
+  {
+    id: "ach_score_90k",
+    icon: "🌌",
+    title: "Void Fényörvény",
+    desc: "Érj el legalább 90 000 pontot egyetlen meccsben!",
+  },
+  {
+    id: "ach_score_100k",
+    icon: "👑",
+    title: "Halhatatlan Rekorder",
+    desc: "Lépd át a mitikus 100 000 pontos álomhatárt!",
+  },
+  {
+    id: "ach_score_110k",
+    icon: "🔱",
+    title: "Arany Trónörökös",
+    desc: "Érj el legalább 110 000 pontot egy menetben!",
+  },
+  {
+    id: "ach_score_125k",
+    icon: "👑",
+    title: "Birodalmi Császár",
+    desc: "Lépd át a 125 000 pontos gigantikus csúcsot!",
+  },
+  {
+    id: "ach_score_150k",
+    icon: "🌠",
+    title: "Abszolút Csúcsdöntő",
+    desc: "Érj el legalább 150 000 pontot egy menetben!",
+  },
+  {
+    id: "ach_score_200k",
+    icon: "☄️",
+    title: "Hullócsillag Vihar",
+    desc: "Lépd át a szédületes 200 000 pontos határt!",
+  },
+  {
+    id: "ach_score_250k",
+    icon: "🌌",
+    title: "Kozmikus Fenség",
+    desc: "Érj el felfoghatatlan 250 000 pontot egyetlen meccsben!",
+  },
+  {
+    id: "ach_score_300k",
+    icon: "🪐",
+    title: "Galaktikus Maghasadás",
+    desc: "Lépd át a 300 000 pontos mítikus rekordot!",
+  },
+  {
+    id: "ach_score_500k",
+    icon: "✨",
+    title: "Félmilliós Isten",
+    desc: "Érj el félelmetes 500 000 pontot egy menetben!",
+  },
+  {
+    id: "ach_total_score_50k",
+    icon: "🗡️",
+    title: "Lovagi Kezdet",
+    desc: "Gyűjts össze összesen legalább 50 000 összpontszámot!",
+  },
+  {
+    id: "ach_total_score_100k",
+    icon: "💎",
+    title: "Pontgyűjtő Titán",
+    desc: "Gyűjts össze összesen legalább 100 000 pontot a profilodon!",
+  },
+  {
+    id: "ach_total_score_250k",
+    icon: "🔮",
+    title: "Lila Varázsló",
+    desc: "Érj el legalább 250 000 összesített összpontszámot!",
+  },
+  {
+    id: "ach_total_score_500k",
+    icon: "✨",
+    title: "Félmilliós Legenda",
+    desc: "Érj el legalább 500 000 összpontszámot a profilodon!",
+  },
+  {
+    id: "ach_total_score_1m",
+    icon: "👑",
+    title: "Pontmilliomos",
+    desc: "Lépd át az 1 000 000 összesített rekord pontszámot!",
+  },
+  {
+    id: "ach_total_score_2m",
+    icon: "🟣",
+    title: "Ametiszt Uralkodó",
+    desc: "Gyűjts össze legalább 2 000 000 összesített pontot!",
+  },
+  {
+    id: "ach_total_score_5m",
+    icon: "💎",
+    title: "Multimilliomos Rekorder",
+    desc: "Lépd át az 5 000 000 összesített összpontszámot!",
+  },
+  {
+    id: "ach_total_score_10m",
+    icon: "👑",
+    title: "Tízmilliós Birodalom",
+    desc: "Érd el a felfoghatatlan 10 000 000 összesített összpontot!",
+  },
+  {
+    id: "ach_matches_3",
+    icon: "🎮",
+    title: "Bemelegítő Háromság",
+    desc: "Játssz le legalább 3 teljes meccset az arénában!",
+  },
+  {
+    id: "ach_matches_5",
     icon: "🎮",
     title: "Gyakori Vendég",
     desc: "Játssz le legalább 5 teljes mérkőzést!",
   },
   {
-    id: "matches_10",
+    id: "ach_matches_10",
     icon: "⚔️",
     title: "Harcedzett Zúzó",
     desc: "Játssz le legalább 10 teljes mérkőzést!",
   },
   {
-    id: "play_20_matches",
+    id: "ach_matches_15",
+    icon: "⏳",
+    title: "Gyakorlott Játékos",
+    desc: "Játssz le legalább 15 teljes mérkőzést!",
+  },
+  {
+    id: "ach_matches_20",
     icon: "🔥",
     title: "Elhivatott Zúzó",
     desc: "Játssz le legalább 20 teljes mérkőzést!",
   },
   {
-    id: "matches_50",
+    id: "ach_matches_50",
     icon: "🎖️",
     title: "Crashdown Veterán",
     desc: "Játssz le legalább 50 teljes mérkőzést!",
   },
   {
-    id: "matches_100",
+    id: "ach_matches_75",
+    icon: "🛡️",
+    title: "Gyémánt Harcos",
+    desc: "Játssz le legalább 75 teljes mérkőzést!",
+  },
+  {
+    id: "ach_matches_100",
     icon: "🎖️",
     title: "Százados Veterán",
     desc: "Játssz le legalább 100 teljes mérkőzést!",
   },
   {
-    id: "matches_250",
+    id: "ach_matches_250",
     icon: "⚔️",
     title: "Crashdown Örökös",
     desc: "Játssz le legalább 250 mérkőzést az arénában!",
   },
   {
-    id: "play_time_1m",
-    icon: "⏱️",
-    title: "Bemelegítés",
+    id: "ach_matches_500",
+    icon: "👑",
+    title: "Örökös Legenda",
+    desc: "Játssz le félelmetes 500 teljes mérkőzést!",
+  },
+  {
+    id: "ach_matches_750",
+    icon: "🌈",
+    title: "Prizma Lovag",
+    desc: "Játssz le félelmetes 750 teljes mérkőzést!",
+  },
+  {
+    id: "ach_matches_1000",
+    icon: "👑",
+    title: "Eredendő Császár",
+    desc: "Lépd át az 1 000 lejátszott mérkőzés álomhatárát!",
+  },
+  {
+    id: "ach_play_time_1m",
+    icon: "🌲",
+    title: "Zöld Kezdet",
     desc: "Játssz összesen legalább 1 percet a játékban!",
   },
   {
-    id: "play_time_5m",
+    id: "ach_play_time_3m",
+    icon: "⏱️",
+    title: "Három Perces Zúzó",
+    desc: "Tölts el legalább 3 percet játékkal!",
+  },
+  {
+    id: "ach_play_time_5m",
     icon: "⏳",
     title: "Kitartó Blokkozó",
     desc: "Játssz összesen legalább 5 percet!",
   },
   {
-    id: "play_time_15m",
+    id: "ach_play_time_10m",
+    icon: "🌅",
+    title: "Naplemente Vándor",
+    desc: "Érj el legalább 10 perc összesített játékidőt!",
+  },
+  {
+    id: "ach_play_time_15m",
     icon: "⌛",
     title: "Időmester",
     desc: "Érj el legalább 15 perc összesített játékidőt!",
   },
   {
-    id: "play_time_30m",
+    id: "ach_play_time_20m",
+    icon: "🔥",
+    title: "Lángoló Idő",
+    desc: "Érj el legalább 20 perc összesített játékidőt!",
+  },
+  {
+    id: "ach_play_time_30m",
     icon: "🌌",
     title: "Crashdown Fanatikus",
     desc: "Tölts el legalább 30 percet a játékban!",
   },
   {
-    id: "play_time_1h",
-    icon: "⌛",
-    title: "Időutazó Mester",
-    desc: "Érj el legalább 1 óra (60 perc) összesített játékidőt!",
+    id: "ach_play_time_45m",
+    icon: "🌊",
+    title: "Mélytengeri Merülés",
+    desc: "Érj el legalább 45 perc összesített játékidőt!",
   },
   {
-    id: "play_time_2h",
+    id: "ach_play_time_1h",
+    icon: "⌛",
+    title: "Időutazó Mester",
+    desc: "Érj el legalább 1 óra (60 perc) játékidőt!",
+  },
+  {
+    id: "ach_play_time_90m",
+    icon: "🪐",
+    title: "Időhajlító Mester",
+    desc: "Érj el legalább 90 perc összesített játékidőt!",
+  },
+  {
+    id: "ach_play_time_2h",
     icon: "🪐",
     title: "Megállíthatatlan",
     desc: "Tölts el legalább 2 órát (120 perc) az arénában!",
   },
-
-  // 7. Játékmód Mesterek
   {
-    id: "mode_chaos_win",
-    icon: "🌀",
-    title: "Káosz Túlélő",
-    desc: "Érj el legalább 5 000 pontot a Káosz módban!",
-  },
-  {
-    id: "mode_bomb_win",
-    icon: "💣",
-    title: "Bombaszakértő",
-    desc: "Érj el legalább 5 000 pontot a Robbanás Mániában!",
-  },
-  {
-    id: "mode_time_win",
-    icon: "⏳",
-    title: "Időfutam Bajnok",
-    desc: "Érj el legalább 5 000 pontot az Időhajsza módban!",
-  },
-  {
-    id: "mode_raw_win",
-    icon: "🧱",
-    title: "Tisztakezű Zseni",
-    desc: "Érj el legalább 3 000 pontot a Nyers (power-up mentes) módban!",
-  },
-
-  // 8. Új Különleges Kihívások & Felfedezések
-  {
-    id: "all_modes_played",
-    icon: "🎯",
-    title: "Minden Mód Vándora",
-    desc: "Játssz legalább egy meccset mind az 5 játékmódban!",
-  },
-  {
-    id: "all_durations_played",
-    icon: "⏱️",
-    title: "Időfutár Mester",
-    desc: "Játssz legalább egy meccset mind a 4 időkeretben!",
-  },
-  {
-    id: "all_colors_played",
-    icon: "🌈",
-    title: "Színkavalkád Felfedező",
-    desc: "Játssz meccset a 2, 3, 4 és 5 színű beállításban is!",
-  },
-  {
-    id: "tnt_collector_25",
-    icon: "💣",
-    title: "TNT Szakértő Mester",
-    desc: "Robbants fel legalább 25 db TNT blokkot a meccseid során!",
-  },
-  {
-    id: "magnet_collector_25",
-    icon: "🧲",
-    title: "Mágnes Bűvész",
-    desc: "Használj fel legalább 25 db mágnes power-upot!",
-  },
-  {
-    id: "freeze_collector_25",
-    icon: "❄️",
-    title: "Jégvarázs Mester",
-    desc: "Fagyaszd be az időt legalább 25 alkalommal!",
-  },
-  {
-    id: "doubler_collector_25",
+    id: "ach_play_time_3h",
     icon: "⚡",
-    title: "Duplázó Szenzáció",
-    desc: "Aktiválj legalább 25 db 2× pontduplázó Frenzy-t!",
+    title: "Három Órás Titán",
+    desc: "Érj el félelmetes 3 óra összesített játékidőt!",
   },
   {
-    id: "colorbomb_collector_25",
-    icon: "✦",
-    title: "Szín-Kataklizma Bajnok",
-    desc: "Tisztíts le pályát 25 db szín-bomba segítségével!",
+    id: "ach_combo_x4",
+    icon: "🔥",
+    title: "Lángoló Kezek",
+    desc: "Érj el legalább 4×-es kombó szorzót játék közben!",
   },
   {
-    id: "score_150k",
-    icon: "🌠",
-    title: "Abszolút Csúcsdöntő",
-    desc: "Érj el 150 000 pontot egyetlen menetben!",
+    id: "ach_combo_x5",
+    icon: "🔥",
+    title: "Kombó Isten",
+    desc: "Érd el a maximális 5×-ös kombó csúcsot!",
   },
   {
-    id: "score_250k",
-    icon: "🌌",
-    title: "Kozmikus Fenség",
-    desc: "Érj el szédítő 250 000 pontot egy menetben!",
+    id: "ach_lightning_combo_6",
+    icon: "⚡",
+    title: "Szuperszonikus Kombó",
+    desc: "Pörgesd fel a szorzót 6×-os szuperszonikus kombóig!",
   },
   {
-    id: "matches_500",
-    icon: "👑",
-    title: "Crashdown Legenda",
-    desc: "Játssz le félelmetes 500 teljes mérkőzést!",
+    id: "ach_combo_x7",
+    icon: "💥",
+    title: "Pokoli Láncreakció",
+    desc: "Érj el elképesztő 7×-es kombó szorzót!",
   },
   {
-    id: "total_score_5m",
-    icon: "💎",
-    title: "Multimilliomos Rekorder",
-    desc: "Gyűjts össze összesen legalább 5 000 000 pontot a profilodon!",
+    id: "ach_combo_x8",
+    icon: "🔥",
+    title: "Főnix Kataklizma",
+    desc: "Pörgesd fel a szorzót félelmetes 8×-os kombóig!",
   },
   {
-    id: "massive_clear_16",
+    id: "ach_mega_clear_8",
+    icon: "💥",
+    title: "Mega Törlés",
+    desc: "Takaríts el egyetlen kattintással legalább 8 blokkot!",
+  },
+  {
+    id: "ach_hyper_clear_12",
+    icon: "⚡",
+    title: "Kolosszus Törlés",
+    desc: "Takaríts el legalább 12 blokkot egyetlen kattintással!",
+  },
+  {
+    id: "ach_massive_clear_16",
     icon: "💥",
     title: "Kolosszális Pusztítás",
     desc: "Törölj el legalább 16 blokkot egyetlen kattintással!",
   },
   {
-    id: "lightning_combo_6",
+    id: "ach_massive_clear_20",
     icon: "⚡",
-    title: "Kombó Szuperszonikus",
-    desc: "Pörgesd fel a szorzót 6×-os kombóig!",
+    title: "Titán Kataklizma",
+    desc: "Törölj el legalább 20 blokkot egyetlen kattintással!",
   },
   {
-    id: "marathon_15k",
+    id: "ach_perfect_clear_board",
+    icon: "✨",
+    title: "Tiszta Pálya",
+    desc: "Pucold le az utolsó szálig az egész táblát (0 blokk)!",
+  },
+  {
+    id: "ach_speed_demon_8",
+    icon: "🐆",
+    title: "Villám Kéz",
+    desc: "Kattints legalább 8 sikeres csoportra 10 másodpercen belül!",
+  },
+  {
+    id: "ach_mode_chaos_win",
+    icon: "🌀",
+    title: "Káosz Túlélő",
+    desc: "Érj el legalább 5 000 pontot a Káosz módban!",
+  },
+  {
+    id: "ach_mode_bomb_win",
+    icon: "💣",
+    title: "Bombaszakértő",
+    desc: "Érj el legalább 5 000 pontot a Robbanás Mániában!",
+  },
+  {
+    id: "ach_mode_time_win",
+    icon: "⏳",
+    title: "Időfutam Bajnok",
+    desc: "Érj el legalább 5 000 pontot az Időhajsza módban!",
+  },
+  {
+    id: "ach_mode_raw_win",
+    icon: "🧱",
+    title: "Tisztakezű Zseni",
+    desc: "Érj el legalább 3 000 pontot a Nyers módban!",
+  },
+  {
+    id: "ach_marathon_15k",
     icon: "🏃",
     title: "Maratonista Zseni",
     desc: "Érj el legalább 15 000 pontot a 3 perces maratoni módban!",
   },
   {
-    id: "sprint_5k",
+    id: "ach_sprint_5k",
     icon: "🐆",
     title: "Villámfutó Titán",
-    desc: "Érj el legalább 5 000 pontot a 30 másodperces villámmódban!",
+    desc: "Érj el legalább 5 000 pontot a 30 másodperces módban!",
+  },
+  {
+    id: "ach_sprint_8k",
+    icon: "⚡",
+    title: "Fénysebességű Sprint",
+    desc: "Érj el legalább 8 000 pontot a 30 másodperces módban!",
+  },
+  {
+    id: "ach_all_modes_played",
+    icon: "🎯",
+    title: "Minden Mód Vándora",
+    desc: "Játssz legalább egy meccset mind az 5 játékmódban!",
+  },
+  {
+    id: "ach_all_durations_played",
+    icon: "⏱️",
+    title: "Időfutár Mester",
+    desc: "Játssz legalább egy meccset mind a 4 időkeretben!",
+  },
+  {
+    id: "ach_all_colors_played",
+    icon: "🌈",
+    title: "Színkavalkád Felfedező",
+    desc: "Játssz meccset a 2, 3, 4 és 5 színű beállításban is!",
+  },
+  {
+    id: "ach_master_5_color",
+    icon: "🌈",
+    title: "Színkavalkád Mester",
+    desc: "Érj el legalább 2 000 pontot az 5 színű módban!",
+  },
+  {
+    id: "ach_powerup_tnt_first",
+    icon: "💣",
+    title: "TNT Beavatás",
+    desc: "Robbants fel egy TNT blokkot a pályán!",
+  },
+  {
+    id: "ach_powerup_freeze_first",
+    icon: "❄️",
+    title: "Jégvarázs Beavatás",
+    desc: "Fagyaszd be az időt az Időfagyasztó Jégkockával!",
+  },
+  {
+    id: "ach_powerup_magnet_first",
+    icon: "🧲",
+    title: "Mágnes Beavatás",
+    desc: "Ránts össze egy egész színt a Szuper Mágnessel!",
+  },
+  {
+    id: "ach_powerup_colorbomb_first",
+    icon: "✦",
+    title: "Szín-kataklizma Beavatás",
+    desc: "Tisztíts le egy teljes színt a Szín-bomba használatával!",
+  },
+  {
+    id: "ach_powerup_5",
+    icon: "⚡",
+    title: "Power-up Kezdő",
+    desc: "Aktiválj összesen legalább 5 db power-upot!",
+  },
+  {
+    id: "ach_powerup_10",
+    icon: "✨",
+    title: "Power-up Gyűjtő",
+    desc: "Aktiválj összesen legalább 10 db power-upot!",
+  },
+  {
+    id: "ach_powerup_25",
+    icon: "💥",
+    title: "Power-up Mester",
+    desc: "Aktiválj összesen legalább 25 db power-upot!",
+  },
+  {
+    id: "ach_powerup_total_35",
+    icon: "🔮",
+    title: "Energia Mágus",
+    desc: "Aktiválj összesen legalább 35 db power-upot!",
+  },
+  {
+    id: "ach_powerup_50",
+    icon: "👑",
+    title: "Power-up Titán",
+    desc: "Aktiválj összesen legalább 50 db power-upot!",
+  },
+  {
+    id: "ach_powerup_75",
+    icon: "⚡",
+    title: "Energia Vihar",
+    desc: "Aktiválj összesen legalább 75 db power-upot!",
+  },
+  {
+    id: "ach_powerup_100",
+    icon: "🌌",
+    title: "Power-up Fanatikus",
+    desc: "Aktiválj összesen legalább 100 db power-upot!",
+  },
+  {
+    id: "ach_powerup_150",
+    icon: "💥",
+    title: "Erőforrás Császár",
+    desc: "Aktiválj összesen legalább 150 db power-upot!",
+  },
+  {
+    id: "ach_powerup_250",
+    icon: "🌌",
+    title: "Power-up Vihar",
+    desc: "Aktiválj összesen legalább 250 db power-upot!",
+  },
+  {
+    id: "ach_powerup_500",
+    icon: "🌟",
+    title: "Power-up Istenség",
+    desc: "Aktiválj félelmetes 500 db power-upot!",
+  },
+  {
+    id: "ach_tnt_collector_25",
+    icon: "💣",
+    title: "TNT Mester",
+    desc: "Robbants fel legalább 25 db TNT blokkot a meccseid során!",
+  },
+  {
+    id: "ach_tnt_collector_50",
+    icon: "💣",
+    title: "Robbantó Hadúr",
+    desc: "Robbants fel legalább 50 db TNT blokkot a meccseid során!",
+  },
+  {
+    id: "ach_magnet_collector_25",
+    icon: "🧲",
+    title: "Mágnes Bűvész",
+    desc: "Használj fel legalább 25 db mágnes power-upot!",
+  },
+  {
+    id: "ach_freeze_collector_25",
+    icon: "❄️",
+    title: "Jégvarázs Mester",
+    desc: "Fagyaszd be az időt legalább 25 alkalommal!",
+  },
+  {
+    id: "ach_freeze_collector_50",
+    icon: "❄️",
+    title: "Abszolút Nulla Fagyasztó",
+    desc: "Fagyaszd be az időt legalább 50 alkalommal!",
+  },
+  {
+    id: "ach_doubler_collector_25",
+    icon: "⚡",
+    title: "Duplázó Szenzáció",
+    desc: "Aktiválj legalább 25 db 2× pontduplázó Frenzy-t!",
+  },
+  {
+    id: "ach_colorbomb_collector_25",
+    icon: "✦",
+    title: "Szín-Kataklizma Bajnok",
+    desc: "Tisztíts le pályát 25 db szín-bomba segítségével!",
+  },
+  {
+    id: "ach_inspect_first",
+    icon: "🔍",
+    title: "Kíváncsi Szemek",
+    desc: "Nézd meg egy másik játékos profilját a ranglistán!",
+  },
+  {
+    id: "ach_inspect_profile",
+    icon: "🕵️",
+    title: "Éjféli Detektív",
+    desc: "Böngéssz mások eredményei és trófeái között!",
+  },
+  {
+    id: "ach_inspect_profile_5",
+    icon: "🕵️",
+    title: "Mester Nyomozó",
+    desc: "Tekints meg legalább 5 különböző játékos profilt!",
   },
 ];
 
+
+
+// ==================== PROFILKÉPEK (AVATARS) RENDSZER ====================
 // ==================== PROFILKÉPEK (AVATARS) RENDSZER ====================
 const PROFILE_AVATARS = [
   { id: "avatar_default", symbol: "👤", name: "Alapértelmezett", achId: null },
-  { id: "avatar_ice", symbol: "🧊", name: "Jégkristály", achId: "freeze_time" },
-  {
-    id: "avatar_fire",
-    symbol: "🔥",
-    name: "Főnix Láng",
-    achId: "play_20_matches",
-  },
-  { id: "avatar_bomb", symbol: "💣", name: "Robbanófej", achId: "tnt_boom" },
-  {
-    id: "avatar_lightning",
-    symbol: "⚡",
-    name: "Neon Villám",
-    achId: "hyper_clear",
-  },
-  { id: "avatar_magnet", symbol: "🧲", name: "Mágnes", achId: "magnet_pull" },
-  {
-    id: "avatar_crown",
-    symbol: "👑",
-    name: "Arany Korona",
-    achId: "score_10k",
-  },
-  {
-    id: "avatar_diamond",
-    symbol: "💎",
-    name: "Kozmikus Gyémánt",
-    achId: "score_50k",
-  },
-  {
-    id: "avatar_star",
-    symbol: "✨",
-    name: "Szupernóva",
-    achId: "perfect_clear",
-  },
-  {
-    id: "avatar_rainbow",
-    symbol: "🌈",
-    name: "Szivárvány Prizma",
-    achId: "master_5_color",
-  },
-  {
-    id: "avatar_speed",
-    symbol: "🐆",
-    name: "Villám Párduc",
-    achId: "speed_demon",
-  },
-  { id: "avatar_galaxy", symbol: "🌌", name: "Kozmosz", achId: "score_25k" },
-  {
-    id: "avatar_sunset",
-    symbol: "🌅",
-    name: "Naplemente",
-    achId: "powerup_10",
-  },
-  {
-    id: "avatar_detective",
-    symbol: "🕵️",
-    name: "Detektív",
-    achId: "inspect_profile",
-  },
-  {
-    id: "avatar_hourglass",
-    symbol: "⏳",
-    name: "Homokóra",
-    achId: "play_time_15m",
-  },
-  { id: "avatar_sword", symbol: "⚔️", name: "Lovagkard", achId: "matches_10" },
-  {
-    id: "avatar_flame_hand",
-    symbol: "💥",
-    name: "Plazmagömb",
-    achId: "powerup_50",
-  },
-  {
-    id: "avatar_aurora",
-    symbol: "🌌",
-    name: "Sarki Fény",
-    achId: "powerup_100",
-  },
-  {
-    id: "avatar_void",
-    symbol: "🔮",
-    name: "Misztikus Void",
-    achId: "score_75k",
-  },
-  {
-    id: "avatar_gold_emperor",
-    symbol: "👑",
-    name: "Császári Arany",
-    achId: "score_100k",
-  },
-  {
-    id: "avatar_clock",
-    symbol: "⌛",
-    name: "Örökkévalóság",
-    achId: "play_time_1h",
-  },
-  {
-    id: "avatar_century",
-    symbol: "🎖️",
-    name: "Százados",
-    achId: "matches_100",
-  },
-  {
-    id: "avatar_meteor",
-    symbol: "🌠",
-    name: "Hullócsillag",
-    achId: "score_150k",
-  },
-  {
-    id: "avatar_galaxy_core",
-    symbol: "🪐",
-    name: "Galaxis Mag",
-    achId: "score_250k",
-  },
-  {
-    id: "avatar_flame_phoenix",
-    symbol: "🔥",
-    name: "Főnix",
-    achId: "lightning_combo_6",
-  },
-  {
-    id: "avatar_legend_crown",
-    symbol: "👑",
-    name: "Örök Korona",
-    achId: "matches_500",
-  },
-  {
-    id: "avatar_speed_lightning",
-    symbol: "⚡",
-    name: "Villámfutó",
-    achId: "sprint_5k",
-  },
+  { id: "avatar_ice", symbol: "🧊", name: "Jégkristály", achId: "ach_powerup_freeze_first" },
+  { id: "avatar_fire", symbol: "🔥", name: "Főnix Láng", achId: "ach_matches_20" },
+  { id: "avatar_bomb", symbol: "💣", name: "Robbanófej", achId: "ach_powerup_tnt_first" },
+  { id: "avatar_lightning", symbol: "⚡", name: "Neon Villám", achId: "ach_massive_clear_20" },
+  { id: "avatar_magnet", symbol: "🧲", name: "Mágnes", achId: "ach_powerup_magnet_first" },
+  { id: "avatar_crown", symbol: "👑", name: "Arany Korona", achId: "ach_score_7500" },
+  { id: "avatar_diamond", symbol: "💎", name: "Kozmikus Gyémánt", achId: "ach_score_60k" },
+  { id: "avatar_star", symbol: "✨", name: "Szupernóva", achId: "ach_powerup_colorbomb_first" },
+  { id: "avatar_rainbow", symbol: "🌈", name: "Szivárvány Prizma", achId: "ach_all_colors_played" },
+  { id: "avatar_speed", symbol: "🐆", name: "Villám Párduc", achId: "ach_mega_clear_8" },
+  { id: "avatar_galaxy", symbol: "🌌", name: "Kozmosz", achId: "ach_score_35k" },
+  { id: "avatar_sunset", symbol: "🌅", name: "Naplemente", achId: "ach_play_time_10m" },
+  { id: "avatar_detective", symbol: "🕵️", name: "Detektív", achId: "ach_inspect_profile_5" },
+  { id: "avatar_hourglass", symbol: "⏳", name: "Homokóra", achId: "ach_matches_15" },
+  { id: "avatar_sword", symbol: "⚔️", name: "Lovagkard", achId: "ach_total_score_50k" },
+  { id: "avatar_flame_hand", symbol: "💥", name: "Plazmagömb", achId: "ach_total_score_100k" },
+  { id: "avatar_aurora", symbol: "🌌", name: "Sarki Fény", achId: "ach_powerup_250" },
+  { id: "avatar_void", symbol: "🔮", name: "Misztikus Void", achId: "ach_score_90k" },
+  { id: "avatar_gold_emperor", symbol: "👑", name: "Császári Arany", achId: "ach_score_125k", isSpecial: true },
+  { id: "avatar_clock", symbol: "⌛", name: "Örökkévalóság", achId: "ach_play_time_2h" },
+  { id: "avatar_century", symbol: "🎖️", name: "Százados", achId: "ach_matches_75" },
+  { id: "avatar_meteor", symbol: "🌠", name: "Hullócsillag", achId: "ach_score_200k", isSpecial: true },
+  { id: "avatar_galaxy_core", symbol: "🪐", name: "Galaxis Mag", achId: "ach_score_500k", isSpecial: true },
+  { id: "avatar_flame_phoenix", symbol: "🔥", name: "Főnix", achId: "ach_combo_x8", isSpecial: true },
+  { id: "avatar_legend_crown", symbol: "👑", name: "Örök Korona", achId: "ach_matches_1000", isSpecial: true },
+  { id: "avatar_speed_lightning", symbol: "⚡", name: "Villámfutó", achId: "ach_sprint_8k" }
 ];
+
 
 // Segédfüggvény tiszta szövegekhez (szimbólumok és emojik eltávolítása a jutalom leírásokhoz)
 function cleanSymbolText(str) {
@@ -638,6 +802,7 @@ function getAchievementRewards(achId) {
 
 // ==================== RANGCÍMEK (PROFILE TITLES) RENDSZER ====================
 // A rangcímek nevei tiszták, szimbólumok nélkül, egységes felépítéssel
+// ==================== RANGCÍMEK (TITLES) RENDSZER ====================
 const PROFILE_TITLES = [
   {
     id: "title_beginner",
@@ -653,441 +818,415 @@ const PROFILE_TITLES = [
     desc: "Érj el legalább 1 500 pontot vagy játssz 3 meccset",
     achId: null,
     isSpecial: false,
-    isUnlocked: (stats, achSet) =>
-      stats.bestScore >= 1500 || stats.totalMatches >= 3,
+    isUnlocked: (stats, achSet) => stats.bestScore >= 1500 || stats.totalMatches >= 3,
+  },
+  {
+    id: "title_veteran",
+    name: "Veterán Blokktörő",
+    desc: "Lépd át az 1 000 pontot egy menetben",
+    achId: "ach_score_1000",
+    isSpecial: false,
+    isUnlocked: (stats, achSet) => achSet.has("ach_score_1000"),
   },
   {
     id: "title_champion",
     name: "Crashdown Bajnok",
     desc: "Érj el legalább 5 000 pontot egy meccsben",
-    achId: "score_5000",
+    achId: "ach_score_5000",
     isSpecial: false,
-    isUnlocked: (stats, achSet) =>
-      stats.bestScore >= 5000 || achSet.has("score_5000"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_score_5000"),
   },
   {
     id: "title_grandmaster",
     name: "Crashdown Nagymester",
     desc: "Lépd át a 10 000 pontos álomhatárt",
-    achId: "score_10k",
+    achId: "ach_score_10k",
     isSpecial: false,
-    isUnlocked: (stats, achSet) =>
-      stats.bestScore >= 10000 || achSet.has("score_10k"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_score_10k"),
   },
   {
     id: "title_legend",
     name: "Galaktikus Legenda",
     desc: "Érj el szédítő 25 000 pontot",
-    achId: "score_25k",
+    achId: "ach_score_25k",
     isSpecial: false,
-    isUnlocked: (stats, achSet) =>
-      stats.bestScore >= 25000 || achSet.has("score_25k"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_score_25k"),
   },
   {
     id: "title_cosmic",
     name: "Kozmikus Rekorder",
     desc: "Lépd át az 50 000 pontos csúcsot",
-    achId: "score_50k",
+    achId: "ach_score_50k",
     isSpecial: false,
-    isUnlocked: (stats, achSet) =>
-      stats.bestScore >= 50000 || achSet.has("score_50k"),
-  },
-  {
-    id: "title_combo_mage",
-    name: "Kombó Mágus",
-    desc: "Érd el a maximális 5×-ös kombó szorzót",
-    achId: "combo_x5",
-    isSpecial: false,
-    isUnlocked: (stats, achSet) => achSet.has("combo_x5"),
-  },
-  {
-    id: "title_titan",
-    name: "Titán Zúzó",
-    desc: "Takaríts el legalább 12 blokkot egyetlen kattintással",
-    achId: "hyper_clear",
-    isSpecial: false,
-    isUnlocked: (stats, achSet) => achSet.has("hyper_clear"),
-  },
-  {
-    id: "title_speed",
-    name: "Villámkezű",
-    desc: "Kattints legalább 8 sikeres csoportra 10 másodpercen belül",
-    achId: "speed_demon",
-    isSpecial: false,
-    isUnlocked: (stats, achSet) => achSet.has("speed_demon"),
-  },
-  {
-    id: "title_color_master",
-    name: "Színmester",
-    desc: "Érj el legalább 2 000 pontot az 5 színű mester módban",
-    achId: "master_5_color",
-    isSpecial: false,
-    isUnlocked: (stats, achSet) => achSet.has("master_5_color"),
-  },
-  {
-    id: "title_demolition",
-    name: "Robbantómester",
-    desc: "Használj TNT robbantást vagy Szín-bombát",
-    achId: "tnt_boom",
-    isSpecial: false,
-    isUnlocked: (stats, achSet) =>
-      achSet.has("tnt_boom") || achSet.has("color_bomb"),
-  },
-  {
-    id: "title_ice_lord",
-    name: "Jégkirály",
-    desc: "Fagyaszd meg az időt az Időfagyasztóval",
-    achId: "freeze_time",
-    isSpecial: false,
-    isUnlocked: (stats, achSet) => achSet.has("freeze_time"),
-  },
-  {
-    id: "title_magnet_force",
-    name: "Mágneses Erőmű",
-    desc: "Ránts össze egy egész színt a Szuper Mágnessel",
-    achId: "magnet_pull",
-    isSpecial: false,
-    isUnlocked: (stats, achSet) => achSet.has("magnet_pull"),
-  },
-  {
-    id: "title_perfectionist",
-    name: "Tökéletesség Híve",
-    desc: "Takarítsd le a teljes táblát 0 blokkra",
-    achId: "perfect_clear",
-    isSpecial: false,
-    isUnlocked: (stats, achSet) => achSet.has("perfect_clear"),
-  },
-  {
-    id: "title_time_bender",
-    name: "Időhajlító",
-    desc: "Játssz legalább 10 percet vagy gyűjts időbónuszt",
-    achId: "time_bonus",
-    isSpecial: false,
-    isUnlocked: (stats, achSet) =>
-      stats.totalPlaytimeSeconds >= 600 || achSet.has("time_bonus"),
-  },
-  {
-    id: "title_veteran",
-    name: "Veterán Blokktörő",
-    desc: "Játssz le legalább 5 teljes meccset",
-    achId: "play_5_matches",
-    isSpecial: false,
-    isUnlocked: (stats, achSet) =>
-      stats.totalMatches >= 5 || achSet.has("play_5_matches"),
-  },
-  {
-    id: "title_devoted",
-    name: "Zúzó Legenda",
-    desc: "Játssz le legalább 20 teljes mérkőzést",
-    achId: "play_20_matches",
-    isSpecial: false,
-    isUnlocked: (stats, achSet) =>
-      stats.totalMatches >= 20 || achSet.has("play_20_matches"),
-  },
-  {
-    id: "title_power_novice",
-    name: "Energikus Zúzó",
-    desc: "Aktiválj legalább 5 power-upot",
-    achId: "powerup_5",
-    isSpecial: false,
-    isUnlocked: (stats, achSet) => achSet.has("powerup_5"),
-  },
-  {
-    id: "title_power_collector",
-    name: "Power-up Mágus",
-    desc: "Aktiválj legalább 10 power-upot",
-    achId: "powerup_10",
-    isSpecial: false,
-    isUnlocked: (stats, achSet) => achSet.has("powerup_10"),
-  },
-  {
-    id: "title_power_master",
-    name: "Power-up Varázsló",
-    desc: "Aktiválj legalább 25 power-upot",
-    achId: "powerup_25",
-    isSpecial: false,
-    isUnlocked: (stats, achSet) => achSet.has("powerup_25"),
-  },
-  {
-    id: "title_power_titan",
-    name: "Power-up Titán",
-    desc: "Aktiválj legalább 50 power-upot",
-    achId: "powerup_50",
-    isSpecial: false,
-    isUnlocked: (stats, achSet) => achSet.has("powerup_50"),
-  },
-  {
-    id: "title_inspector",
-    name: "Profil Kutató",
-    desc: "Nézd meg egy másik játékos profilját a ranglistán",
-    achId: "inspect_profile",
-    isSpecial: false,
-    isUnlocked: (stats, achSet) => achSet.has("inspect_profile"),
-  },
-  {
-    id: "title_time_1m",
-    name: "Bemelegítő Bajnok",
-    desc: "Játssz legalább 1 percet a játékban",
-    achId: "play_time_1m",
-    isSpecial: false,
-    isUnlocked: (stats, achSet) =>
-      stats.totalPlaytimeSeconds >= 60 || achSet.has("play_time_1m"),
-  },
-  {
-    id: "title_time_5m",
-    name: "Kitartó Blokkozó",
-    desc: "Játssz legalább 5 percet a játékban",
-    achId: "play_time_5m",
-    isSpecial: false,
-    isUnlocked: (stats, achSet) =>
-      stats.totalPlaytimeSeconds >= 300 || achSet.has("play_time_5m"),
-  },
-  {
-    id: "title_time_15m",
-    name: "Időúr",
-    desc: "Érj el legalább 15 perc összesített játékidőt",
-    achId: "play_time_15m",
-    isSpecial: false,
-    isUnlocked: (stats, achSet) =>
-      stats.totalPlaytimeSeconds >= 900 || achSet.has("play_time_15m"),
-  },
-  {
-    id: "title_time_30m",
-    name: "Crashdown Fanatikus",
-    desc: "Érj el legalább 30 perc összesített játékidőt",
-    achId: "play_time_30m",
-    isSpecial: false,
-    isUnlocked: (stats, achSet) =>
-      stats.totalPlaytimeSeconds >= 1800 || achSet.has("play_time_30m"),
-  },
-  {
-    id: "title_matches_10",
-    name: "Harcedzett Zúzó",
-    desc: "Játssz le legalább 10 teljes mérkőzést",
-    achId: "matches_10",
-    isSpecial: false,
-    isUnlocked: (stats, achSet) =>
-      stats.totalMatches >= 10 || achSet.has("matches_10"),
-  },
-  {
-    id: "title_matches_50",
-    name: "Crashdown Veterán",
-    desc: "Játssz le legalább 50 teljes mérkőzést",
-    achId: "matches_50",
-    isSpecial: false,
-    isUnlocked: (stats, achSet) =>
-      stats.totalMatches >= 50 || achSet.has("matches_50"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_score_50k"),
   },
   {
     id: "title_combo_x4",
     name: "Lángoló Kezek",
     desc: "Érj el legalább 4×-es kombó szorzót",
-    achId: "combo_x4",
+    achId: "ach_combo_x4",
     isSpecial: false,
-    isUnlocked: (stats, achSet) => achSet.has("combo_x4"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_combo_x4"),
+  },
+  {
+    id: "title_combo_mage",
+    name: "Kombó Mágus",
+    desc: "Érd el a maximális 5×-ös kombó szorzót",
+    achId: "ach_combo_x5",
+    isSpecial: false,
+    isUnlocked: (stats, achSet) => achSet.has("ach_combo_x5"),
+  },
+  {
+    id: "title_titan",
+    name: "Titán Zúzó",
+    desc: "Takaríts el legalább 12 blokkot egyetlen kattintással",
+    achId: "ach_hyper_clear_12",
+    isSpecial: false,
+    isUnlocked: (stats, achSet) => achSet.has("ach_hyper_clear_12"),
+  },
+  {
+    id: "title_speed",
+    name: "Villámkezű",
+    desc: "Kattints legalább 8 sikeres csoportra 10 másodpercen belül",
+    achId: "ach_speed_demon_8",
+    isSpecial: false,
+    isUnlocked: (stats, achSet) => achSet.has("ach_speed_demon_8"),
+  },
+  {
+    id: "title_color_master",
+    name: "Színmester",
+    desc: "Érj el legalább 2 000 pontot az 5 színű mester módban",
+    achId: "ach_master_5_color",
+    isSpecial: false,
+    isUnlocked: (stats, achSet) => achSet.has("ach_master_5_color"),
+  },
+  {
+    id: "title_demolition",
+    name: "Robbantómester",
+    desc: "Tisztíts le pályát 25 db szín-bomba segítségével",
+    achId: "ach_colorbomb_collector_25",
+    isSpecial: false,
+    isUnlocked: (stats, achSet) => achSet.has("ach_colorbomb_collector_25"),
+  },
+  {
+    id: "title_ice_lord",
+    name: "Jégkirály",
+    desc: "Fagyaszd be az időt legalább 50 alkalommal",
+    achId: "ach_freeze_collector_50",
+    isSpecial: false,
+    isUnlocked: (stats, achSet) => achSet.has("ach_freeze_collector_50"),
+  },
+  {
+    id: "title_magnet_force",
+    name: "Mágneses Erőmű",
+    desc: "Robbants fel legalább 50 db TNT blokkot",
+    achId: "ach_tnt_collector_50",
+    isSpecial: false,
+    isUnlocked: (stats, achSet) => achSet.has("ach_tnt_collector_50"),
+  },
+  {
+    id: "title_perfectionist",
+    name: "Tökéletesség Híve",
+    desc: "Takarítsd le a teljes táblát 0 blokkra",
+    achId: "ach_perfect_clear_board",
+    isSpecial: false,
+    isUnlocked: (stats, achSet) => achSet.has("ach_perfect_clear_board"),
+  },
+  {
+    id: "title_time_bender",
+    name: "Időhajlító",
+    desc: "Játssz legalább 3 percet a játékban",
+    achId: "ach_play_time_3m",
+    isSpecial: false,
+    isUnlocked: (stats, achSet) => achSet.has("ach_play_time_3m"),
+  },
+  {
+    id: "title_devoted",
+    name: "Zúzó Legenda",
+    desc: "Érj el legalább 500 000 összpontszámot a profilodon",
+    achId: "ach_total_score_500k",
+    isSpecial: false,
+    isUnlocked: (stats, achSet) => achSet.has("ach_total_score_500k"),
+  },
+  {
+    id: "title_power_novice",
+    name: "Energikus Zúzó",
+    desc: "Aktiválj legalább 5 power-upot",
+    achId: "ach_powerup_5",
+    isSpecial: false,
+    isUnlocked: (stats, achSet) => achSet.has("ach_powerup_5"),
+  },
+  {
+    id: "title_power_collector",
+    name: "Power-up Mágus",
+    desc: "Aktiválj legalább 35 power-upot",
+    achId: "ach_powerup_total_35",
+    isSpecial: false,
+    isUnlocked: (stats, achSet) => achSet.has("ach_powerup_total_35"),
+  },
+  {
+    id: "title_power_master",
+    name: "Power-up Varázsló",
+    desc: "Aktiválj legalább 50 power-upot",
+    achId: "ach_powerup_50",
+    isSpecial: false,
+    isUnlocked: (stats, achSet) => achSet.has("ach_powerup_50"),
+  },
+  {
+    id: "title_power_titan",
+    name: "Power-up Titán",
+    desc: "Aktiválj legalább 75 power-upot",
+    achId: "ach_powerup_75",
+    isSpecial: false,
+    isUnlocked: (stats, achSet) => achSet.has("ach_powerup_75"),
   },
   {
     id: "title_powerup_100",
     name: "Power-up Fanatikus",
-    desc: "Aktiválj legalább 100 db power-upot",
-    achId: "powerup_100",
+    desc: "Aktiválj legalább 150 db power-upot",
+    achId: "ach_powerup_150",
     isSpecial: false,
-    isUnlocked: (stats, achSet) => achSet.has("powerup_100"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_powerup_150"),
+  },
+  {
+    id: "title_inspector",
+    name: "Profil Kutató",
+    desc: "Nézd meg egy másik játékos profilját a ranglistán",
+    achId: "ach_inspect_first",
+    isSpecial: false,
+    isUnlocked: (stats, achSet) => achSet.has("ach_inspect_first"),
+  },
+  {
+    id: "title_time_1m",
+    name: "Bemelegítő Bajnok",
+    desc: "Játssz le legalább 3 teljes meccset az arénában",
+    achId: "ach_matches_3",
+    isSpecial: false,
+    isUnlocked: (stats, achSet) => achSet.has("ach_matches_3"),
+  },
+  {
+    id: "title_time_5m",
+    name: "Kitartó Blokkozó",
+    desc: "Játssz le legalább 5 teljes mérkőzést",
+    achId: "ach_matches_5",
+    isSpecial: false,
+    isUnlocked: (stats, achSet) => achSet.has("ach_matches_5"),
+  },
+  {
+    id: "title_time_15m",
+    name: "Időúr",
+    desc: "Érj el legalább 15 perc összesített játékidőt",
+    achId: "ach_play_time_15m",
+    isSpecial: false,
+    isUnlocked: (stats, achSet) => achSet.has("ach_play_time_15m"),
+  },
+  {
+    id: "title_time_30m",
+    name: "Crashdown Fanatikus",
+    desc: "Érj el legalább 30 perc összesített játékidőt",
+    achId: "ach_play_time_30m",
+    isSpecial: false,
+    isUnlocked: (stats, achSet) => achSet.has("ach_play_time_30m"),
+  },
+  {
+    id: "title_matches_10",
+    name: "Harcedzett Zúzó",
+    desc: "Játssz le legalább 10 teljes mérkőzést",
+    achId: "ach_matches_10",
+    isSpecial: false,
+    isUnlocked: (stats, achSet) => achSet.has("ach_matches_10"),
+  },
+  {
+    id: "title_matches_50",
+    name: "Crashdown Veterán",
+    desc: "Játssz le legalább 50 teljes mérkőzést",
+    achId: "ach_matches_50",
+    isSpecial: false,
+    isUnlocked: (stats, achSet) => achSet.has("ach_matches_50"),
   },
   {
     id: "title_matches_100",
     name: "Százados Zúzó",
     desc: "Játssz le legalább 100 teljes mérkőzést",
-    achId: "matches_100",
+    achId: "ach_matches_100",
     isSpecial: false,
-    isUnlocked: (stats, achSet) =>
-      stats.totalMatches >= 100 || achSet.has("matches_100"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_matches_100"),
   },
   {
     id: "title_play_1h",
     name: "Időutazó Mester",
-    desc: "Érj el legalább 1 óra összesített játékidőt",
-    achId: "play_time_1h",
+    desc: "Érj el legalább 90 perc összesített játékidőt",
+    achId: "ach_play_time_90m",
     isSpecial: false,
-    isUnlocked: (stats, achSet) =>
-      stats.totalPlaytimeSeconds >= 3600 || achSet.has("play_time_1h"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_play_time_90m"),
   },
   {
     id: "title_chaos_lord",
     name: "Káosz Ura",
     desc: "Érj el legalább 5 000 pontot a Káosz módban",
-    achId: "mode_chaos_win",
+    achId: "ach_mode_chaos_win",
     isSpecial: false,
-    isUnlocked: (stats, achSet) => achSet.has("mode_chaos_win"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_mode_chaos_win"),
   },
   {
     id: "title_bomb_master",
     name: "Mesterbombázó",
     desc: "Érj el legalább 5 000 pontot a Robbanás Mániában",
-    achId: "mode_bomb_win",
+    achId: "ach_mode_bomb_win",
     isSpecial: false,
-    isUnlocked: (stats, achSet) =>
-      achSet.has("mode_bomb_win") || achSet.has("tnt_collector_25"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_mode_bomb_win"),
   },
   {
     id: "title_time_master",
     name: "Időhajhász",
     desc: "Érj el legalább 5 000 pontot az Időhajsza módban",
-    achId: "mode_time_win",
+    achId: "ach_mode_time_win",
     isSpecial: false,
-    isUnlocked: (stats, achSet) => achSet.has("mode_time_win"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_mode_time_win"),
   },
   {
     id: "title_purist",
     name: "Tisztakezű Zseni",
     desc: "Érj el legalább 3 000 pontot a Nyers módban",
-    achId: "mode_raw_win",
+    achId: "ach_mode_raw_win",
     isSpecial: false,
-    isUnlocked: (stats, achSet) => achSet.has("mode_raw_win"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_mode_raw_win"),
   },
   {
     id: "title_tnt_master",
     name: "Bomba Szakértő",
     desc: "Robbants fel legalább 25 db TNT blokkot",
-    achId: "tnt_collector_25",
+    achId: "ach_tnt_collector_25",
     isSpecial: false,
-    isUnlocked: (stats, achSet) => achSet.has("tnt_collector_25"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_tnt_collector_25"),
   },
   {
     id: "title_magnet_expert",
     name: "Mágnes Mester",
     desc: "Használj fel legalább 25 db mágnes power-upot",
-    achId: "magnet_collector_25",
+    achId: "ach_magnet_collector_25",
     isSpecial: false,
-    isUnlocked: (stats, achSet) => achSet.has("magnet_collector_25"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_magnet_collector_25"),
   },
   {
     id: "title_freeze_lord",
     name: "Fagyasztó Úr",
     desc: "Fagyaszd be az időt legalább 25 alkalommal",
-    achId: "freeze_collector_25",
+    achId: "ach_freeze_collector_25",
     isSpecial: false,
-    isUnlocked: (stats, achSet) => achSet.has("freeze_collector_25"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_freeze_collector_25"),
   },
-
-  // SPECIÁLIS RANGCÍMEK (Ragyogó, animált színátmenetes címek, tiszta névvel)
   {
     id: "title_cosmic_destroyer",
     name: "Kozmikus Pusztító",
-    desc: "Érj el legalább 75 000 pontot egy meccsben",
-    achId: "score_75k",
+    desc: "Érj el legalább 85 000 pontot egy meccsben",
+    achId: "ach_score_85k",
     specialClass: "title-special-cosmic",
     isSpecial: true,
-    isUnlocked: (stats, achSet) =>
-      stats.bestScore >= 75000 || achSet.has("score_75k"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_score_85k"),
   },
   {
     id: "title_golden_emperor",
     name: "Halhatatlan Blokkuralkodó",
-    desc: "Lépd át a 100 000 pontos álomhatárt egy menetben!",
-    achId: "score_100k",
+    desc: "Lépd át a 110 000 pontos álomhatárt egy menetben!",
+    achId: "ach_score_110k",
     specialClass: "title-special-gold",
     isSpecial: true,
-    isUnlocked: (stats, achSet) =>
-      stats.bestScore >= 100000 || achSet.has("score_100k"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_score_110k"),
   },
   {
     id: "title_firestorm_god",
     name: "Tűzvihar Istenség",
     desc: "Aktiválj legalább 500 db power-upot!",
-    achId: "powerup_500",
+    achId: "ach_powerup_500",
     specialClass: "title-special-flame",
     isSpecial: true,
-    isUnlocked: (stats, achSet) => achSet.has("powerup_500"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_powerup_500"),
   },
   {
     id: "title_infinite_legend",
     name: "Végtelen Krónikás",
     desc: "Játssz le legalább 250 mérkőzést az arénában!",
-    achId: "matches_250",
+    achId: "ach_matches_250",
     specialClass: "title-special-rainbow",
     isSpecial: true,
-    isUnlocked: (stats, achSet) =>
-      stats.totalMatches >= 250 || achSet.has("matches_250"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_matches_250"),
   },
   {
     id: "title_millionaire",
     name: "Pontmilliomos",
     desc: "Gyűjts össze összesen legalább 1 000 000 pontot a profilodon!",
-    achId: "total_score_1m",
+    achId: "ach_total_score_1m",
     specialClass: "title-special-gold",
     isSpecial: true,
-    isUnlocked: (stats, achSet) =>
-      (stats.totalScore || 0) >= 1000000 || achSet.has("total_score_1m"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_total_score_1m"),
   },
   {
     id: "title_peak_breaker",
     name: "Abszolút Csúcsdöntő",
     desc: "Érj el legalább 150 000 pontot egy menetben!",
-    achId: "score_150k",
+    achId: "ach_score_150k",
     specialClass: "title-special-cosmic",
     isSpecial: true,
-    isUnlocked: (stats, achSet) =>
-      stats.bestScore >= 150000 || achSet.has("score_150k"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_score_150k"),
   },
   {
     id: "title_cosmic_majesty",
     name: "Kozmikus Fenség",
     desc: "Érj el legalább 250 000 pontot egy meccsben!",
-    achId: "score_250k",
+    achId: "ach_score_250k",
     specialClass: "title-special-cosmic",
     isSpecial: true,
-    isUnlocked: (stats, achSet) =>
-      stats.bestScore >= 250000 || achSet.has("score_250k"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_score_250k"),
   },
   {
     id: "title_supersonic_combo",
     name: "Szuperszonikus Kombó",
     desc: "Pörgesd fel a kombó szorzót legalább 6×-os kombóig!",
-    achId: "lightning_combo_6",
+    achId: "ach_lightning_combo_6",
     specialClass: "title-special-flame",
     isSpecial: true,
-    isUnlocked: (stats, achSet) => achSet.has("lightning_combo_6"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_lightning_combo_6"),
   },
   {
     id: "title_colossus_destroyer",
     name: "Kolosszális Pusztító",
     desc: "Törölj el legalább 16 blokkot egyetlen kattintással!",
-    achId: "massive_clear_16",
+    achId: "ach_massive_clear_16",
     specialClass: "title-special-rainbow",
     isSpecial: true,
-    isUnlocked: (stats, achSet) => achSet.has("massive_clear_16"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_massive_clear_16"),
   },
   {
     id: "title_mythic_legend",
     name: "Örökös Crashdown Legenda",
     desc: "Játssz le legalább 500 mérkőzést az arénában!",
-    achId: "matches_500",
+    achId: "ach_matches_500",
     specialClass: "title-special-rainbow",
     isSpecial: true,
-    isUnlocked: (stats, achSet) =>
-      stats.totalMatches >= 500 || achSet.has("matches_500"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_matches_500"),
   },
   {
     id: "title_multimillionaire",
     name: "Multimilliomos Rekorder",
     desc: "Lépd át az 5 000 000 összesített pontszámot!",
-    achId: "total_score_5m",
+    achId: "ach_total_score_5m",
     specialClass: "title-special-gold",
     isSpecial: true,
-    isUnlocked: (stats, achSet) =>
-      (stats.totalScore || 0) >= 5000000 || achSet.has("total_score_5m"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_total_score_5m"),
   },
   {
     id: "title_sprint_titan",
     name: "Villámfutó Titán",
     desc: "Érj el legalább 5 000 pontot a 30 másodperces villámmódban!",
-    achId: "sprint_5k",
+    achId: "ach_sprint_5k",
     specialClass: "title-special-flame",
     isSpecial: true,
-    isUnlocked: (stats, achSet) => achSet.has("sprint_5k"),
+    isUnlocked: (stats, achSet) => achSet.has("ach_sprint_5k"),
   },
 ];
+
+
 
 let recentSuccessfulClicks = [];
 let currentAchievementFilter = "all";
@@ -1402,66 +1541,121 @@ function updatePlayerStatsRecord(
     // Mérföldkő ellenőrzések CSAKIS valódi lefutott meccs esetén (durSec > 0)
     if (durSec > 0) {
       // Mérkőzésszám mérföldkövek
-      if (p.totalMatches >= 5) checkAchievement("play_5_matches");
-      if (p.totalMatches >= 10) checkAchievement("matches_10");
-      if (p.totalMatches >= 20) checkAchievement("play_20_matches");
-      if (p.totalMatches >= 50) checkAchievement("matches_50");
-      if (p.totalMatches >= 100) checkAchievement("matches_100");
-      if (p.totalMatches >= 250) checkAchievement("matches_250");
-      if (p.totalMatches >= 500) checkAchievement("matches_500");
+      if (p.totalMatches >= 1) { checkAchievement("ach_matches_1"); }
+      if (p.totalMatches >= 3) { checkAchievement("ach_matches_3"); }
+      if (p.totalMatches >= 5) { checkAchievement("ach_matches_5"); checkAchievement("play_5_matches"); }
+      if (p.totalMatches >= 10) { checkAchievement("ach_matches_10"); checkAchievement("matches_10"); }
+      if (p.totalMatches >= 15) { checkAchievement("ach_matches_15"); }
+      if (p.totalMatches >= 20) { checkAchievement("ach_matches_20"); checkAchievement("play_20_matches"); }
+      if (p.totalMatches >= 50) { checkAchievement("ach_matches_50"); checkAchievement("matches_50"); }
+      if (p.totalMatches >= 75) { checkAchievement("ach_matches_75"); }
+      if (p.totalMatches >= 100) { checkAchievement("ach_matches_100"); checkAchievement("matches_100"); }
+      if (p.totalMatches >= 250) { checkAchievement("ach_matches_250"); checkAchievement("matches_250"); }
+      if (p.totalMatches >= 500) { checkAchievement("ach_matches_500"); checkAchievement("matches_500"); }
+      if (p.totalMatches >= 750) { checkAchievement("ach_matches_750"); }
+      if (p.totalMatches >= 1000) { checkAchievement("ach_matches_1000"); }
 
       // Játékidő mérföldkövek
-      if (p.totalPlaytimeSeconds >= 60) checkAchievement("play_time_1m");
-      if (p.totalPlaytimeSeconds >= 300) checkAchievement("play_time_5m");
-      if (p.totalPlaytimeSeconds >= 900) checkAchievement("play_time_15m");
-      if (p.totalPlaytimeSeconds >= 1800) checkAchievement("play_time_30m");
-      if (p.totalPlaytimeSeconds >= 3600) checkAchievement("play_time_1h");
-      if (p.totalPlaytimeSeconds >= 7200) checkAchievement("play_time_2h");
+      if (p.totalPlaytimeSeconds >= 15) { checkAchievement("ach_play_time_15s"); }
+      if (p.totalPlaytimeSeconds >= 60) { checkAchievement("ach_play_time_1m"); checkAchievement("play_time_1m"); }
+      if (p.totalPlaytimeSeconds >= 180) { checkAchievement("ach_play_time_3m"); }
+      if (p.totalPlaytimeSeconds >= 300) { checkAchievement("ach_play_time_5m"); checkAchievement("play_time_5m"); }
+      if (p.totalPlaytimeSeconds >= 600) { checkAchievement("ach_play_time_10m"); }
+      if (p.totalPlaytimeSeconds >= 900) { checkAchievement("ach_play_time_15m"); checkAchievement("play_time_15m"); }
+      if (p.totalPlaytimeSeconds >= 1200) { checkAchievement("ach_play_time_20m"); }
+      if (p.totalPlaytimeSeconds >= 1800) { checkAchievement("ach_play_time_30m"); checkAchievement("play_time_30m"); }
+      if (p.totalPlaytimeSeconds >= 2700) { checkAchievement("ach_play_time_45m"); }
+      if (p.totalPlaytimeSeconds >= 3600) { checkAchievement("ach_play_time_1h"); checkAchievement("play_time_1h"); }
+      if (p.totalPlaytimeSeconds >= 5400) { checkAchievement("ach_play_time_90m"); }
+      if (p.totalPlaytimeSeconds >= 7200) { checkAchievement("ach_play_time_2h"); checkAchievement("play_time_2h"); }
+      if (p.totalPlaytimeSeconds >= 10800) { checkAchievement("ach_play_time_3h"); }
 
       // Összesített pontszám mérföldkövek
-      if (p.totalScore >= 100000) checkAchievement("total_score_100k");
-      if (p.totalScore >= 500000) checkAchievement("total_score_500k");
-      if (p.totalScore >= 1000000) checkAchievement("total_score_1m");
-      if (p.totalScore >= 5000000) checkAchievement("total_score_5m");
+      if (p.totalScore >= 50000) { checkAchievement("ach_total_score_50k"); }
+      if (p.totalScore >= 100000) { checkAchievement("ach_total_score_100k"); checkAchievement("total_score_100k"); }
+      if (p.totalScore >= 250000) { checkAchievement("ach_total_score_250k"); }
+      if (p.totalScore >= 500000) { checkAchievement("ach_total_score_500k"); checkAchievement("total_score_500k"); }
+      if (p.totalScore >= 1000000) { checkAchievement("ach_total_score_1m"); checkAchievement("total_score_1m"); }
+      if (p.totalScore >= 2000000) { checkAchievement("ach_total_score_2m"); }
+      if (p.totalScore >= 5000000) { checkAchievement("ach_total_score_5m"); checkAchievement("total_score_5m"); }
+      if (p.totalScore >= 10000000) { checkAchievement("ach_total_score_10m"); }
 
       // Pontszám rekord mérföldkövek
-      if (numericScore >= 500) checkAchievement("first_500");
-      if (numericScore >= 1500) checkAchievement("score_1500");
-      if (numericScore >= 5000) checkAchievement("score_5000");
-      if (numericScore >= 10000) checkAchievement("score_10k");
-      if (numericScore >= 25000) checkAchievement("score_25k");
-      if (numericScore >= 50000) checkAchievement("score_5000");
-      if (numericScore >= 75000) checkAchievement("score_75k");
-      if (numericScore >= 100000) checkAchievement("score_100k");
-      if (numericScore >= 150000) checkAchievement("score_150k");
-      if (numericScore >= 250000) checkAchievement("score_250k");
+      if (numericScore >= 200) { checkAchievement("ach_score_200"); }
+      if (numericScore >= 500) { checkAchievement("ach_score_500"); checkAchievement("first_500"); }
+      if (numericScore >= 800) { checkAchievement("ach_score_800"); }
+      if (numericScore >= 1000) { checkAchievement("ach_score_1000"); }
+      if (numericScore >= 1500) { checkAchievement("ach_score_1500"); checkAchievement("score_1500"); }
+      if (numericScore >= 5000) { checkAchievement("ach_score_5000"); checkAchievement("score_5000"); }
+      if (numericScore >= 7500) { checkAchievement("ach_score_7500"); }
+      if (numericScore >= 10000) { checkAchievement("ach_score_10k"); checkAchievement("score_10k"); }
+      if (numericScore >= 15000) { checkAchievement("ach_score_15k"); }
+      if (numericScore >= 25000) { checkAchievement("ach_score_25k"); checkAchievement("score_25k"); }
+      if (numericScore >= 35000) { checkAchievement("ach_score_35k"); }
+      if (numericScore >= 50000) { checkAchievement("ach_score_50k"); checkAchievement("score_50k"); }
+      if (numericScore >= 60000) { checkAchievement("ach_score_60k"); }
+      if (numericScore >= 75000) { checkAchievement("ach_score_75k"); checkAchievement("score_75k"); }
+      if (numericScore >= 85000) { checkAchievement("ach_score_85k"); }
+      if (numericScore >= 90000) { checkAchievement("ach_score_90k"); }
+      if (numericScore >= 100000) { checkAchievement("ach_score_100k"); checkAchievement("score_100k"); }
+      if (numericScore >= 110000) { checkAchievement("ach_score_110k"); }
+      if (numericScore >= 125000) { checkAchievement("ach_score_125k"); }
+      if (numericScore >= 150000) { checkAchievement("ach_score_150k"); checkAchievement("score_150k"); }
+      if (numericScore >= 200000) { checkAchievement("ach_score_200k"); }
+      if (numericScore >= 250000) { checkAchievement("ach_score_250k"); checkAchievement("score_250k"); }
+      if (numericScore >= 300000) { checkAchievement("ach_score_300k"); }
+      if (numericScore >= 500000) { checkAchievement("ach_score_500k"); }
 
-      // Mód szerinti győzelmek / jó eredmények
-      if (modKey === "chaos" && numericScore >= 5000)
+      // Mód szerinti győzelmek
+      if (modKey === "chaos" && numericScore >= 5000) {
+        checkAchievement("ach_mode_chaos_win");
         checkAchievement("mode_chaos_win");
-      if (modKey === "bomb_frenzy" && numericScore >= 5000)
+      }
+      if (modKey === "bomb_frenzy" && numericScore >= 5000) {
+        checkAchievement("ach_mode_bomb_win");
         checkAchievement("mode_bomb_win");
-      if (modKey === "time_rush" && numericScore >= 5000)
+      }
+      if (modKey === "time_rush" && numericScore >= 5000) {
+        checkAchievement("ach_mode_time_win");
         checkAchievement("mode_time_win");
-      if (modKey === "no_powerups" && numericScore >= 3000)
+      }
+      if (modKey === "no_powerups" && numericScore >= 3000) {
+        checkAchievement("ach_mode_raw_win");
         checkAchievement("mode_raw_win");
+      }
 
       // Időtartam rekordok
-      if (durSec === 30 && numericScore >= 5000) checkAchievement("sprint_5k");
-      if (durSec === 180 && numericScore >= 15000) checkAchievement("marathon_15k");
+      if (durSec === 30 && numericScore >= 5000) {
+        checkAchievement("ach_sprint_5k");
+        checkAchievement("sprint_5k");
+      }
+      if (durSec === 30 && numericScore >= 8000) {
+        checkAchievement("ach_sprint_8k");
+      }
+      if (durSec === 180 && numericScore >= 15000) {
+        checkAchievement("ach_marathon_15k");
+        checkAchievement("marathon_15k");
+      }
 
-      // Változatosság mérföldkövek (minden mód, minden időtartam, minden színszám)
+      // Változatosság mérföldkövek
       const all5Modes = ["normal", "chaos", "bomb_frenzy", "time_rush", "no_powerups"];
       if (all5Modes.every((m) => p.modifierStats[m] && p.modifierStats[m].matches > 0)) {
+        checkAchievement("ach_all_modes_played");
         checkAchievement("all_modes_played");
       }
       const allDurations = ["30", "60", "90", "180"];
       if (allDurations.every((d) => p.durationStats[d] && p.durationStats[d].matches > 0)) {
+        checkAchievement("ach_all_durations_played");
         checkAchievement("all_durations_played");
       }
       const allColors = ["2", "3", "4", "5"];
       if (allColors.every((c) => p.modes[c] && p.modes[c].matches > 0)) {
+        checkAchievement("ach_all_colors_played");
         checkAchievement("all_colors_played");
+      }
+      if (cKey === "5" && numericScore >= 2000) {
+        checkAchievement("ach_master_5_color");
+        checkAchievement("master_5_color");
       }
     }
 
@@ -1486,23 +1680,44 @@ function regisztraljPowerupHasznalatot(type = null) {
   );
   count += 1;
   localStorage.setItem("crashdown_powerup_count", count);
-  if (count >= 5) checkAchievement("powerup_5");
-  if (count >= 10) checkAchievement("powerup_10");
-  if (count >= 25) checkAchievement("powerup_25");
-  if (count >= 50) checkAchievement("powerup_50");
-  if (count >= 100) checkAchievement("powerup_100");
-  if (count >= 250) checkAchievement("powerup_250");
-  if (count >= 500) checkAchievement("powerup_500");
+
+  checkAchievement("ach_powerup_first_any");
+  if (count >= 5) { checkAchievement("ach_powerup_5"); checkAchievement("powerup_5"); }
+  if (count >= 10) { checkAchievement("ach_powerup_10"); checkAchievement("powerup_10"); }
+  if (count >= 25) { checkAchievement("ach_powerup_25"); checkAchievement("powerup_25"); }
+  if (count >= 35) { checkAchievement("ach_powerup_total_35"); }
+  if (count >= 50) { checkAchievement("ach_powerup_50"); checkAchievement("powerup_50"); }
+  if (count >= 75) { checkAchievement("ach_powerup_75"); }
+  if (count >= 100) { checkAchievement("ach_powerup_100"); checkAchievement("powerup_100"); }
+  if (count >= 150) { checkAchievement("ach_powerup_150"); }
+  if (count >= 250) { checkAchievement("ach_powerup_250"); checkAchievement("powerup_250"); }
+  if (count >= 500) { checkAchievement("ach_powerup_500"); checkAchievement("powerup_500"); }
 
   if (type) {
     const key = `crashdown_powerup_${type}_count`;
     let tCount = parseInt(localStorage.getItem(key) || "0", 10) + 1;
     localStorage.setItem(key, tCount);
-    if (type === "tnt" && tCount >= 25) checkAchievement("tnt_collector_25");
-    if (type === "magnet" && tCount >= 25) checkAchievement("magnet_collector_25");
-    if (type === "freeze" && tCount >= 25) checkAchievement("freeze_collector_25");
-    if (type === "doubler" && tCount >= 25) checkAchievement("doubler_collector_25");
-    if (type === "colorbomb" && tCount >= 25) checkAchievement("colorbomb_collector_25");
+    if (type === "tnt") {
+      checkAchievement("ach_powerup_tnt_first");
+      if (tCount >= 25) { checkAchievement("ach_tnt_collector_25"); checkAchievement("tnt_collector_25"); }
+      if (tCount >= 50) { checkAchievement("ach_tnt_collector_50"); }
+    }
+    if (type === "magnet") {
+      checkAchievement("ach_powerup_magnet_first");
+      if (tCount >= 25) { checkAchievement("ach_magnet_collector_25"); checkAchievement("magnet_collector_25"); }
+    }
+    if (type === "freeze") {
+      checkAchievement("ach_powerup_freeze_first");
+      if (tCount >= 25) { checkAchievement("ach_freeze_collector_25"); checkAchievement("freeze_collector_25"); }
+      if (tCount >= 50) { checkAchievement("ach_freeze_collector_50"); }
+    }
+    if (type === "doubler") {
+      if (tCount >= 25) { checkAchievement("ach_doubler_collector_25"); checkAchievement("doubler_collector_25"); }
+    }
+    if (type === "colorbomb") {
+      checkAchievement("ach_powerup_colorbomb_first");
+      if (tCount >= 25) { checkAchievement("ach_colorbomb_collector_25"); checkAchievement("colorbomb_collector_25"); }
+    }
   }
 }
 

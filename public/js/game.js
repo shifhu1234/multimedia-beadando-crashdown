@@ -100,6 +100,7 @@ function aktivaldPontduplazot(seconds = 5) {
     playSound(doublerKatt);
     triggerHaptic('heavy');
     checkAchievement('frenzy_master');
+    checkAchievement('ach_frenzy_active');
 
     if (doublePointsInterval) clearInterval(doublePointsInterval);
     doublePointsInterval = setInterval(() => {
@@ -141,6 +142,7 @@ function aktivaldFagyasztast(seconds = 4) {
     playSound(timeEffekt);
     triggerHaptic('heavy');
     checkAchievement('freeze_time');
+    checkAchievement('ach_powerup_freeze_first');
 
     if (freezeInterval) clearInterval(freezeInterval);
     freezeInterval = setInterval(() => {
@@ -232,6 +234,7 @@ function magnesPowerUp() {
 
     gridUjraRendezes();
     checkAchievement('magnet_pull');
+    checkAchievement('ach_powerup_magnet_first');
 
     shockwaves.push({
         x: LOGICAL_SIZE / 2,
@@ -250,11 +253,13 @@ function regisztraljKomboLepest() {
     comboStreak++;
     comboMultiplier = Math.min(6, 1 + Math.floor(comboStreak / 2));
 
-    if (comboMultiplier >= 2) checkAchievement('combo_x2');
-    if (comboMultiplier >= 3) checkAchievement('combo_x3');
-    if (comboMultiplier >= 4) checkAchievement('combo_x4');
-    if (comboMultiplier >= 5) checkAchievement('combo_x5');
-    if (comboMultiplier >= 6) checkAchievement('lightning_combo_6');
+    if (comboMultiplier >= 2) { checkAchievement('combo_x2'); checkAchievement('ach_combo_x2'); }
+    if (comboMultiplier >= 3) { checkAchievement('combo_x3'); checkAchievement('ach_combo_x3'); }
+    if (comboMultiplier >= 4) { checkAchievement('combo_x4'); checkAchievement('ach_combo_x4'); }
+    if (comboMultiplier >= 5) { checkAchievement('combo_x5'); checkAchievement('ach_combo_x5'); }
+    if (comboMultiplier >= 6) { checkAchievement('lightning_combo_6'); checkAchievement('ach_lightning_combo_6'); }
+    if (comboStreak >= 7) checkAchievement('ach_combo_x7');
+    if (comboStreak >= 8) checkAchievement('ach_combo_x8');
 
     if (comboResetTimeout) clearTimeout(comboResetTimeout);
     comboResetTimeout = setTimeout(() => {
@@ -425,6 +430,7 @@ function ellenorizdPalyaAllapot() {
         playSound(doublerKatt);
         triggerHaptic('success');
         checkAchievement('perfect_clear');
+        checkAchievement('ach_perfect_clear_board');
 
         shockwaves.push({
             x: LOGICAL_SIZE / 2,
@@ -612,6 +618,7 @@ function handleClick(event) {
         playSound(tntKatt);
         triggerHaptic('heavy');
         checkAchievement('tnt_boom');
+        checkAchievement('ach_powerup_tnt_first');
         robbantasPowerUp(x, y);
         screenShake = 8;
         shockwaves.push({
@@ -670,6 +677,7 @@ function handleClick(event) {
         const earned = baseEarned * (isDoublePointsActive ? 2 : 1);
         pontSzam += earned;
         checkAchievement('color_bomb');
+        checkAchievement('ach_powerup_colorbomb_first');
         updateScoreUI();
         gridUjraRendezes();
         spawnFloatingText(x, y, isDoublePointsActive ? `✦ BOMB +${earned} (2×)` : `✦ BOMB +${earned}`, '#14b8a6');
@@ -711,6 +719,7 @@ function handleClick(event) {
         const gained = 50 * (isDoublePointsActive ? 2 : 1);
         pontSzam += gained;
         checkAchievement('shuffle_master');
+        checkAchievement('ach_shuffle_board');
         updateScoreUI();
         gridUjraRendezes();
         spawnFloatingText(x, y, isDoublePointsActive ? `⟳ KEVERÉS +${gained} (2×)` : `⟳ KEVERÉS +${gained}`, '#818cf8');
@@ -725,6 +734,7 @@ function handleClick(event) {
         gridUjraRendezes();
         pluszIdoPowerUp();
         checkAchievement('time_bonus');
+        checkAchievement('ach_time_bonus_catch');
         spawnFloatingText(x, y, '+5 MP!', '#c084fc');
         setComboStatus('⌛ +5 másodperc extra idő!', true);
         ellenorizdPalyaAllapot();
@@ -749,13 +759,15 @@ function handleClick(event) {
             playSound(sikeresKatt);
             triggerHaptic('light');
             checkAchievement('first_match');
-            if (torlendoNegyzetek.length >= 8) checkAchievement('mega_clear');
-            if (torlendoNegyzetek.length >= 12) checkAchievement('hyper_clear');
-            if (torlendoNegyzetek.length >= 16) checkAchievement('massive_clear_16');
+            checkAchievement('ach_first_click');
+            if (torlendoNegyzetek.length >= 8) { checkAchievement('mega_clear'); checkAchievement('ach_mega_clear_8'); }
+            if (torlendoNegyzetek.length >= 12) { checkAchievement('hyper_clear'); checkAchievement('ach_hyper_clear_12'); }
+            if (torlendoNegyzetek.length >= 16) { checkAchievement('massive_clear_16'); checkAchievement('ach_massive_clear_16'); }
+            if (torlendoNegyzetek.length >= 20) { checkAchievement('ach_massive_clear_20'); }
 
             recentSuccessfulClicks.push(Date.now());
             recentSuccessfulClicks = recentSuccessfulClicks.filter(t => Date.now() - t <= 10000);
-            if (recentSuccessfulClicks.length >= 8) checkAchievement('speed_demon');
+            if (recentSuccessfulClicks.length >= 8) { checkAchievement('speed_demon'); checkAchievement('ach_speed_demon_8'); }
             const mult = regisztraljKomboLepest();
 
             for (let i = 0; i < torlendoNegyzetek.length; i++) {
@@ -1711,6 +1723,7 @@ function executeBoardShuffle() {
     spawnFloatingText(LOGICAL_SIZE / 2, LOGICAL_SIZE / 2, '⟳ PÁLYA ÚJRAKEVERVE!', '#818cf8');
     setComboStatus('⟳ Pálya újrakeverve! Keresd az új kombinációkat!', true);
     checkAchievement('shuffle_master');
+    checkAchievement('ach_shuffle_board');
 
     setTimeout(() => {
         isShufflingBoard = false;
