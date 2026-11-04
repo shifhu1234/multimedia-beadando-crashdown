@@ -82,7 +82,7 @@ async function adminForceUpdateUserAchievements(targetUsername, newAchievementsL
   const toastMsg = customToast || `⚡ ${targetUsername} jelvényei frissítve (${newAchievementsList.length} db)!`;
   showToast(toastMsg, "success");
 
-  // Profil és Játékosok lista azonnali frissítése (görgetési pozíció megtartásával)
+  // Profil, Játékosok lista és Ranglista azonnali frissítése (görgetési pozíció megtartásával)
   const pArea = document.querySelector(".profile-content-area");
   const prevScroll = pArea ? pArea.scrollTop : 0;
   await openPlayerProfileModal(targetUsername, false);
@@ -92,6 +92,9 @@ async function adminForceUpdateUserAchievements(targetUsername, newAchievementsL
   }
   if (typeof updatePlayersModalUI === "function") {
     updatePlayersModalUI();
+  }
+  if (typeof toplistaMegjelenites === "function") {
+    toplistaMegjelenites();
   }
 }
 
@@ -275,6 +278,32 @@ async function syncPlayerCustomization(username, updates) {
     }
     Object.assign(profiles[username], updates);
     localStorage.setItem(key, JSON.stringify(profiles));
+
+    // Frissítsük a helyi toplistát is azonnal a módosított adatokkal
+    try {
+      const localScores = JSON.parse(localStorage.getItem("toplista") || "[]");
+      const uLower = username.trim().toLowerCase();
+      let updatedAny = false;
+      localScores.forEach((s) => {
+        if (String(s.name || "").trim().toLowerCase() === uLower) {
+          if (updates.chosenTitle !== undefined) s.chosenTitle = updates.chosenTitle;
+          if (updates.chosenAvatar !== undefined) s.chosenAvatar = updates.chosenAvatar;
+          if (updates.chosenNameColor !== undefined) s.chosenNameColor = updates.chosenNameColor;
+          updatedAny = true;
+        }
+      });
+      if (updatedAny) {
+        localStorage.setItem("toplista", JSON.stringify(localScores));
+      }
+    } catch (e) {}
+
+    // Azonnali felületi frissítések a Ranglistán és a Játékosok listán
+    if (typeof toplistaMegjelenites === "function") {
+      toplistaMegjelenites();
+    }
+    if (typeof updatePlayersModalUI === "function") {
+      updatePlayersModalUI();
+    }
 
     if (
       window.leaderboardService &&
@@ -472,13 +501,20 @@ async function openPlayerProfileModal(username, resetScroll = true) {
                 const nextSet = new Set(achSet);
                 nextSet.add(colObj.achId);
                 nextSet.add(colObj.id);
+                if (isOwnProfile) {
+                  localStorage.setItem("crashdown_chosen_name_color", colId);
+                }
+                stats.chosenNameColor = colId;
+                stats.activeNameColor = colObj;
+                await syncPlayerCustomization(stats.username, { chosenNameColor: colId });
                 triggerHaptic("impact");
                 if (typeof hangKatt !== "undefined") playSound(hangKatt);
                 await adminForceUpdateUserAchievements(
                   stats.username,
                   Array.from(nextSet),
-                  `⚡ ${colObj.name} névszín feloldva és aktiválva (${stats.username})!`
+                  `⚡ ${colObj.name} névszín feloldva és beállítva (${stats.username})!`
                 );
+                return;
               } else {
                 const reqAch = colObj.achId
                   ? ACHIEVEMENTS.find((a) => a.id === colObj.achId)
@@ -500,7 +536,7 @@ async function openPlayerProfileModal(username, resetScroll = true) {
             stats.chosenNameColor = colId;
             stats.activeNameColor = colObj;
 
-            syncPlayerCustomization(stats.username, { chosenNameColor: colId });
+            await syncPlayerCustomization(stats.username, { chosenNameColor: colId });
 
             if (nameEl) {
               nameColorCatalog.forEach((c) =>
@@ -622,13 +658,20 @@ async function openPlayerProfileModal(username, resetScroll = true) {
               const nextSet = new Set(achSet);
               if (titleObj.achId) nextSet.add(titleObj.achId);
               nextSet.add(titleObj.id);
+              if (isOwnProfile) {
+                localStorage.setItem("crashdown_chosen_title", chosenId);
+              }
+              stats.chosenTitle = chosenId;
+              stats.activeTitle = titleObj;
+              await syncPlayerCustomization(stats.username, { chosenTitle: chosenId });
               triggerHaptic("impact");
               if (typeof hangKatt !== "undefined") playSound(hangKatt);
               await adminForceUpdateUserAchievements(
                 stats.username,
                 Array.from(nextSet),
-                `⚡ ${titleObj.name} rangcím feloldva és aktiválva (${stats.username})!`
+                `⚡ ${titleObj.name} rangcím feloldva és beállítva (${stats.username})!`
               );
+              return;
             } else {
               const reqAch = titleObj.achId
                 ? ACHIEVEMENTS.find((a) => a.id === titleObj.achId)
@@ -650,7 +693,7 @@ async function openPlayerProfileModal(username, resetScroll = true) {
           stats.chosenTitle = chosenId;
           stats.activeTitle = titleObj;
 
-          syncPlayerCustomization(stats.username, { chosenTitle: chosenId });
+          await syncPlayerCustomization(stats.username, { chosenTitle: chosenId });
 
           if (titleEl) {
             titleEl.textContent = titleObj.name;
@@ -754,13 +797,20 @@ async function openPlayerProfileModal(username, resetScroll = true) {
               const nextSet = new Set(achSet);
               nextSet.add(avObj.achId);
               nextSet.add(avObj.id);
+              if (isOwnProfile) {
+                localStorage.setItem("crashdown_chosen_avatar", avId);
+              }
+              stats.chosenAvatar = avId;
+              stats.activeAvatar = avObj;
+              await syncPlayerCustomization(stats.username, { chosenAvatar: avId });
               triggerHaptic("impact");
               if (typeof hangKatt !== "undefined") playSound(hangKatt);
               await adminForceUpdateUserAchievements(
                 stats.username,
                 Array.from(nextSet),
-                `⚡ ${avObj.symbol} ${avObj.name} profilkép feloldva és aktiválva (${stats.username})!`
+                `⚡ ${avObj.symbol} ${avObj.name} profilkép feloldva és beállítva (${stats.username})!`
               );
+              return;
             } else {
               const reqAch = avObj.achId
                 ? ACHIEVEMENTS.find((a) => a.id === avObj.achId)
@@ -782,7 +832,7 @@ async function openPlayerProfileModal(username, resetScroll = true) {
           stats.chosenAvatar = avId;
           stats.activeAvatar = avObj;
 
-          syncPlayerCustomization(stats.username, { chosenAvatar: avId });
+          await syncPlayerCustomization(stats.username, { chosenAvatar: avId });
 
           if (avatarEl) avatarEl.textContent = avObj.symbol;
           if (isOwnProfile) {
@@ -1132,7 +1182,7 @@ async function openPlayerProfileModal(username, resetScroll = true) {
  * Valós idejű profil-frissítés, ha a megtekintett játékos éppen módosította
  * a rangcímét, névszínét vagy profilképét
  */
-function refreshOpenProfileModalRealtime(username) {
+async function refreshOpenProfileModalRealtime(username) {
   const modal = document.getElementById("playerProfileModal");
   if (!modal || modal.classList.contains("hidden")) return;
   if (
@@ -1142,52 +1192,13 @@ function refreshOpenProfileModalRealtime(username) {
     return;
   }
 
-  const localProfiles = JSON.parse(
-    localStorage.getItem("crashdown_player_profiles") || "{}",
-  );
-  const pMatchKey = Object.keys(localProfiles).find(
-    (k) => k.toLowerCase() === username.toLowerCase(),
-  );
-  const onlineProfile = pMatchKey ? localProfiles[pMatchKey] : null;
-
-  let allScores = [];
-  try {
-    allScores = JSON.parse(localStorage.getItem("toplista") || "[]");
-  } catch (e) {}
-
-  const stats = getPlayerProfileStats(username, allScores, onlineProfile);
-  if (!stats) return;
-
-  const nameEl = document.getElementById("profilePlayerName");
-  const avatarEl = document.getElementById("profileAvatar");
-  const titleEl = document.getElementById("profilePlayerTitle");
-
-  if (nameEl) {
-    nameEl.textContent = stats.username;
-    const nameColorCatalog =
-      typeof NAME_COLORS_CATALOG !== "undefined" ? NAME_COLORS_CATALOG : [];
-    nameColorCatalog.forEach((c) => nameEl.classList.remove(c.className));
-    if (stats.activeNameColor && stats.activeNameColor.className) {
-      nameEl.classList.add(stats.activeNameColor.className);
-    }
-  }
-
-  if (avatarEl && stats.activeAvatar) {
-    avatarEl.textContent = stats.activeAvatar.symbol;
-    avatarEl.title = `Profilkép: ${stats.activeAvatar.name}`;
-  }
-
-  if (titleEl && stats.activeTitle) {
-    titleEl.textContent = stats.activeTitle.name;
-    titleEl.classList.remove(
-      "title-special-gold",
-      "title-special-cosmic",
-      "title-special-flame",
-      "title-special-rainbow",
-    );
-    if (stats.activeTitle.specialClass) {
-      titleEl.classList.add(stats.activeTitle.specialClass);
-    }
+  // Teljes profil újrarajzolása valós időben a legfrissebb adatokkal, görgetési pozíció megtartásával
+  const pArea = document.querySelector(".profile-content-area");
+  const prevScroll = pArea ? pArea.scrollTop : 0;
+  await openPlayerProfileModal(username, false);
+  const pAreaAfter = document.querySelector(".profile-content-area");
+  if (pAreaAfter) {
+    pAreaAfter.scrollTop = prevScroll;
   }
 }
 

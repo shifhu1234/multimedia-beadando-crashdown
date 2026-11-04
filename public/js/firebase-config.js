@@ -601,6 +601,35 @@ class LeaderboardService {
                             }
                         });
                         localStorage.setItem('crashdown_player_profiles', JSON.stringify(localProfiles));
+
+                        // Ha a bejelentkezett felhasználó profilját módosította valaki (pl. admin valós időben):
+                        const currentUser = window.authService?.getCurrentUser();
+                        if (currentUser && currentUser.displayName && data) {
+                            const cMatchKey = Object.keys(data).find(k => String(data[k]?.username || '').toLowerCase() === currentUser.displayName.toLowerCase());
+                            if (cMatchKey) {
+                                const myUpdatedProfile = data[cMatchKey];
+                                if (myUpdatedProfile.achievements) {
+                                    localStorage.setItem('crashdown_achievements_' + currentUser.displayName.toLowerCase(), JSON.stringify(myUpdatedProfile.achievements));
+                                    localStorage.setItem('crashdown_achievements', JSON.stringify(myUpdatedProfile.achievements));
+                                }
+                                if (myUpdatedProfile.chosenNameColor) {
+                                    localStorage.setItem('crashdown_chosen_name_color', myUpdatedProfile.chosenNameColor);
+                                }
+                                if (myUpdatedProfile.chosenTitle) {
+                                    localStorage.setItem('crashdown_chosen_title', myUpdatedProfile.chosenTitle);
+                                }
+                                if (myUpdatedProfile.chosenAvatar) {
+                                    localStorage.setItem('crashdown_chosen_avatar', myUpdatedProfile.chosenAvatar);
+                                }
+                                if (typeof updateAuthUI === 'function') {
+                                    updateAuthUI(currentUser);
+                                }
+                                if (typeof updateThemeSelectUI === 'function') {
+                                    updateThemeSelectUI();
+                                }
+                            }
+                        }
+
                         if (typeof toplistaMegjelenites === 'function') {
                             toplistaMegjelenites();
                         }
@@ -875,6 +904,24 @@ class LeaderboardService {
                     modes: profileData.modes || {},
                     updatedAt: new Date().toISOString()
                 });
+
+                // Frissítsük a játékos meglévő rekordjait a ranglistán is valós időben
+                const snap = await this.db.ref('leaderboard').once('value');
+                const data = snap.val();
+                if (data) {
+                    const uLower = username.trim().toLowerCase();
+                    const batchUpdates = {};
+                    Object.keys(data).forEach(key => {
+                        if (String(data[key].name || '').trim().toLowerCase() === uLower) {
+                            if (profileData.chosenTitle !== undefined) batchUpdates[`leaderboard/${key}/chosenTitle`] = profileData.chosenTitle;
+                            if (profileData.chosenAvatar !== undefined) batchUpdates[`leaderboard/${key}/chosenAvatar`] = profileData.chosenAvatar;
+                            if (profileData.chosenNameColor !== undefined) batchUpdates[`leaderboard/${key}/chosenNameColor`] = profileData.chosenNameColor;
+                        }
+                    });
+                    if (Object.keys(batchUpdates).length > 0) {
+                        await this.db.ref().update(batchUpdates);
+                    }
+                }
             } catch (e) {
                 console.warn('Firebase profil mentési hiba:', e);
             }
