@@ -909,7 +909,6 @@ async function openPlayerProfileModal(username, resetScroll = true) {
       .join("");
   }
 
-  const isAdmin = isAdminUser();
   const adminBadgeActions = document.getElementById("profileAdminBadgeActions");
   if (adminBadgeActions) {
     if (isAdmin) {
