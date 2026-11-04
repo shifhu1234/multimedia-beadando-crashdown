@@ -23,7 +23,7 @@ function isAdminUser() {
 /**
  * Adminisztrátori jogosultsággal mérföldkövek és testreszabások force unlockolása és lockolása
  */
-async function adminForceUpdateUserAchievements(targetUsername, newAchievementsList) {
+async function adminForceUpdateUserAchievements(targetUsername, newAchievementsList, customToast = null) {
   if (!isAdminUser() || !targetUsername) return;
 
   let profile = null;
@@ -42,19 +42,19 @@ async function adminForceUpdateUserAchievements(targetUsername, newAchievementsL
   const achSet = new Set(newAchievementsList);
   if (profile.chosenTitle) {
     const tObj = typeof PROFILE_TITLES !== "undefined" ? PROFILE_TITLES.find(t => t.id === profile.chosenTitle) : null;
-    if (tObj && tObj.achId && !achSet.has(tObj.achId)) {
+    if (tObj && tObj.achId && !achSet.has(tObj.achId) && !achSet.has(tObj.id)) {
       profile.chosenTitle = "title_beginner";
     }
   }
   if (profile.chosenAvatar) {
     const aObj = typeof PROFILE_AVATARS !== "undefined" ? PROFILE_AVATARS.find(a => a.id === profile.chosenAvatar) : null;
-    if (aObj && aObj.achId && !achSet.has(aObj.achId)) {
+    if (aObj && aObj.achId && !achSet.has(aObj.achId) && !achSet.has(aObj.id)) {
       profile.chosenAvatar = "avatar_default";
     }
   }
   if (profile.chosenNameColor) {
     const cObj = typeof NAME_COLORS_CATALOG !== "undefined" ? NAME_COLORS_CATALOG.find(c => c.id === profile.chosenNameColor) : null;
-    if (cObj && cObj.achId && !achSet.has(cObj.achId)) {
+    if (cObj && cObj.achId && !achSet.has(cObj.achId) && !achSet.has(cObj.id)) {
       profile.chosenNameColor = "name_white";
     }
   }
@@ -79,7 +79,8 @@ async function adminForceUpdateUserAchievements(targetUsername, newAchievementsL
     await window.leaderboardService.savePlayerProfile(targetUsername, profile);
   }
 
-  showToast(`⚡ ${targetUsername} jelvényei frissítve (${newAchievementsList.length} db)!`, "success");
+  const toastMsg = customToast || `⚡ ${targetUsername} jelvényei frissítve (${newAchievementsList.length} db)!`;
+  showToast(toastMsg, "success");
 
   // Profil és Játékosok lista azonnali frissítése (görgetési pozíció megtartásával)
   const pArea = document.querySelector(".profile-content-area");
@@ -386,6 +387,9 @@ async function openPlayerProfileModal(username, resetScroll = true) {
   }
 
 
+  const isAdmin = isAdminUser();
+  const canManageCustomization = isOwnProfile || isAdmin;
+
   // 5. Név színének választása (kártyás nézet)
   const nameColorSection = document.getElementById("profileNameColorSection");
   const nameColorGrid = document.getElementById("profileNameColorGrid");
@@ -393,11 +397,11 @@ async function openPlayerProfileModal(username, resetScroll = true) {
     typeof NAME_COLORS_CATALOG !== "undefined" ? NAME_COLORS_CATALOG : [];
 
   if (nameColorSection && nameColorGrid) {
-    if (isOwnProfile) {
+    if (canManageCustomization) {
       nameColorSection.style.display = "block";
       nameColorGrid.innerHTML = nameColorCatalog
         .map((col) => {
-          const unlocked = !col.achId || achSet.has(col.achId);
+          const unlocked = !col.achId || achSet.has(col.achId) || achSet.has(col.id);
           const isSelected =
             stats.activeNameColor && stats.activeNameColor.id === col.id;
           const reqAch = col.achId
@@ -407,11 +411,17 @@ async function openPlayerProfileModal(username, resetScroll = true) {
             ? `Zárolva: ${reqAch.title} (${reqAch.desc}) szükséges hozzá!`
             : "";
           return `
-            <div class="name-color-pick-card ${unlocked ? "" : "locked"} ${isSelected ? "active" : ""}"
+            <div class="name-color-pick-card ${unlocked ? "" : "locked"} ${isSelected ? "active" : ""} ${isAdmin ? "admin-manageable" : ""}"
                  data-color-id="${col.id}"
                  data-unlocked="${unlocked ? "1" : "0"}"
-                 title="${unlocked ? col.name : lockTitle}">
-                ${!unlocked ? '<span class="avatar-lock-icon">🔒</span>' : ""}
+                 title="${isAdmin ? (unlocked ? `${col.name} (Kattints a beállításhoz, jobb felső ikonnal zárolhatod)` : `${lockTitle} (Admin: kattints a feloldáshoz)`) : (unlocked ? col.name : lockTitle)}">
+                ${isAdmin && col.achId ? `
+                  <button type="button" class="card-admin-toggle-badge ${unlocked ? "unlocked" : "locked"}" 
+                          data-action="toggle-lock"
+                          title="${unlocked ? "Zárolás (Admin)" : "Feloldás (Admin)"}">
+                    ${unlocked ? "✓" : "🔒"}
+                  </button>
+                ` : (!unlocked ? '<span class="avatar-lock-icon">🔒</span>' : "")}
                 <span class="name-color-preview-text ${col.className}">Aa</span>
                 <span class="name-color-label">${col.name}${col.isSpecial ? " (speciális)" : ""}</span>
             </div>
@@ -422,27 +432,71 @@ async function openPlayerProfileModal(username, resetScroll = true) {
       nameColorGrid
         .querySelectorAll(".name-color-pick-card")
         .forEach((card) => {
-          card.addEventListener("click", function () {
+          card.addEventListener("click", async function (e) {
             const colId = this.getAttribute("data-color-id");
-            const isUnlocked = this.getAttribute("data-unlocked") === "1";
-            if (!isUnlocked) {
-              const colObj = nameColorCatalog.find((c) => c.id === colId);
-              const reqAch = colObj?.achId
-                ? ACHIEVEMENTS.find((a) => a.id === colObj.achId)
-                : null;
-              showToast(
-                `🔒 Ez a név szín még zárolva van! Feloldáshoz: ${reqAch?.title || "Teljesíts több mérföldkövet"}`,
-                "warning",
-              );
-              triggerHaptic("error");
-              if (typeof sorEffekt !== "undefined") playSound(sorEffekt);
-              return;
-            }
-
             const colObj = nameColorCatalog.find((c) => c.id === colId);
             if (!colObj) return;
 
-            localStorage.setItem("crashdown_chosen_name_color", colId);
+            const isToggleBtn = e.target.closest("[data-action='toggle-lock']");
+            const isUnlocked = this.getAttribute("data-unlocked") === "1";
+
+            // Ha az admin a jobb felső státusz gombra kattint: feloldás/visszazárás kapcsolása
+            if (isToggleBtn && isAdmin && colObj.achId) {
+              e.stopPropagation();
+              const nextSet = new Set(achSet);
+              if (isUnlocked) {
+                nextSet.delete(colObj.achId);
+                nextSet.delete(colObj.id);
+                if (stats.chosenNameColor === colId) {
+                  await syncPlayerCustomization(stats.username, { chosenNameColor: "name_white" });
+                }
+              } else {
+                nextSet.add(colObj.achId);
+                nextSet.add(colObj.id);
+              }
+              triggerHaptic("impact");
+              if (typeof hangKatt !== "undefined") playSound(hangKatt);
+              await adminForceUpdateUserAchievements(
+                stats.username,
+                Array.from(nextSet),
+                isUnlocked
+                  ? `🔒 ${colObj.name} névszín zárolva (${stats.username})!`
+                  : `🔓 ${colObj.name} névszín feloldva (${stats.username})!`
+              );
+              return;
+            }
+
+            // Ha zárolt elemre kattintunk
+            if (!isUnlocked) {
+              if (isAdmin && colObj.achId) {
+                const nextSet = new Set(achSet);
+                nextSet.add(colObj.achId);
+                nextSet.add(colObj.id);
+                triggerHaptic("impact");
+                if (typeof hangKatt !== "undefined") playSound(hangKatt);
+                await adminForceUpdateUserAchievements(
+                  stats.username,
+                  Array.from(nextSet),
+                  `⚡ ${colObj.name} névszín feloldva és aktiválva (${stats.username})!`
+                );
+              } else {
+                const reqAch = colObj.achId
+                  ? ACHIEVEMENTS.find((a) => a.id === colObj.achId)
+                  : null;
+                showToast(
+                  `🔒 Ez a név szín még zárolva van! Feloldáshoz: ${reqAch?.title || "Teljesíts több mérföldkövet"}`,
+                  "warning",
+                );
+                triggerHaptic("error");
+                if (typeof sorEffekt !== "undefined") playSound(sorEffekt);
+                return;
+              }
+            }
+
+            // Elem beállítása aktívnak
+            if (isOwnProfile) {
+              localStorage.setItem("crashdown_chosen_name_color", colId);
+            }
             stats.chosenNameColor = colId;
             stats.activeNameColor = colObj;
 
@@ -455,14 +509,16 @@ async function openPlayerProfileModal(username, resetScroll = true) {
               nameEl.classList.add(colObj.className);
             }
 
-            const currentUserNameLabel = document.getElementById(
-              "currentUserNameLabel",
-            );
-            if (currentUserNameLabel) {
-              nameColorCatalog.forEach((c) =>
-                currentUserNameLabel.classList.remove(c.className),
+            if (isOwnProfile) {
+              const currentUserNameLabel = document.getElementById(
+                "currentUserNameLabel",
               );
-              currentUserNameLabel.classList.add(colObj.className);
+              if (currentUserNameLabel) {
+                nameColorCatalog.forEach((c) =>
+                  currentUserNameLabel.classList.remove(c.className),
+                );
+                currentUserNameLabel.classList.add(colObj.className);
+              }
             }
 
             nameColorGrid
@@ -470,7 +526,7 @@ async function openPlayerProfileModal(username, resetScroll = true) {
               .forEach((c) => c.classList.remove("active"));
             this.classList.add("active");
 
-            showToast(`🎨 Új név szín beállítva: ${colObj.name}!`, "success");
+            showToast(`🎨 Új név szín beállítva (${stats.username}): ${colObj.name}!`, "success");
             playSound(sikeresKatt);
             triggerHaptic("success");
             toplistaMegjelenites();
@@ -486,10 +542,12 @@ async function openPlayerProfileModal(username, resetScroll = true) {
   const titleGrid = document.getElementById("profileTitleGrid");
 
   if (titleSection && titleGrid) {
-    if (isOwnProfile) {
+    if (canManageCustomization) {
       titleSection.style.display = "block";
       titleGrid.innerHTML = PROFILE_TITLES.map((t) => {
-        const unlocked = t.isUnlocked(stats, achSet);
+        const unlocked = (!t.achId && t.id === "title_beginner")
+          ? true
+          : (achSet.has(t.achId) || achSet.has(t.id) || (typeof t.isUnlocked === "function" && t.isUnlocked(stats, achSet)));
         const isSelected = stats.chosenTitle
           ? t.id === stats.chosenTitle
           : t.id === stats.activeTitle.id;
@@ -504,11 +562,17 @@ async function openPlayerProfileModal(username, resetScroll = true) {
           : "";
 
         return `
-          <div class="title-pick-card ${unlocked ? "" : "locked"} ${isSelected ? "active" : ""}"
+          <div class="title-pick-card ${unlocked ? "" : "locked"} ${isSelected ? "active" : ""} ${isAdmin ? "admin-manageable" : ""}"
                data-title-id="${t.id}"
                data-unlocked="${unlocked ? "1" : "0"}"
-               title="${unlocked ? t.name : lockTitle}">
-              ${!unlocked ? '<span class="avatar-lock-icon">🔒</span>' : ""}
+               title="${isAdmin ? (unlocked ? `${t.name} (Kattints a beállításhoz, jobb felső ikonnal zárolhatod)` : `${lockTitle} (Admin: kattints a feloldáshoz)`) : (unlocked ? t.name : lockTitle)}">
+              ${isAdmin && t.id !== "title_beginner" ? `
+                <button type="button" class="card-admin-toggle-badge ${unlocked ? "unlocked" : "locked"}" 
+                        data-action="toggle-lock"
+                        title="${unlocked ? "Zárolás (Admin)" : "Feloldás (Admin)"}">
+                  ${unlocked ? "✓" : "🔒"}
+                </button>
+              ` : (!unlocked ? '<span class="avatar-lock-icon">🔒</span>' : "")}
               <div class="title-pick-name">
                 <span class="title-text-label ${t.specialClass || ""}">${t.name}</span>
                 ${specialBadge}
@@ -518,27 +582,71 @@ async function openPlayerProfileModal(username, resetScroll = true) {
       }).join("");
 
       titleGrid.querySelectorAll(".title-pick-card").forEach((card) => {
-        card.addEventListener("click", function () {
+        card.addEventListener("click", async function (e) {
           const chosenId = this.getAttribute("data-title-id");
-          const isUnlocked = this.getAttribute("data-unlocked") === "1";
-          if (!isUnlocked) {
-            const titleObj = PROFILE_TITLES.find((t) => t.id === chosenId);
-            const reqAch = titleObj?.achId
-              ? ACHIEVEMENTS.find((a) => a.id === titleObj.achId)
-              : null;
-            showToast(
-              `🔒 Ez a rangcím még zárolva van! Feloldáshoz: ${reqAch?.title || titleObj?.desc || "Mérföldkő"}`,
-              "warning",
-            );
-            triggerHaptic("error");
-            if (typeof sorEffekt !== "undefined") playSound(sorEffekt);
-            return;
-          }
-
           const titleObj = PROFILE_TITLES.find((t) => t.id === chosenId);
           if (!titleObj) return;
 
-          localStorage.setItem("crashdown_chosen_title", chosenId);
+          const isToggleBtn = e.target.closest("[data-action='toggle-lock']");
+          const isUnlocked = this.getAttribute("data-unlocked") === "1";
+
+          // Ha az admin a jobb felső státusz gombra kattint: feloldás/visszazárás kapcsolása
+          if (isToggleBtn && isAdmin && titleObj.id !== "title_beginner") {
+            e.stopPropagation();
+            const nextSet = new Set(achSet);
+            if (isUnlocked) {
+              if (titleObj.achId) nextSet.delete(titleObj.achId);
+              nextSet.delete(titleObj.id);
+              if (stats.chosenTitle === chosenId || stats.activeTitle?.id === chosenId) {
+                await syncPlayerCustomization(stats.username, { chosenTitle: "title_beginner" });
+              }
+            } else {
+              if (titleObj.achId) nextSet.add(titleObj.achId);
+              nextSet.add(titleObj.id);
+            }
+            triggerHaptic("impact");
+            if (typeof hangKatt !== "undefined") playSound(hangKatt);
+            await adminForceUpdateUserAchievements(
+              stats.username,
+              Array.from(nextSet),
+              isUnlocked
+                ? `🔒 ${titleObj.name} rangcím zárolva (${stats.username})!`
+                : `🔓 ${titleObj.name} rangcím feloldva (${stats.username})!`
+            );
+            return;
+          }
+
+          // Ha zárolt elemre kattintunk
+          if (!isUnlocked) {
+            if (isAdmin && titleObj.id !== "title_beginner") {
+              const nextSet = new Set(achSet);
+              if (titleObj.achId) nextSet.add(titleObj.achId);
+              nextSet.add(titleObj.id);
+              triggerHaptic("impact");
+              if (typeof hangKatt !== "undefined") playSound(hangKatt);
+              await adminForceUpdateUserAchievements(
+                stats.username,
+                Array.from(nextSet),
+                `⚡ ${titleObj.name} rangcím feloldva és aktiválva (${stats.username})!`
+              );
+            } else {
+              const reqAch = titleObj.achId
+                ? ACHIEVEMENTS.find((a) => a.id === titleObj.achId)
+                : null;
+              showToast(
+                `🔒 Ez a rangcím még zárolva van! Feloldáshoz: ${reqAch?.title || titleObj?.desc || "Mérföldkő"}`,
+                "warning",
+              );
+              triggerHaptic("error");
+              if (typeof sorEffekt !== "undefined") playSound(sorEffekt);
+              return;
+            }
+          }
+
+          // Elem beállítása aktívnak
+          if (isOwnProfile) {
+            localStorage.setItem("crashdown_chosen_title", chosenId);
+          }
           stats.chosenTitle = chosenId;
           stats.activeTitle = titleObj;
 
@@ -562,7 +670,7 @@ async function openPlayerProfileModal(username, resetScroll = true) {
             .forEach((c) => c.classList.remove("active"));
           this.classList.add("active");
 
-          showToast(`🎖️ Új rangcím beállítva: ${titleObj.name}!`, "success");
+          showToast(`🎖️ Új rangcím beállítva (${stats.username}): ${titleObj.name}!`, "success");
           playSound(sikeresKatt);
           triggerHaptic("success");
           toplistaMegjelenites();
@@ -577,10 +685,10 @@ async function openPlayerProfileModal(username, resetScroll = true) {
   const avatarSection = document.getElementById("profileAvatarSection");
   const avatarGrid = document.getElementById("profileAvatarGrid");
   if (avatarSection && avatarGrid) {
-    if (isOwnProfile) {
+    if (canManageCustomization) {
       avatarSection.style.display = "block";
       avatarGrid.innerHTML = PROFILE_AVATARS.map((av) => {
-        const unlocked = !av.achId || achSet.has(av.achId);
+        const unlocked = !av.achId || achSet.has(av.achId) || achSet.has(av.id);
         const isSelected = stats.activeAvatar.id === av.id;
         const reqAch = av.achId
           ? ACHIEVEMENTS.find((a) => a.id === av.achId)
@@ -589,46 +697,98 @@ async function openPlayerProfileModal(username, resetScroll = true) {
           ? `Zárolva: ${reqAch.title} (${reqAch.desc}) szükséges hozzá!`
           : "";
         return `
-                    <div class="avatar-pick-card ${unlocked ? "" : "locked"} ${isSelected ? "active" : ""}"
-                         data-avatar-id="${av.id}"
-                         data-unlocked="${unlocked ? "1" : "0"}"
-                         title="${unlocked ? av.name : lockTitle}">
-                        ${!unlocked ? '<span class="avatar-lock-icon">🔒</span>' : ""}
-                        <span class="avatar-pick-symbol">${av.symbol}</span>
-                    </div>
-                `;
+          <div class="avatar-pick-card ${unlocked ? "" : "locked"} ${isSelected ? "active" : ""} ${isAdmin ? "admin-manageable" : ""}"
+               data-avatar-id="${av.id}"
+               data-unlocked="${unlocked ? "1" : "0"}"
+               title="${isAdmin ? (unlocked ? `${av.name} (Kattints a beállításhoz, jobb felső ikonnal zárolhatod)` : `${lockTitle} (Admin: kattints a feloldáshoz)`) : (unlocked ? av.name : lockTitle)}">
+              ${isAdmin && av.achId ? `
+                <button type="button" class="card-admin-toggle-badge ${unlocked ? "unlocked" : "locked"}" 
+                        data-action="toggle-lock"
+                        title="${unlocked ? "Zárolás (Admin)" : "Feloldás (Admin)"}">
+                  ${unlocked ? "✓" : "🔒"}
+                </button>
+              ` : (!unlocked ? '<span class="avatar-lock-icon">🔒</span>' : "")}
+              <span class="avatar-pick-symbol">${av.symbol}</span>
+          </div>
+        `;
       }).join("");
 
       avatarGrid.querySelectorAll(".avatar-pick-card").forEach((card) => {
-        card.addEventListener("click", function () {
+        card.addEventListener("click", async function (e) {
           const avId = this.getAttribute("data-avatar-id");
-          const isUnlocked = this.getAttribute("data-unlocked") === "1";
-          if (!isUnlocked) {
-            const avObj = PROFILE_AVATARS.find((a) => a.id === avId);
-            const reqAch = avObj?.achId
-              ? ACHIEVEMENTS.find((a) => a.id === avObj.achId)
-              : null;
-            showToast(
-              `🔒 Ez a profilkép még zárolva van! Feloldáshoz: ${reqAch?.title || "Teljesíts több mérföldkövet"}`,
-              "warning",
-            );
-            triggerHaptic("error");
-            if (typeof sorEffekt !== "undefined") playSound(sorEffekt);
-            return;
-          }
-
           const avObj = PROFILE_AVATARS.find((a) => a.id === avId);
           if (!avObj) return;
 
-          localStorage.setItem("crashdown_chosen_avatar", avId);
+          const isToggleBtn = e.target.closest("[data-action='toggle-lock']");
+          const isUnlocked = this.getAttribute("data-unlocked") === "1";
+
+          // Ha az admin a jobb felső státusz gombra kattint: feloldás/visszazárás kapcsolása
+          if (isToggleBtn && isAdmin && avObj.achId) {
+            e.stopPropagation();
+            const nextSet = new Set(achSet);
+            if (isUnlocked) {
+              nextSet.delete(avObj.achId);
+              nextSet.delete(avObj.id);
+              if (stats.chosenAvatar === avId || stats.activeAvatar?.id === avId) {
+                await syncPlayerCustomization(stats.username, { chosenAvatar: "avatar_default" });
+              }
+            } else {
+              nextSet.add(avObj.achId);
+              nextSet.add(avObj.id);
+            }
+            triggerHaptic("impact");
+            if (typeof hangKatt !== "undefined") playSound(hangKatt);
+            await adminForceUpdateUserAchievements(
+              stats.username,
+              Array.from(nextSet),
+              isUnlocked
+                ? `🔒 ${avObj.symbol} ${avObj.name} profilkép zárolva (${stats.username})!`
+                : `🔓 ${avObj.symbol} ${avObj.name} profilkép feloldva (${stats.username})!`
+            );
+            return;
+          }
+
+          // Ha zárolt elemre kattintunk
+          if (!isUnlocked) {
+            if (isAdmin && avObj.achId) {
+              const nextSet = new Set(achSet);
+              nextSet.add(avObj.achId);
+              nextSet.add(avObj.id);
+              triggerHaptic("impact");
+              if (typeof hangKatt !== "undefined") playSound(hangKatt);
+              await adminForceUpdateUserAchievements(
+                stats.username,
+                Array.from(nextSet),
+                `⚡ ${avObj.symbol} ${avObj.name} profilkép feloldva és aktiválva (${stats.username})!`
+              );
+            } else {
+              const reqAch = avObj.achId
+                ? ACHIEVEMENTS.find((a) => a.id === avObj.achId)
+                : null;
+              showToast(
+                `🔒 Ez a profilkép még zárolva van! Feloldáshoz: ${reqAch?.title || "Teljesíts több mérföldkövet"}`,
+                "warning",
+              );
+              triggerHaptic("error");
+              if (typeof sorEffekt !== "undefined") playSound(sorEffekt);
+              return;
+            }
+          }
+
+          // Elem beállítása aktívnak
+          if (isOwnProfile) {
+            localStorage.setItem("crashdown_chosen_avatar", avId);
+          }
           stats.chosenAvatar = avId;
           stats.activeAvatar = avObj;
 
           syncPlayerCustomization(stats.username, { chosenAvatar: avId });
 
           if (avatarEl) avatarEl.textContent = avObj.symbol;
-          const userAvatarDot = document.getElementById("userAvatarDot");
-          if (userAvatarDot) userAvatarDot.textContent = avObj.symbol;
+          if (isOwnProfile) {
+            const userAvatarDot = document.getElementById("userAvatarDot");
+            if (userAvatarDot) userAvatarDot.textContent = avObj.symbol;
+          }
 
           avatarGrid
             .querySelectorAll(".avatar-pick-card")
@@ -636,7 +796,7 @@ async function openPlayerProfileModal(username, resetScroll = true) {
           this.classList.add("active");
 
           showToast(
-            `🖼️ Új profilkép beállítva: ${avObj.symbol} ${avObj.name}!`,
+            `🖼️ Új profilkép beállítva (${stats.username}): ${avObj.symbol} ${avObj.name}!`,
             "success",
           );
           playSound(sikeresKatt);
