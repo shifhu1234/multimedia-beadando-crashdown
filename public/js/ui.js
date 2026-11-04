@@ -176,6 +176,40 @@ function switchToMobileTab(targetId, shouldScroll = true) {
 }
 
 // ==================== JÁTÉKOS PROFIL MODAL ====================
+// ==================== JÁTÉKOS PROFIL TESTRESZABÁS SZINKRONIZÁLÁS ====================
+async function syncPlayerCustomization(username, updates) {
+  if (!username) return;
+  try {
+    const key = "crashdown_player_profiles";
+    const profiles = JSON.parse(localStorage.getItem(key) || "{}");
+    if (!profiles[username]) {
+      profiles[username] = { username: username };
+    }
+    Object.assign(profiles[username], updates);
+    localStorage.setItem(key, JSON.stringify(profiles));
+
+    if (
+      window.leaderboardService &&
+      typeof window.leaderboardService.updatePlayerCustomizations === "function"
+    ) {
+      await window.leaderboardService.updatePlayerCustomizations(
+        username,
+        updates,
+      );
+    } else if (
+      window.databaseService &&
+      typeof window.databaseService.savePlayerProfile === "function"
+    ) {
+      await window.databaseService.savePlayerProfile(
+        username,
+        profiles[username],
+      );
+    }
+  } catch (e) {
+    console.warn("Hiba a testreszabások online szinkronizálásakor:", e);
+  }
+}
+
 async function openPlayerProfileModal(username) {
   let allScores = [];
   if (window.leaderboardService) {
@@ -203,7 +237,7 @@ async function openPlayerProfileModal(username) {
     stats.activeTitle =
       typeof PROFILE_TITLES !== "undefined" && PROFILE_TITLES[0]
         ? PROFILE_TITLES[0]
-        : { id: "title_kevezo", name: "Újonc Blokktörő" };
+        : { id: "title_beginner", name: "Kezdő Blokktörő" };
   }
   const currentUser = window.authService?.getCurrentUser();
   const isOwnProfile =
@@ -218,7 +252,6 @@ async function openPlayerProfileModal(username) {
   const nameEl = document.getElementById("profilePlayerName");
   const avatarEl = document.getElementById("profileAvatar");
   const titleEl = document.getElementById("profilePlayerTitle");
-  const titleSelectEl = document.getElementById("profileTitleSelect");
   const bestScoreEl = document.getElementById("profileBestScore");
   const matchesEl = document.getElementById("profileTotalMatches");
   const timeEl = document.getElementById("profileTotalTime");
@@ -254,155 +287,7 @@ async function openPlayerProfileModal(username) {
     }
   }
 
-  if (titleSelectEl) {
-    if (isOwnProfile) {
-      titleSelectEl.style.display = "inline-block";
-      titleSelectEl.innerHTML = PROFILE_TITLES.map((t) => {
-        const unlocked = t.isUnlocked(stats, achSet);
-        const isSelected = stats.chosenTitle
-          ? t.id === stats.chosenTitle
-          : t.id === stats.activeTitle.id;
-        const specialBadge = t.isSpecial ? " [SPECIÁLIS]" : "";
-        if (unlocked) {
-          return `<option value="${t.id}" ${isSelected ? "selected" : ""}>${t.name}${specialBadge}</option>`;
-        } else {
-          return `<option value="${t.id}" disabled>🔒 ${t.name}${specialBadge} (${t.desc})</option>`;
-        }
-      }).join("");
-
-      titleSelectEl.onchange = function () {
-        const chosenId = this.value;
-        const titleObj = PROFILE_TITLES.find((t) => t.id === chosenId);
-        if (titleObj) {
-          localStorage.setItem("crashdown_chosen_title", chosenId);
-          stats.chosenTitle = chosenId;
-          stats.activeTitle = titleObj;
-
-          try {
-            const profiles = JSON.parse(
-              localStorage.getItem("crashdown_player_profiles") || "{}",
-            );
-            if (!profiles[stats.username]) {
-              profiles[stats.username] = { ...stats };
-            }
-            profiles[stats.username].chosenTitle = chosenId;
-            localStorage.setItem(
-              "crashdown_player_profiles",
-              JSON.stringify(profiles),
-            );
-          } catch (e) {}
-
-          if (titleEl) {
-            titleEl.textContent = titleObj.name;
-            titleEl.classList.remove(
-              "title-special-gold",
-              "title-special-cosmic",
-              "title-special-flame",
-              "title-special-rainbow",
-            );
-            if (titleObj.specialClass) {
-              titleEl.classList.add(titleObj.specialClass);
-            }
-          }
-          showToast(`🎖️ Új rangcím beállítva: ${titleObj.name}!`, "success");
-          playSound(sikeresKatt);
-          triggerHaptic("success");
-          toplistaMegjelenites();
-        }
-      };
-    } else {
-      titleSelectEl.style.display = "none";
-    }
-  }
-
-  const avatarSection = document.getElementById("profileAvatarSection");
-  const avatarGrid = document.getElementById("profileAvatarGrid");
-  if (avatarSection && avatarGrid) {
-    if (isOwnProfile) {
-      avatarSection.style.display = "block";
-      avatarGrid.innerHTML = PROFILE_AVATARS.map((av) => {
-        const unlocked = !av.achId || achSet.has(av.achId);
-        const isSelected = stats.activeAvatar.id === av.id;
-        const reqAch = av.achId
-          ? ACHIEVEMENTS.find((a) => a.id === av.achId)
-          : null;
-        const lockTitle = reqAch
-          ? `Zárolva: ${reqAch.title} (${reqAch.desc}) szükséges hozzá!`
-          : "";
-        return `
-                    <div class="avatar-pick-card ${unlocked ? "" : "locked"} ${isSelected ? "active" : ""}"
-                         data-avatar-id="${av.id}"
-                         data-unlocked="${unlocked ? "1" : "0"}"
-                         title="${unlocked ? av.name : lockTitle}">
-                        ${!unlocked ? '<span class="avatar-lock-icon">🔒</span>' : ""}
-                        <span class="avatar-pick-symbol">${av.symbol}</span>
-                        <span class="avatar-pick-name">${av.name}</span>
-                    </div>
-                `;
-      }).join("");
-
-      avatarGrid.querySelectorAll(".avatar-pick-card").forEach((card) => {
-        card.addEventListener("click", function () {
-          const avId = this.getAttribute("data-avatar-id");
-          const isUnlocked = this.getAttribute("data-unlocked") === "1";
-          if (!isUnlocked) {
-            const avObj = PROFILE_AVATARS.find((a) => a.id === avId);
-            const reqAch = avObj?.achId
-              ? ACHIEVEMENTS.find((a) => a.id === avObj.achId)
-              : null;
-            showToast(
-              `🔒 Ez a profilkép még zárolva van! Feloldáshoz: ${reqAch?.title || "Teljesíts több mérföldkövet"}`,
-              "warning",
-            );
-            triggerHaptic("error");
-            if (typeof sorEffekt !== "undefined") playSound(sorEffekt);
-            return;
-          }
-
-          const avObj = PROFILE_AVATARS.find((a) => a.id === avId);
-          if (!avObj) return;
-
-          localStorage.setItem("crashdown_chosen_avatar", avId);
-          stats.chosenAvatar = avId;
-          stats.activeAvatar = avObj;
-
-          try {
-            const profiles = JSON.parse(
-              localStorage.getItem("crashdown_player_profiles") || "{}",
-            );
-            if (!profiles[stats.username]) {
-              profiles[stats.username] = { ...stats };
-            }
-            profiles[stats.username].chosenAvatar = avId;
-            localStorage.setItem(
-              "crashdown_player_profiles",
-              JSON.stringify(profiles),
-            );
-          } catch (e) {}
-
-          if (avatarEl) avatarEl.textContent = avObj.symbol;
-          const userAvatarDot = document.getElementById("userAvatarDot");
-          if (userAvatarDot) userAvatarDot.textContent = avObj.symbol;
-
-          avatarGrid
-            .querySelectorAll(".avatar-pick-card")
-            .forEach((c) => c.classList.remove("active"));
-          this.classList.add("active");
-
-          showToast(
-            `🖼️ Új profilkép beállítva: ${avObj.symbol} ${avObj.name}!`,
-            "success",
-          );
-          playSound(sikeresKatt);
-          triggerHaptic("success");
-          toplistaMegjelenites();
-        });
-      });
-    } else {
-      avatarSection.style.display = "none";
-    }
-  }
-
+  // 5. Név színének választása (kártyás nézet)
   const nameColorSection = document.getElementById("profileNameColorSection");
   const nameColorGrid = document.getElementById("profileNameColorGrid");
   const nameColorCatalog =
@@ -462,19 +347,7 @@ async function openPlayerProfileModal(username) {
             stats.chosenNameColor = colId;
             stats.activeNameColor = colObj;
 
-            try {
-              const profiles = JSON.parse(
-                localStorage.getItem("crashdown_player_profiles") || "{}",
-              );
-              if (!profiles[stats.username]) {
-                profiles[stats.username] = { ...stats };
-              }
-              profiles[stats.username].chosenNameColor = colId;
-              localStorage.setItem(
-                "crashdown_player_profiles",
-                JSON.stringify(profiles),
-              );
-            } catch (e) {}
+            syncPlayerCustomization(stats.username, { chosenNameColor: colId });
 
             if (nameEl) {
               nameColorCatalog.forEach((c) =>
@@ -506,6 +379,174 @@ async function openPlayerProfileModal(username) {
         });
     } else {
       nameColorSection.style.display = "none";
+    }
+  }
+
+  // 6. Rangcím választása (Kártyás felsorolás a dropdown helyett)
+  const titleSection = document.getElementById("profileTitleSection");
+  const titleGrid = document.getElementById("profileTitleGrid");
+
+  if (titleSection && titleGrid) {
+    if (isOwnProfile) {
+      titleSection.style.display = "block";
+      titleGrid.innerHTML = PROFILE_TITLES.map((t) => {
+        const unlocked = t.isUnlocked(stats, achSet);
+        const isSelected = stats.chosenTitle
+          ? t.id === stats.chosenTitle
+          : t.id === stats.activeTitle.id;
+        const reqAch = t.achId
+          ? ACHIEVEMENTS.find((a) => a.id === t.achId)
+          : null;
+        const lockTitle = reqAch
+          ? `Zárolva: ${reqAch.title} (${reqAch.desc}) szükséges hozzá!`
+          : `Zárolva: ${t.desc}`;
+        const specialBadge = t.isSpecial
+          ? '<span class="title-pick-special-tag">Speciális</span>'
+          : "";
+
+        return `
+          <div class="title-pick-card ${unlocked ? "" : "locked"} ${isSelected ? "active" : ""}"
+               data-title-id="${t.id}"
+               data-unlocked="${unlocked ? "1" : "0"}"
+               title="${unlocked ? t.name : lockTitle}">
+              ${!unlocked ? '<span class="avatar-lock-icon">🔒</span>' : ""}
+              <div class="title-pick-name">
+                <span class="title-text-label ${t.specialClass || ""}">${t.name}</span>
+                ${specialBadge}
+              </div>
+          </div>
+        `;
+      }).join("");
+
+      titleGrid.querySelectorAll(".title-pick-card").forEach((card) => {
+        card.addEventListener("click", function () {
+          const chosenId = this.getAttribute("data-title-id");
+          const isUnlocked = this.getAttribute("data-unlocked") === "1";
+          if (!isUnlocked) {
+            const titleObj = PROFILE_TITLES.find((t) => t.id === chosenId);
+            const reqAch = titleObj?.achId
+              ? ACHIEVEMENTS.find((a) => a.id === titleObj.achId)
+              : null;
+            showToast(
+              `🔒 Ez a rangcím még zárolva van! Feloldáshoz: ${reqAch?.title || titleObj?.desc || "Mérföldkő"}`,
+              "warning",
+            );
+            triggerHaptic("error");
+            if (typeof sorEffekt !== "undefined") playSound(sorEffekt);
+            return;
+          }
+
+          const titleObj = PROFILE_TITLES.find((t) => t.id === chosenId);
+          if (!titleObj) return;
+
+          localStorage.setItem("crashdown_chosen_title", chosenId);
+          stats.chosenTitle = chosenId;
+          stats.activeTitle = titleObj;
+
+          syncPlayerCustomization(stats.username, { chosenTitle: chosenId });
+
+          if (titleEl) {
+            titleEl.textContent = titleObj.name;
+            titleEl.classList.remove(
+              "title-special-gold",
+              "title-special-cosmic",
+              "title-special-flame",
+              "title-special-rainbow",
+            );
+            if (titleObj.specialClass) {
+              titleEl.classList.add(titleObj.specialClass);
+            }
+          }
+
+          titleGrid
+            .querySelectorAll(".title-pick-card")
+            .forEach((c) => c.classList.remove("active"));
+          this.classList.add("active");
+
+          showToast(`🎖️ Új rangcím beállítva: ${titleObj.name}!`, "success");
+          playSound(sikeresKatt);
+          triggerHaptic("success");
+          toplistaMegjelenites();
+        });
+      });
+    } else {
+      titleSection.style.display = "none";
+    }
+  }
+
+  // 7. Profilkép választása
+  const avatarSection = document.getElementById("profileAvatarSection");
+  const avatarGrid = document.getElementById("profileAvatarGrid");
+  if (avatarSection && avatarGrid) {
+    if (isOwnProfile) {
+      avatarSection.style.display = "block";
+      avatarGrid.innerHTML = PROFILE_AVATARS.map((av) => {
+        const unlocked = !av.achId || achSet.has(av.achId);
+        const isSelected = stats.activeAvatar.id === av.id;
+        const reqAch = av.achId
+          ? ACHIEVEMENTS.find((a) => a.id === av.achId)
+          : null;
+        const lockTitle = reqAch
+          ? `Zárolva: ${reqAch.title} (${reqAch.desc}) szükséges hozzá!`
+          : "";
+        return `
+                    <div class="avatar-pick-card ${unlocked ? "" : "locked"} ${isSelected ? "active" : ""}"
+                         data-avatar-id="${av.id}"
+                         data-unlocked="${unlocked ? "1" : "0"}"
+                         title="${unlocked ? av.name : lockTitle}">
+                        ${!unlocked ? '<span class="avatar-lock-icon">🔒</span>' : ""}
+                        <span class="avatar-pick-symbol">${av.symbol}</span>
+                    </div>
+                `;
+      }).join("");
+
+      avatarGrid.querySelectorAll(".avatar-pick-card").forEach((card) => {
+        card.addEventListener("click", function () {
+          const avId = this.getAttribute("data-avatar-id");
+          const isUnlocked = this.getAttribute("data-unlocked") === "1";
+          if (!isUnlocked) {
+            const avObj = PROFILE_AVATARS.find((a) => a.id === avId);
+            const reqAch = avObj?.achId
+              ? ACHIEVEMENTS.find((a) => a.id === avObj.achId)
+              : null;
+            showToast(
+              `🔒 Ez a profilkép még zárolva van! Feloldáshoz: ${reqAch?.title || "Teljesíts több mérföldkövet"}`,
+              "warning",
+            );
+            triggerHaptic("error");
+            if (typeof sorEffekt !== "undefined") playSound(sorEffekt);
+            return;
+          }
+
+          const avObj = PROFILE_AVATARS.find((a) => a.id === avId);
+          if (!avObj) return;
+
+          localStorage.setItem("crashdown_chosen_avatar", avId);
+          stats.chosenAvatar = avId;
+          stats.activeAvatar = avObj;
+
+          syncPlayerCustomization(stats.username, { chosenAvatar: avId });
+
+          if (avatarEl) avatarEl.textContent = avObj.symbol;
+          const userAvatarDot = document.getElementById("userAvatarDot");
+          if (userAvatarDot) userAvatarDot.textContent = avObj.symbol;
+
+          avatarGrid
+            .querySelectorAll(".avatar-pick-card")
+            .forEach((c) => c.classList.remove("active"));
+          this.classList.add("active");
+
+          showToast(
+            `🖼️ Új profilkép beállítva: ${avObj.symbol} ${avObj.name}!`,
+            "success",
+          );
+          playSound(sikeresKatt);
+          triggerHaptic("success");
+          toplistaMegjelenites();
+        });
+      });
+    } else {
+      avatarSection.style.display = "none";
     }
   }
 
@@ -901,6 +942,19 @@ function updateAuthUI(user) {
 
 // ==================== RANGLISTA SERVICE & MEGJELENÍTÉS ====================
 async function toplistaHozzaadas(jatekosAdat) {
+  if (!jatekosAdat.chosenAvatar) {
+    jatekosAdat.chosenAvatar =
+      localStorage.getItem("crashdown_chosen_avatar") || "avatar_default";
+  }
+  if (!jatekosAdat.chosenTitle) {
+    jatekosAdat.chosenTitle =
+      localStorage.getItem("crashdown_chosen_title") || null;
+  }
+  if (!jatekosAdat.chosenNameColor) {
+    jatekosAdat.chosenNameColor =
+      localStorage.getItem("crashdown_chosen_name_color") || "name_white";
+  }
+
   if (window.leaderboardService) {
     return await window.leaderboardService.addScore(jatekosAdat);
   }
@@ -932,6 +986,9 @@ async function toplistaHozzaadas(jatekosAdat) {
       existing.duration = jatekosAdat.duration;
       existing.modifier = targetModifier;
       existing.timestamp = jatekosAdat.timestamp;
+      existing.chosenAvatar = jatekosAdat.chosenAvatar;
+      existing.chosenTitle = jatekosAdat.chosenTitle;
+      existing.chosenNameColor = jatekosAdat.chosenNameColor;
       isRecord = true;
     } else {
       return { success: true, isRecord: false, previousBest: previousBest };
@@ -1042,7 +1099,11 @@ async function toplistaMegjelenites() {
 
     try {
       const pStats = getPlayerProfileStats(elem.name, toplista);
-      if (pStats && pStats.activeNameColor && pStats.activeNameColor.className) {
+      if (
+        pStats &&
+        pStats.activeNameColor &&
+        pStats.activeNameColor.className
+      ) {
         nameSpan.classList.add(pStats.activeNameColor.className);
       }
     } catch (e) {}

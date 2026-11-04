@@ -1416,11 +1416,20 @@ function getPlayerProfileStats(username, allScores = [], onlineProfile = null) {
     const profiles = JSON.parse(
       localStorage.getItem("crashdown_player_profiles") || "{}",
     );
-    profile = profiles[username] ? { ...profiles[username] } : null;
+    if (profiles[username]) {
+      profile = { ...profiles[username] };
+    } else {
+      const matchKey = Object.keys(profiles).find(
+        (k) => k.toLowerCase() === String(username).toLowerCase(),
+      );
+      if (matchKey) {
+        profile = { ...profiles[matchKey] };
+      }
+    }
   } catch (e) {}
 
   const playerScores = allScores.filter(
-    (s) => s.name && s.name.toLowerCase() === username.toLowerCase(),
+    (s) => s.name && s.name.toLowerCase() === String(username).toLowerCase(),
   );
 
   if (!profile) {
@@ -1441,6 +1450,25 @@ function getPlayerProfileStats(username, allScores = [], onlineProfile = null) {
       chosenNameColor: "name_white",
     };
   }
+
+  // Ha a ranglistán szerepel a játékos egyedi testreszabása, vegyük figyelembe
+  playerScores.forEach((s) => {
+    if (
+      (!profile.chosenAvatar || profile.chosenAvatar === "avatar_default") &&
+      s.chosenAvatar
+    ) {
+      profile.chosenAvatar = s.chosenAvatar;
+    }
+    if (!profile.chosenTitle && s.chosenTitle) {
+      profile.chosenTitle = s.chosenTitle;
+    }
+    if (
+      (!profile.chosenNameColor || profile.chosenNameColor === "name_white") &&
+      s.chosenNameColor
+    ) {
+      profile.chosenNameColor = s.chosenNameColor;
+    }
+  });
   if (!profile.history) profile.history = [];
   if (!profile.modes) profile.modes = {};
   if (!profile.modifierStats) profile.modifierStats = {};

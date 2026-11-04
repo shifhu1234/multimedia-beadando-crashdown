@@ -261,13 +261,22 @@ function regisztraljKomboLepest() {
 
 function updateComboUI() {
     const pill = document.getElementById('comboIndicator');
-    if (!pill) return;
+    const wrapper = document.getElementById('canvasWrapper');
 
-    pill.classList.remove('combo-x2', 'combo-x3', 'combo-x4', 'combo-x5');
+    if (pill) {
+        pill.classList.remove('combo-x2', 'combo-x3', 'combo-x4', 'combo-x5', 'combo-x6');
+        if (comboMultiplier > 1) {
+            pill.classList.add(`combo-x${comboMultiplier}`);
+            pill.textContent = `🔥 KOMBÓ ×${comboMultiplier}!`;
+        }
+    }
 
-    if (comboMultiplier > 1) {
-        pill.classList.add(`combo-x${comboMultiplier}`);
-        pill.textContent = `🔥 KOMBÓ ×${comboMultiplier}!`;
+    if (wrapper) {
+        wrapper.classList.remove('combo-glow-2', 'combo-glow-3', 'combo-glow-4', 'combo-glow-5', 'combo-glow-6');
+        if (comboMultiplier >= 2) {
+            const glowLevel = Math.min(6, comboMultiplier);
+            wrapper.classList.add(`combo-glow-${glowLevel}`);
+        }
     }
 }
 
@@ -935,14 +944,89 @@ function drawGrid() {
         ctx.translate(dx, dy);
     }
 
+    // Dinamikus háttér és slot szín számítás: fagyasztás, 2x frenzy és kombó fúzió
     let bgFill = '#0d1017';
     let slotFill = '#151a24';
-    if (isDoublePointsActive) {
-        bgFill = '#071d2e';
-        slotFill = '#0c3554';
-    } else if (isFrozen) {
-        bgFill = '#062033';
-        slotFill = '#0c3d5c';
+
+    const has2x = isDoublePointsActive;
+    const hasFreeze = isFrozen;
+    const cMult = Math.min(6, Math.max(1, comboMultiplier || 1));
+
+    if (hasFreeze && has2x) {
+        // Mindkettő aktív egyszerre: elektromos jeges szuperállapot
+        if (cMult <= 1) {
+            bgFill = '#071f38';
+            slotFill = '#0e3e68';
+        } else if (cMult <= 3) {
+            bgFill = '#0a1d3c';
+            slotFill = '#14386e';
+        } else if (cMult <= 5) {
+            bgFill = '#141843';
+            slotFill = '#262875';
+        } else {
+            bgFill = '#1d1248';
+            slotFill = '#371c82';
+        }
+    } else if (hasFreeze) {
+        // Csak fagyasztás aktív: hideg jégkék, amibe a kombó belekeveri a tüzét (Frostfire)
+        if (cMult <= 1) {
+            bgFill = '#062033';
+            slotFill = '#0c3d5c';
+        } else if (cMult === 2) {
+            bgFill = '#081e35';
+            slotFill = '#0e3a60';
+        } else if (cMult === 3) {
+            bgFill = '#0b1d38';
+            slotFill = '#143864';
+        } else if (cMult === 4) {
+            bgFill = '#111b3d';
+            slotFill = '#1f3069';
+        } else if (cMult === 5) {
+            bgFill = '#17163f';
+            slotFill = '#29256d';
+        } else {
+            bgFill = '#1a1244';
+            slotFill = '#311f75';
+        }
+    } else if (has2x) {
+        // Csak 2x szorzó aktív: villanykék, amibe a kombó belekeveri a plazmát
+        if (cMult <= 1) {
+            bgFill = '#071d2e';
+            slotFill = '#0c3554';
+        } else if (cMult === 2) {
+            bgFill = '#091b32';
+            slotFill = '#103359';
+        } else if (cMult === 3) {
+            bgFill = '#0c1a36';
+            slotFill = '#173060';
+        } else if (cMult === 4) {
+            bgFill = '#121739';
+            slotFill = '#222864';
+        } else if (cMult === 5) {
+            bgFill = '#18143d';
+            slotFill = '#2c1e69';
+        } else {
+            bgFill = '#1d1042';
+            slotFill = '#351873';
+        }
+    } else if (cMult > 1) {
+        // Csak kombó izzik
+        if (cMult === 2) {
+            bgFill = '#141216';
+            slotFill = '#201a24';
+        } else if (cMult === 3) {
+            bgFill = '#171114';
+            slotFill = '#27171d';
+        } else if (cMult === 4) {
+            bgFill = '#1c0e12';
+            slotFill = '#30131b';
+        } else if (cMult === 5) {
+            bgFill = '#200b1a';
+            slotFill = '#38112e';
+        } else {
+            bgFill = '#1a0928';
+            slotFill = '#301048';
+        }
     }
 
     ctx.fillStyle = bgFill;

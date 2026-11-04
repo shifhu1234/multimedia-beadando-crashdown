@@ -3,7 +3,7 @@
    ================================================================ */
 
 /* 1. Retro Arcade (Alapértelmezett zöldes arcade) */
-body.theme-retro {
+:root.theme-retro, html.theme-retro, body.theme-retro {
     --bg-main: #0c140e;
     --bg-panel: #132017;
     --bg-card: #192a1f;
@@ -19,7 +19,7 @@ body.theme-retro {
 }
 
 /* 2. Cyber Neon (Kék/Lila techno) */
-body.theme-cyber {
+:root.theme-cyber, html.theme-cyber, body.theme-cyber {
     --bg-main: #0b0f19;
     --bg-panel: #131929;
     --bg-card: #1b233a;
@@ -35,7 +35,7 @@ body.theme-cyber {
 }
 
 /* 3. Candy Pop (Édes rózsaszín / pasztell) */
-body.theme-candy {
+:root.theme-candy, html.theme-candy, body.theme-candy {
     --bg-main: #191222;
     --bg-panel: #231a31;
     --bg-card: #2e2240;
@@ -51,7 +51,7 @@ body.theme-candy {
 }
 
 /* 4. Deep Space (Mélyűr kozmikus kék / indigo) */
-body.theme-space {
+:root.theme-space, html.theme-space, body.theme-space {
     --bg-main: #060814;
     --bg-panel: #0d1226;
     --bg-card: #131c38;
@@ -67,7 +67,7 @@ body.theme-space {
 }
 
 /* 5. Sunset Synthwave (Naplemente narancs és lila) */
-body.theme-sunset {
+:root.theme-sunset, html.theme-sunset, body.theme-sunset {
     --bg-main: #180d19;
     --bg-panel: #241426;
     --bg-card: #311b34;
@@ -83,7 +83,7 @@ body.theme-sunset {
 }
 
 /* 6. Emerald Forest (Smaragd erdő) */
-body.theme-forest {
+:root.theme-forest, html.theme-forest, body.theme-forest {
     --bg-main: #09150f;
     --bg-panel: #102118;
     --bg-card: #162d21;
@@ -99,7 +99,7 @@ body.theme-forest {
 }
 
 /* 7. Vulkán Láva (Tüzes vörös és pernye) */
-body.theme-lava {
+:root.theme-lava, html.theme-lava, body.theme-lava {
     --bg-main: #170909;
     --bg-panel: #230e0e;
     --bg-card: #301414;
@@ -115,7 +115,7 @@ body.theme-lava {
 }
 
 /* 8. Monokróm Noir (Elegáns sötét szürke és acél) */
-body.theme-noir {
+:root.theme-noir, html.theme-noir, body.theme-noir {
     --bg-main: #0b0c10;
     --bg-panel: #14161d;
     --bg-card: #1d202b;
@@ -131,7 +131,7 @@ body.theme-noir {
 }
 
 /* 9. Mélytengeri Misztikum (Cián és tengerkék) */
-body.theme-ocean {
+:root.theme-ocean, html.theme-ocean, body.theme-ocean {
     --bg-main: #061118;
     --bg-panel: #0c1c27;
     --bg-card: #122837;
@@ -147,7 +147,7 @@ body.theme-ocean {
 }
 
 /* 10. Sarki Fény (Aurora Borealis - Türkiz és lila) */
-body.theme-aurora {
+:root.theme-aurora, html.theme-aurora, body.theme-aurora {
     --bg-main: #051419;
     --bg-panel: #0c1f27;
     --bg-card: #112a35;
@@ -163,7 +163,7 @@ body.theme-aurora {
 }
 
 /* 11. Retró Synthwave (80s Vaporwave rózsaszín & cián) */
-body.theme-vaporwave {
+:root.theme-vaporwave, html.theme-vaporwave, body.theme-vaporwave {
     --bg-main: #140b1e;
     --bg-panel: #1e112d;
     --bg-card: #2b1740;
@@ -179,7 +179,7 @@ body.theme-vaporwave {
 }
 
 /* 12. SPECIÁLIS TÉMA: Kozmikus Void (Sötét anyagos misztikus lila) */
-body.theme-cosmic_void {
+:root.theme-cosmic_void, html.theme-cosmic_void, body.theme-cosmic_void {
     --bg-main: #090514;
     --bg-panel: #130a27;
     --bg-card: #1d0f3a;
@@ -196,7 +196,7 @@ body.theme-cosmic_void {
 }
 
 /* 13. SPECIÁLIS TÉMA: Birodalmi Arany (Császári ragyogó arany és borostyán) */
-body.theme-golden {
+:root.theme-golden, html.theme-golden, body.theme-golden {
     --bg-main: #140e04;
     --bg-panel: #211708;
     --bg-card: #30210b;

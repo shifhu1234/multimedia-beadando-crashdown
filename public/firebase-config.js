@@ -429,6 +429,34 @@ class LeaderboardService {
             }, (error) => {
                 console.warn('Firebase valós idejű olvasási hiba:', error);
             });
+
+            // Valós idejű profil-figyelés (név szín, rangcím, avatar változások azonnali lekövetése)
+            const profilesRef = this.db.ref('profiles');
+            profilesRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    try {
+                        const localProfiles = JSON.parse(localStorage.getItem('crashdown_player_profiles') || '{}');
+                        Object.keys(data).forEach(key => {
+                            const p = data[key];
+                            if (p && p.username) {
+                                localProfiles[p.username] = {
+                                    ...(localProfiles[p.username] || {}),
+                                    ...p
+                                };
+                            }
+                        });
+                        localStorage.setItem('crashdown_player_profiles', JSON.stringify(localProfiles));
+                        if (typeof toplistaMegjelenites === 'function') {
+                            toplistaMegjelenites();
+                        }
+                    } catch (e) {
+                        console.warn('Hiba profilok valós idejű frissítésekor:', e);
+                    }
+                }
+            }, (error) => {
+                console.warn('Firebase valós idejű profil olvasási hiba:', error);
+            });
         } catch (err) {
             console.warn('Firebase figyelő hiba:', err);
         }
@@ -472,6 +500,16 @@ class LeaderboardService {
         const targetModifier = String(jatekosAdat.modifier || 'normal');
         const newScore = parseInt(jatekosAdat.score, 10) || 0;
 
+        if (!jatekosAdat.chosenAvatar) {
+            jatekosAdat.chosenAvatar = localStorage.getItem('crashdown_chosen_avatar') || 'avatar_default';
+        }
+        if (!jatekosAdat.chosenTitle) {
+            jatekosAdat.chosenTitle = localStorage.getItem('crashdown_chosen_title') || null;
+        }
+        if (!jatekosAdat.chosenNameColor) {
+            jatekosAdat.chosenNameColor = localStorage.getItem('crashdown_chosen_name_color') || 'name_white';
+        }
+
         const existingIndex = currentScores.findIndex(s => 
             String(s.name || '').trim().toLowerCase() === userNameLower &&
             String(s.color || '3') === targetColor &&
@@ -488,6 +526,9 @@ class LeaderboardService {
                 existing.duration = jatekosAdat.duration;
                 existing.modifier = targetModifier;
                 existing.timestamp = jatekosAdat.timestamp;
+                existing.chosenAvatar = jatekosAdat.chosenAvatar;
+                existing.chosenTitle = jatekosAdat.chosenTitle;
+                existing.chosenNameColor = jatekosAdat.chosenNameColor;
                 wasUpdated = true;
 
                 if (this.isOnline && this.db && existing.firebaseKey) {
@@ -496,7 +537,10 @@ class LeaderboardService {
                             score: newScore,
                             duration: jatekosAdat.duration,
                             modifier: targetModifier,
-                            timestamp: jatekosAdat.timestamp
+                            timestamp: jatekosAdat.timestamp,
+                            chosenAvatar: jatekosAdat.chosenAvatar,
+                            chosenTitle: jatekosAdat.chosenTitle,
+                            chosenNameColor: jatekosAdat.chosenNameColor
                         });
                     } catch (err) {
                         console.warn('Nem sikerült az online rekordfrissítés:', err);
@@ -568,14 +612,55 @@ class LeaderboardService {
                     bestScore: profileData.bestScore || 0,
                     totalMatches: profileData.totalMatches || 0,
                     totalPlaytimeSeconds: profileData.totalPlaytimeSeconds || 0,
+                    totalScore: profileData.totalScore || 0,
                     achievements: profileData.achievements || [],
                     history: (profileData.history || []).slice(0, 10),
                     chosenTitle: profileData.chosenTitle || null,
                     chosenAvatar: profileData.chosenAvatar || 'avatar_default',
+                    chosenNameColor: profileData.chosenNameColor || 'name_white',
+                    modifierStats: profileData.modifierStats || {},
+                    durationStats: profileData.durationStats || {},
+                    modes: profileData.modes || {},
                     updatedAt: new Date().toISOString()
                 });
             } catch (e) {
                 console.warn('Firebase profil mentési hiba:', e);
+            }
+        }
+    }
+
+    async updatePlayerCustomizations(username, { chosenTitle, chosenAvatar, chosenNameColor }) {
+        if (!username) return;
+        const safeKey = encodeURIComponent(username.trim().toLowerCase()).replace(/\./g, '%2E');
+        if (this.isOnline && this.db) {
+            try {
+                const updates = {};
+                if (chosenTitle !== undefined) updates.chosenTitle = chosenTitle;
+                if (chosenAvatar !== undefined) updates.chosenAvatar = chosenAvatar;
+                if (chosenNameColor !== undefined) updates.chosenNameColor = chosenNameColor;
+                updates.updatedAt = new Date().toISOString();
+
+                await this.db.ref('profiles/' + safeKey).update(updates);
+
+                // Frissítsük a játékos meglévő rekordjait a ranglistán is valós időben
+                const snap = await this.db.ref('leaderboard').once('value');
+                const data = snap.val();
+                if (data) {
+                    const uLower = username.trim().toLowerCase();
+                    const batchUpdates = {};
+                    Object.keys(data).forEach(key => {
+                        if (String(data[key].name || '').trim().toLowerCase() === uLower) {
+                            if (chosenTitle !== undefined) batchUpdates[`leaderboard/${key}/chosenTitle`] = chosenTitle;
+                            if (chosenAvatar !== undefined) batchUpdates[`leaderboard/${key}/chosenAvatar`] = chosenAvatar;
+                            if (chosenNameColor !== undefined) batchUpdates[`leaderboard/${key}/chosenNameColor`] = chosenNameColor;
+                        }
+                    });
+                    if (Object.keys(batchUpdates).length > 0) {
+                        await this.db.ref().update(batchUpdates);
+                    }
+                }
+            } catch (e) {
+                console.warn('Firebase testreszabás mentési hiba:', e);
             }
         }
     }
@@ -584,3 +669,4 @@ class LeaderboardService {
 // Globális példányok
 window.authService = new AuthService();
 window.leaderboardService = new LeaderboardService();
+window.databaseService = window.leaderboardService;

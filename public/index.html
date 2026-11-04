@@ -17,6 +17,16 @@
     />
     <link rel="stylesheet" href="style.css?v=3.8" />
 
+    <!-- Azonnali színtéma érvényesítés a bevillanás (FOUC) teljes megelőzésére -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("crashdown_theme") || "retro";
+          document.documentElement.className = "theme-" + t;
+        } catch (e) {}
+      })();
+    </script>
+
     <!-- Firebase SDK (Compat - automatikus integráció) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -24,6 +34,14 @@
     <script src="firebase-config.js?v=3.0"></script>
   </head>
   <body>
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("crashdown_theme") || "retro";
+          document.body.className = "theme-" + t;
+        } catch (e) {}
+      })();
+    </script>
     <!-- Felső Felhasználói Sáv & Mobilos Navigáció -->
     <header class="top-nav-bar">
       <div class="user-profile-bar" id="userProfileBar">
@@ -758,14 +776,6 @@
                 </div>
               </div>
             </div>
-            <div class="profile-title-select-wrap">
-              <select
-                id="profileTitleSelect"
-                class="profile-title-select"
-                style="display: none"
-                title="Válassz a megszerzett rangcímeid közül"
-              ></select>
-            </div>
           </div>
           <button
             id="closePlayerProfileModalBtn"
@@ -777,7 +787,7 @@
         </div>
 
         <div class="profile-content-area">
-          <!-- 4 Statisztikai Kártya -->
+          <!-- 1. Alapstatisztikák Kártyák (Legjobb pont ... Átlagpont) -->
           <div class="profile-stats-grid">
             <div class="profile-stat-box">
               <span class="profile-stat-icon">🏆</span>
@@ -840,24 +850,37 @@
             </div>
           </div>
 
-          <!-- Profilkép választó részleg (Saját profilnál feloldott avatárok) -->
-          <div
-            id="profileAvatarSection"
-            class="profile-section"
-            style="display: none"
-          >
-            <div class="profile-section-header">
-              <h4 class="profile-section-title">🖼️ Profilkép választása</h4>
-              <span class="auth-hint-text"
-                >Mérföldkövekkel kinyitható szimbólumok</span
-              >
-            </div>
-            <div id="profileAvatarGrid" class="profile-avatar-grid">
+          <!-- 2. Teljesítmény Színmódok szerint -->
+          <div class="profile-section">
+            <h4 class="profile-section-title">
+              📊 Teljesítmény Színmódok szerint
+            </h4>
+            <div id="profileModesBreakdown" class="profile-modes-list">
               <!-- Dinamikusan renderelve ui.js-ből -->
             </div>
           </div>
 
-          <!-- Név színe választó részleg (Saját profilnál feloldott színek) -->
+          <!-- 3. Teljesítmény Játékmód szerint -->
+          <div class="profile-section">
+            <h4 class="profile-section-title">
+              🎯 Teljesítmény Játékmód szerint
+            </h4>
+            <div id="profileGameModesBreakdown" class="profile-modes-list">
+              <!-- Dinamikusan renderelve ui.js-ből -->
+            </div>
+          </div>
+
+          <!-- 4. Teljesítmény Játékidő szerint -->
+          <div class="profile-section">
+            <h4 class="profile-section-title">
+              ⏱️ Teljesítmény Játékidő szerint
+            </h4>
+            <div id="profileDurationsBreakdown" class="profile-modes-list">
+              <!-- Dinamikusan renderelve ui.js-ből -->
+            </div>
+          </div>
+
+          <!-- 5. Név Színének Állítása -->
           <div
             id="profileNameColorSection"
             class="profile-section"
@@ -874,37 +897,41 @@
             </div>
           </div>
 
-          <!-- Játékmódok szerinti lebontás -->
-          <div class="profile-section">
-            <h4 class="profile-section-title">
-              📊 Teljesítmény Színmódok szerint
-            </h4>
-            <div id="profileModesBreakdown" class="profile-modes-list">
+          <!-- 6. Rangcím Állítása (Kártyás lista) -->
+          <div
+            id="profileTitleSection"
+            class="profile-section"
+            style="display: none"
+          >
+            <div class="profile-section-header">
+              <h4 class="profile-section-title">🎖️ Rangcím Választása</h4>
+              <span class="auth-hint-text"
+                >Mérföldkövekkel feloldható rangcímek</span
+              >
+            </div>
+            <div id="profileTitleGrid" class="profile-title-grid">
               <!-- Dinamikusan renderelve ui.js-ből -->
             </div>
           </div>
 
-          <!-- Játékmódok szerinti teljesítmény (Normál, Időhajsza, Robbanás Mánia, Káosz, Nyers) -->
-          <div class="profile-section">
-            <h4 class="profile-section-title">
-              🎯 Teljesítmény Játékmód szerint
-            </h4>
-            <div id="profileGameModesBreakdown" class="profile-modes-list">
+          <!-- 7. Profilkép Választása -->
+          <div
+            id="profileAvatarSection"
+            class="profile-section"
+            style="display: none"
+          >
+            <div class="profile-section-header">
+              <h4 class="profile-section-title">🖼️ Profilkép választása</h4>
+              <span class="auth-hint-text"
+                >Mérföldkövekkel kinyitható szimbólumok</span
+              >
+            </div>
+            <div id="profileAvatarGrid" class="profile-avatar-grid">
               <!-- Dinamikusan renderelve ui.js-ből -->
             </div>
           </div>
 
-          <!-- Játékidő szerinti teljesítmény (30s, 60s, 90s, 180s) -->
-          <div class="profile-section">
-            <h4 class="profile-section-title">
-              ⏱️ Teljesítmény Játékidő szerint
-            </h4>
-            <div id="profileDurationsBreakdown" class="profile-modes-list">
-              <!-- Dinamikusan renderelve ui.js-ből -->
-            </div>
-          </div>
-
-          <!-- Feloldott Jelvények & Eredmények -->
+          <!-- 8. Elért Jelvények -->
           <div class="profile-section">
             <div class="profile-section-header">
               <h4 class="profile-section-title">🎖️ Elért Jelvények</h4>
@@ -915,7 +942,7 @@
             </div>
           </div>
 
-          <!-- Legutóbbi 10 meccs előzményei (Match History) -->
+          <!-- 9. Játékelőzmények (Match History) -->
           <div class="profile-section">
             <div class="profile-section-header">
               <h4 class="profile-section-title">
@@ -930,7 +957,7 @@
             </div>
           </div>
 
-          <!-- Jelszóváltoztatás szekció közvetlenül a profilon belül -->
+          <!-- 10. Jelszó Megváltoztatása -->
           <div
             class="profile-section"
             id="profileChangePasswordSection"
