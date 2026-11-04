@@ -5,6 +5,14 @@
 const canvas = document.getElementById('crashdownCanvas');
 const ctx = canvas.getContext('2d');
 
+function formatScore(score) {
+    if (score === null || score === undefined || score === '') return '0';
+    const num = typeof score === 'number' ? Math.round(score) : parseInt(score, 10);
+    if (isNaN(num)) return '0';
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+window.formatScore = formatScore;
+
 let grid = [];
 let pontSzam = 0;
 let displayedScore = 0;
@@ -1224,7 +1232,7 @@ function animationLoop(now) {
         const step = Math.ceil(Math.abs(diff) * 0.25);
         displayedScore += Math.sign(diff) * step;
         const scoreEl = document.getElementById('score');
-        if (scoreEl) scoreEl.textContent = displayedScore;
+        if (scoreEl) scoreEl.textContent = formatScore(displayedScore);
     }
 
     if (screenShake > 0) {
@@ -1435,7 +1443,7 @@ function timer() {
 
             if (overlay) {
                 overlay.classList.remove('hidden');
-                if (overlayTitle) overlayTitle.textContent = `Végső pontszám: ${pontSzam} p`;
+                if (overlayTitle) overlayTitle.textContent = `Végső pontszám: ${formatScore(pontSzam)} p`;
                 const btnText = document.getElementById('overlayStartBtnText');
                 if (btnText) btnText.textContent = 'Új játék indítása';
                 const timeUpMsg = document.getElementById('timeUpMessage');
@@ -1465,14 +1473,14 @@ function timer() {
                             if (overlaySubtitle) {
                                 overlaySubtitle.textContent = `Gratulálunk, ${currentUser.displayName}! Új egyéni rekordot értél el ebben a módban (${colorVal} szín, ${GAME_MODIFIERS[modVal]?.name || modVal})!`;
                             }
-                            showToast(`🏆 Új személyes rekord rögzítve: ${pontSzam} pont!`, 'success');
+                            showToast(`🏆 Új személyes rekord rögzítve: ${formatScore(pontSzam)} pont!`, 'success');
                             playSound(sikeresKatt);
                             triggerHaptic('success');
                         } else {
                             if (overlaySubtitle) {
-                                overlaySubtitle.textContent = `Szép menet, ${currentUser.displayName}! A jelenlegi rekordod ebben a kategóriában: ${res?.previousBest || 'magasabb'} pont.`;
+                                overlaySubtitle.textContent = `Szép menet, ${currentUser.displayName}! A jelenlegi rekordod ebben a kategóriában: ${res?.previousBest ? formatScore(res.previousBest) : 'magasabb'} pont.`;
                             }
-                            showToast(`Játék vége! Pontszám: ${pontSzam} p`, 'info');
+                            showToast(`Játék vége! Pontszám: ${formatScore(pontSzam)} p`, 'info');
                         }
                     }).catch(() => {
                         toplistaMegjelenites();
@@ -1488,9 +1496,9 @@ function timer() {
                     };
                     if (overlaySaveBtn) overlaySaveBtn.style.display = 'inline-flex';
                     if (overlaySubtitle) {
-                        overlaySubtitle.textContent = `Elért pontszám: ${pontSzam} pont (${GAME_MODIFIERS[modVal]?.name || modVal}). Jelentkezz be vagy regisztrálj az eredmény elmentéséhez!`;
+                        overlaySubtitle.textContent = `Elért pontszám: ${formatScore(pontSzam)} pont (${GAME_MODIFIERS[modVal]?.name || modVal}). Jelentkezz be vagy regisztrálj az eredmény elmentéséhez!`;
                     }
-                    showToast(`Játék vége! Pontszám: ${pontSzam} p`, 'info');
+                    showToast(`Játék vége! Pontszám: ${formatScore(pontSzam)} p`, 'info');
                 }
 
                 if (overlayBtn) {

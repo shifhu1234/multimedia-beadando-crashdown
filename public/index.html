@@ -67,6 +67,18 @@
           >
         </button>
 
+        <!-- Különálló doboz: Admin Mód Kapcsoló (csak jogosult fióknak) -->
+        <button
+          id="navAdminModeToggleBtn"
+          class="top-nav-btn btn-admin-toggle"
+          style="display: none"
+          type="button"
+          title="Adminisztrátori funkciók be/kikapcsolása"
+        >
+          <span id="navAdminModeIcon">🛡️</span>
+          <span id="navAdminModeText">Admin Mód</span>
+        </button>
+
         <!-- Különálló doboz: Kilépés -->
         <button
           id="logoutBtn"
@@ -672,6 +684,15 @@
                   <span id="profilePlayerTitle" class="profile-player-badge"
                     >Crashdown Játékos</span
                   >
+                  <button
+                    id="profileAdminModeToggleBtn"
+                    class="profile-admin-toggle-pill"
+                    style="display: none"
+                    type="button"
+                    title="Adminisztrátori funkciók kapcsolása"
+                  >
+                    🛡️ Admin Mód
+                  </button>
                 </div>
               </div>
             </div>

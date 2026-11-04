@@ -488,7 +488,7 @@
   letter-spacing: 0.8px;
   margin: 0;
   line-height: 1.25;
-  padding: 4px 12px;
+  padding: 0;
   box-sizing: border-box;
   overflow: visible;
   transition: all 0.2s ease;
@@ -1772,6 +1772,8 @@
 .player-roster-info {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
   gap: 2px;
   min-width: 0;
   flex: 1;
@@ -1782,6 +1784,8 @@
   align-items: center;
   gap: 6px;
   overflow: visible;
+  margin: 0;
+  padding: 0;
 }
 
 .player-roster-name {
@@ -1791,7 +1795,8 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding: 2px 8px;
+  padding: 0;
+  margin: 0;
   display: inline-block;
   box-sizing: border-box;
   line-height: 1.35;
@@ -1825,6 +1830,9 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  padding: 0;
+  margin: 0;
+  line-height: 1.3;
 }
 
 .player-roster-right {
@@ -2058,6 +2066,67 @@
   box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
 }
 
+/* ==================== ADMIN MÓD KAPCSOLÓK ==================== */
+.profile-admin-toggle-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  line-height: 1.2;
+}
+
+.profile-admin-toggle-pill:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: #ef4444;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.profile-admin-toggle-pill.active {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.35), rgba(220, 38, 38, 0.55));
+  border-color: #ef4444;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.45);
+}
+
+.btn-admin-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(239, 68, 68, 0.12) !important;
+  border: 1px solid rgba(239, 68, 68, 0.35) !important;
+  color: #fca5a5 !important;
+  font-size: 0.75rem !important;
+  font-weight: 800 !important;
+  padding: 6px 12px !important;
+  border-radius: var(--radius-md) !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-admin-toggle:hover {
+  background: rgba(239, 68, 68, 0.25) !important;
+  border-color: #ef4444 !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+}
+
+.btn-admin-toggle.active {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(220, 38, 38, 0.5)) !important;
+  border-color: #ef4444 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.45);
+}
+
 @media (max-width: 600px) {
   /* Rangcímek 2 oszlopban mobilon a helytakarékosságért */
   .profile-title-grid {
@@ -2106,6 +2175,16 @@
     margin-left: 3px !important;
     width: auto !important;
     display: inline-flex !important;
+  }
+
+  .profile-admin-toggle-pill {
+    font-size: 0.65rem !important;
+    padding: 2px 7px !important;
+  }
+
+  .btn-admin-toggle {
+    font-size: 0.68rem !important;
+    padding: 4px 8px !important;
   }
 
   .profile-badges-header-right {
