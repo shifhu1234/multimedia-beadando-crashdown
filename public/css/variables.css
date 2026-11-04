@@ -147,6 +147,9 @@ html, body {
 .current-user-name {
     font-weight: 700;
     color: #ffffff;
+    padding: 2px 6px;
+    display: inline-block;
+    box-sizing: border-box;
 }
 
 .btn-logout-link {

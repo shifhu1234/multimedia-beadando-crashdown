@@ -88,6 +88,8 @@ async function adminForceUpdateUserAchievements(targetUsername, newAchievementsL
   }
 }
 
+let currentAdminCategoryFilter = "all";
+
 function renderProfileAdminPanel(container, targetUsername, achSet) {
   const allAchs = typeof ACHIEVEMENTS !== "undefined" ? ACHIEVEMENTS : [];
   const totalCount = allAchs.length;
@@ -96,10 +98,10 @@ function renderProfileAdminPanel(container, targetUsername, achSet) {
   container.innerHTML = `
     <div class="admin-header-row">
       <div class="admin-panel-badge">
-        <span>⚡ ADMIN KEZELŐPULT: <strong>${targetUsername}</strong></span>
+        <span>⚡ ADMINISZTRÁTORI KEZELŐPULT</span>
       </div>
       <div class="admin-actions-bar">
-        <button id="adminUnlockAllBtn" class="admin-btn admin-btn-unlock-all" title="Minden mérföldkő és testreszabás feloldása">
+        <button id="adminUnlockAllBtn" class="admin-btn admin-btn-unlock-all" title="Minden mérföldkő és testreszabás azonnali feloldása">
           🔓 Mindent Felold (${totalCount})
         </button>
         <button id="adminLockAllBtn" class="admin-btn admin-btn-lock-all" title="Minden mérföldkő visszazárása alaphelyzetbe">
@@ -107,24 +109,52 @@ function renderProfileAdminPanel(container, targetUsername, achSet) {
         </button>
       </div>
     </div>
-    <div style="font-size: 0.72rem; color: #cbd5e1; display: flex; justify-content: space-between; align-items: center; margin: 2px 0;">
-      <span>Mérföldkövek és jutalmak egyéni ki/bekapcsolása:</span>
-      <strong style="color: #6ee7b7;">${unlockedCount} / ${totalCount} feloldva</strong>
+
+    <div class="admin-info-bar">
+      <span>🎯 Célpont játékos: <strong style="color: #ffffff;">${targetUsername}</strong></span>
+      <span style="color: #6ee7b7; font-weight: 800;">📊 ${unlockedCount} / ${totalCount} feloldva</span>
     </div>
-    <div class="admin-achievements-container">
+
+    <!-- Kategória szűrő fülek a kártyákhoz -->
+    <div class="admin-filter-bar">
+      <button class="admin-filter-chip ${currentAdminCategoryFilter === 'all' ? 'active' : ''}" data-cat="all">🏆 Összes (${totalCount})</button>
+      <button class="admin-filter-chip ${currentAdminCategoryFilter === 'title' ? 'active' : ''}" data-cat="title">👑 Rangcímek</button>
+      <button class="admin-filter-chip ${currentAdminCategoryFilter === 'color' ? 'active' : ''}" data-cat="color">🎨 Név színek</button>
+      <button class="admin-filter-chip ${currentAdminCategoryFilter === 'avatar' ? 'active' : ''}" data-cat="avatar">👤 Profilképek</button>
+      <button class="admin-filter-chip ${currentAdminCategoryFilter === 'theme' ? 'active' : ''}" data-cat="theme">🌈 Témák</button>
+    </div>
+
+    <!-- Tágas, átlátható kártyás elrendezésű rács -->
+    <div class="admin-cards-grid" id="adminCardsGrid">
       ${allAchs.map(a => {
         const isUnlocked = achSet.has(a.id);
         const rewards = typeof getAchievementRewards === 'function' ? getAchievementRewards(a.id) : [];
-        const rewTexts = rewards.map(r => r.text).join(', ');
+        const rewTypes = rewards.map(r => r.type);
+        const rewTexts = rewards.map(r => r.text);
+        
+        let categories = ['all'];
+        if (rewTypes.includes('title')) categories.push('title');
+        if (rewTypes.includes('color')) categories.push('color');
+        if (rewTypes.includes('avatar')) categories.push('avatar');
+        if (rewTypes.includes('theme')) categories.push('theme');
+
+        const isVisible = currentAdminCategoryFilter === 'all' || categories.includes(currentAdminCategoryFilter);
+
         return `
-          <div class="admin-ach-row">
-            <div class="admin-ach-info">
-              <span>${a.icon}</span>
-              <span class="admin-ach-name" title="${a.desc}"><strong>${a.title}</strong></span>
-              ${rewTexts ? `<span class="admin-ach-reward-tag">(${rewTexts})</span>` : ''}
+          <div class="admin-ach-card ${isUnlocked ? 'unlocked' : 'locked'}" 
+               data-ach-id="${a.id}" 
+               data-categories="${categories.join(' ')}"
+               style="display: ${isVisible ? 'flex' : 'none'};">
+            <span class="admin-card-status-pill">${isUnlocked ? '✅ Kész' : '🔒 Zárt'}</span>
+            <div class="admin-card-icon">${a.icon}</div>
+            <strong class="admin-card-title" title="${a.desc}">${a.title}</strong>
+            <div class="admin-card-rewards">
+              ${rewTexts.length > 0 ? rewTexts.map(rt => `<span class="admin-card-reward-tag" title="${rt}">${rt}</span>`).join('') : '<span style="color: #64748b;">Nincs jutalom</span>'}
             </div>
-            <button class="admin-toggle-btn ${isUnlocked ? 'active' : 'locked'}" data-ach-id="${a.id}" data-target-user="${targetUsername}" title="Kattints a státusz váltásához">
-              ${isUnlocked ? '✅ Feloldva' : '🔒 Zárolva'}
+            <button class="admin-card-btn" 
+                    data-ach-id="${a.id}" 
+                    data-target-user="${targetUsername}">
+              ${isUnlocked ? '🔒 Zárás' : '🔓 Feloldás'}
             </button>
           </div>
         `;
@@ -132,6 +162,7 @@ function renderProfileAdminPanel(container, targetUsername, achSet) {
     </div>
   `;
 
+  // Globális gombok eseménykezelői
   document.getElementById("adminUnlockAllBtn")?.addEventListener("click", async () => {
     if (confirm(`Biztosan fel szeretnéd oldani az összes (${totalCount} db) mérföldkövet és jutalmat ${targetUsername} számára?`)) {
       await adminForceUpdateUserAchievements(targetUsername, allAchs.map(a => a.id));
@@ -144,8 +175,29 @@ function renderProfileAdminPanel(container, targetUsername, achSet) {
     }
   });
 
-  container.querySelectorAll(".admin-toggle-btn").forEach(btn => {
-    btn.addEventListener("click", async function() {
+  // Kategória szűrő fülek eseménykezelői
+  container.querySelectorAll(".admin-filter-chip").forEach(chip => {
+    chip.addEventListener("click", function () {
+      container.querySelectorAll(".admin-filter-chip").forEach(c => c.classList.remove("active"));
+      this.classList.add("active");
+      currentAdminCategoryFilter = this.getAttribute("data-cat");
+      const grid = document.getElementById("adminCardsGrid");
+      if (!grid) return;
+      grid.querySelectorAll(".admin-ach-card").forEach(card => {
+        const cardCats = (card.getAttribute("data-categories") || "").split(" ");
+        if (currentAdminCategoryFilter === "all" || cardCats.includes(currentAdminCategoryFilter)) {
+          card.style.display = "flex";
+        } else {
+          card.style.display = "none";
+        }
+      });
+    });
+  });
+
+  // Egyéni kártya feloldás / visszazárás gombok
+  container.querySelectorAll(".admin-card-btn").forEach(btn => {
+    btn.addEventListener("click", async function (e) {
+      e.stopPropagation();
       const achId = this.getAttribute("data-ach-id");
       const user = this.getAttribute("data-target-user");
       const isCurrentlyUnlocked = achSet.has(achId);
@@ -1539,6 +1591,10 @@ async function toplistaMegjelenites() {
     rightDiv.appendChild(scoreSpan);
     rightDiv.appendChild(colorTag);
 
+    const rightWrapper = document.createElement("div");
+    rightWrapper.className = "lb-right-wrapper";
+    rightWrapper.appendChild(rightDiv);
+
     if (isAdminUser()) {
       const delBtn = document.createElement("button");
       delBtn.className = "lb-admin-delete-btn";
@@ -1561,11 +1617,11 @@ async function toplistaMegjelenites() {
           }
         }
       });
-      rightDiv.appendChild(delBtn);
+      rightWrapper.appendChild(delBtn);
     }
 
     listaElem.appendChild(leftDiv);
-    listaElem.appendChild(rightDiv);
+    listaElem.appendChild(rightWrapper);
     toplistaLista.appendChild(listaElem);
   });
 }
