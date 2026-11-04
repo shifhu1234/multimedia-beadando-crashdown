@@ -331,6 +331,104 @@ const ACHIEVEMENTS = [
     title: "Tisztakezű Zseni",
     desc: "Érj el legalább 3 000 pontot a Nyers (power-up mentes) módban!",
   },
+
+  // 8. Új Különleges Kihívások & Felfedezések
+  {
+    id: "all_modes_played",
+    icon: "🎯",
+    title: "Minden Mód Vándora",
+    desc: "Játssz legalább egy meccset mind az 5 játékmódban!",
+  },
+  {
+    id: "all_durations_played",
+    icon: "⏱️",
+    title: "Időfutár Mester",
+    desc: "Játssz legalább egy meccset mind a 4 időkeretben!",
+  },
+  {
+    id: "all_colors_played",
+    icon: "🌈",
+    title: "Színkavalkád Felfedező",
+    desc: "Játssz meccset a 2, 3, 4 és 5 színű beállításban is!",
+  },
+  {
+    id: "tnt_collector_25",
+    icon: "💣",
+    title: "TNT Szakértő Mester",
+    desc: "Robbants fel legalább 25 db TNT blokkot a meccseid során!",
+  },
+  {
+    id: "magnet_collector_25",
+    icon: "🧲",
+    title: "Mágnes Bűvész",
+    desc: "Használj fel legalább 25 db mágnes power-upot!",
+  },
+  {
+    id: "freeze_collector_25",
+    icon: "❄️",
+    title: "Jégvarázs Mester",
+    desc: "Fagyaszd be az időt legalább 25 alkalommal!",
+  },
+  {
+    id: "doubler_collector_25",
+    icon: "⚡",
+    title: "Duplázó Szenzáció",
+    desc: "Aktiválj legalább 25 db 2× pontduplázó Frenzy-t!",
+  },
+  {
+    id: "colorbomb_collector_25",
+    icon: "✦",
+    title: "Szín-Kataklizma Bajnok",
+    desc: "Tisztíts le pályát 25 db szín-bomba segítségével!",
+  },
+  {
+    id: "score_150k",
+    icon: "🌠",
+    title: "Abszolút Csúcsdöntő",
+    desc: "Érj el 150 000 pontot egyetlen menetben!",
+  },
+  {
+    id: "score_250k",
+    icon: "🌌",
+    title: "Kozmikus Fenség",
+    desc: "Érj el szédítő 250 000 pontot egy menetben!",
+  },
+  {
+    id: "matches_500",
+    icon: "👑",
+    title: "Crashdown Legenda",
+    desc: "Játssz le félelmetes 500 teljes mérkőzést!",
+  },
+  {
+    id: "total_score_5m",
+    icon: "💎",
+    title: "Multimilliomos Rekorder",
+    desc: "Gyűjts össze összesen legalább 5 000 000 pontot a profilodon!",
+  },
+  {
+    id: "massive_clear_16",
+    icon: "💥",
+    title: "Kolosszális Pusztítás",
+    desc: "Törölj el legalább 16 blokkot egyetlen kattintással!",
+  },
+  {
+    id: "lightning_combo_6",
+    icon: "⚡",
+    title: "Kombó Szuperszonikus",
+    desc: "Pörgesd fel a szorzót 6×-os kombóig!",
+  },
+  {
+    id: "marathon_15k",
+    icon: "🏃",
+    title: "Maratonista Zseni",
+    desc: "Érj el legalább 15 000 pontot a 3 perces maratoni módban!",
+  },
+  {
+    id: "sprint_5k",
+    icon: "🐆",
+    title: "Villámfutó Titán",
+    desc: "Érj el legalább 5 000 pontot a 30 másodperces villámmódban!",
+  },
 ];
 
 // ==================== PROFILKÉPEK (AVATARS) RENDSZER ====================
@@ -436,6 +534,36 @@ const PROFILE_AVATARS = [
     symbol: "🎖️",
     name: "Százados",
     achId: "matches_100",
+  },
+  {
+    id: "avatar_meteor",
+    symbol: "🌠",
+    name: "Hullócsillag",
+    achId: "score_150k",
+  },
+  {
+    id: "avatar_galaxy_core",
+    symbol: "🪐",
+    name: "Galaxis Mag",
+    achId: "score_250k",
+  },
+  {
+    id: "avatar_flame_phoenix",
+    symbol: "🔥",
+    name: "Főnix",
+    achId: "lightning_combo_6",
+  },
+  {
+    id: "avatar_legend_crown",
+    symbol: "👑",
+    name: "Örök Korona",
+    achId: "matches_500",
+  },
+  {
+    id: "avatar_speed_lightning",
+    symbol: "⚡",
+    name: "Villámfutó",
+    achId: "sprint_5k",
   },
 ];
 
@@ -955,20 +1083,25 @@ function updatePlayerStatsRecord(
       // Színmód statisztika
       if (!p.modes[cKey]) p.modes[cKey] = { matches: 0, bestScore: 0 };
       p.modes[cKey].matches += 1;
-      if (numericScore > p.modes[cKey].bestScore) p.modes[cKey].bestScore = numericScore;
+      if (numericScore > p.modes[cKey].bestScore)
+        p.modes[cKey].bestScore = numericScore;
 
       // Játékmód statisztika
-      if (!p.modifierStats[modKey]) p.modifierStats[modKey] = { matches: 0, bestScore: 0, totalScore: 0 };
+      if (!p.modifierStats[modKey])
+        p.modifierStats[modKey] = { matches: 0, bestScore: 0, totalScore: 0 };
       p.modifierStats[modKey].matches += 1;
       p.modifierStats[modKey].totalScore += numericScore;
-      if (numericScore > p.modifierStats[modKey].bestScore) p.modifierStats[modKey].bestScore = numericScore;
+      if (numericScore > p.modifierStats[modKey].bestScore)
+        p.modifierStats[modKey].bestScore = numericScore;
 
       // Időtartam statisztika
       const dKey = String(durSec);
-      if (!p.durationStats[dKey]) p.durationStats[dKey] = { matches: 0, bestScore: 0, totalScore: 0 };
+      if (!p.durationStats[dKey])
+        p.durationStats[dKey] = { matches: 0, bestScore: 0, totalScore: 0 };
       p.durationStats[dKey].matches += 1;
       p.durationStats[dKey].totalScore += numericScore;
-      if (numericScore > p.durationStats[dKey].bestScore) p.durationStats[dKey].bestScore = numericScore;
+      if (numericScore > p.durationStats[dKey].bestScore)
+        p.durationStats[dKey].bestScore = numericScore;
 
       p.history.unshift({
         score: numericScore,
@@ -1015,10 +1148,14 @@ function updatePlayerStatsRecord(
     if (p.totalScore >= 1000000) checkAchievement("total_score_1m");
 
     // Mód szerinti győzelmek / jó eredmények
-    if (modKey === "chaos" && numericScore >= 5000) checkAchievement("mode_chaos_win");
-    if (modKey === "bomb_frenzy" && numericScore >= 5000) checkAchievement("mode_bomb_win");
-    if (modKey === "time_rush" && numericScore >= 5000) checkAchievement("mode_time_win");
-    if (modKey === "no_powerups" && numericScore >= 3000) checkAchievement("mode_raw_win");
+    if (modKey === "chaos" && numericScore >= 5000)
+      checkAchievement("mode_chaos_win");
+    if (modKey === "bomb_frenzy" && numericScore >= 5000)
+      checkAchievement("mode_bomb_win");
+    if (modKey === "time_rush" && numericScore >= 5000)
+      checkAchievement("mode_time_win");
+    if (modKey === "no_powerups" && numericScore >= 3000)
+      checkAchievement("mode_raw_win");
 
     profiles[username] = p;
     localStorage.setItem(key, JSON.stringify(profiles));
@@ -1117,14 +1254,21 @@ function getPlayerProfileStats(username, allScores = [], onlineProfile = null) {
     if ((onlineProfile.totalScore || 0) > (profile.totalScore || 0))
       profile.totalScore = onlineProfile.totalScore;
     if (
-      (onlineProfile.totalPlaytimeSeconds || 0) > (profile.totalPlaytimeSeconds || 0)
+      (onlineProfile.totalPlaytimeSeconds || 0) >
+      (profile.totalPlaytimeSeconds || 0)
     )
       profile.totalPlaytimeSeconds = onlineProfile.totalPlaytimeSeconds;
     if (onlineProfile.modifierStats) {
-      profile.modifierStats = { ...profile.modifierStats, ...onlineProfile.modifierStats };
+      profile.modifierStats = {
+        ...profile.modifierStats,
+        ...onlineProfile.modifierStats,
+      };
     }
     if (onlineProfile.durationStats) {
-      profile.durationStats = { ...profile.durationStats, ...onlineProfile.durationStats };
+      profile.durationStats = {
+        ...profile.durationStats,
+        ...onlineProfile.durationStats,
+      };
     }
   }
 
@@ -1145,14 +1289,16 @@ function getPlayerProfileStats(username, allScores = [], onlineProfile = null) {
       profile.modifierStats[mKey] = { matches: 0, bestScore: 0, totalScore: 0 };
     profile.modifierStats[mKey].matches += 1;
     profile.modifierStats[mKey].totalScore += sc;
-    if (sc > profile.modifierStats[mKey].bestScore) profile.modifierStats[mKey].bestScore = sc;
+    if (sc > profile.modifierStats[mKey].bestScore)
+      profile.modifierStats[mKey].bestScore = sc;
 
     const dKey = String(s.duration || "60");
     if (!profile.durationStats[dKey])
       profile.durationStats[dKey] = { matches: 0, bestScore: 0, totalScore: 0 };
     profile.durationStats[dKey].matches += 1;
     profile.durationStats[dKey].totalScore += sc;
-    if (sc > profile.durationStats[dKey].bestScore) profile.durationStats[dKey].bestScore = sc;
+    if (sc > profile.durationStats[dKey].bestScore)
+      profile.durationStats[dKey].bestScore = sc;
   });
 
   if (profile.totalMatches < playerScores.length) {
@@ -1167,9 +1313,15 @@ function getPlayerProfileStats(username, allScores = [], onlineProfile = null) {
   // Ha totalScore még mindig 0, számoljuk ki a meccsekből
   if (!profile.totalScore || profile.totalScore === 0) {
     if (playerScores.length > 0) {
-      profile.totalScore = playerScores.reduce((sum, s) => sum + (parseInt(s.score, 10) || 0), 0);
+      profile.totalScore = playerScores.reduce(
+        (sum, s) => sum + (parseInt(s.score, 10) || 0),
+        0,
+      );
     } else if (profile.history && profile.history.length > 0) {
-      profile.totalScore = profile.history.reduce((sum, h) => sum + (parseInt(h.score, 10) || 0), 0);
+      profile.totalScore = profile.history.reduce(
+        (sum, h) => sum + (parseInt(h.score, 10) || 0),
+        0,
+      );
     }
   }
 

@@ -454,13 +454,10 @@
     font-size: 1.85rem;
     font-weight: 900;
     font-family: var(--font-display, 'Outfit', 'Montserrat', 'Segoe UI', sans-serif);
-    background: linear-gradient(135deg, #ffffff 10%, #38bdf8 45%, #c084fc 75%, #f472b6 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
     letter-spacing: 0.8px;
     margin: 0;
     line-height: 1.15;
-    filter: drop-shadow(0 0 16px rgba(56, 189, 248, 0.45));
+    transition: all 0.2s ease;
 }
 
 .profile-title-row {
@@ -933,6 +930,195 @@
     justify-content: center;
     margin-right: 3px;
     flex-shrink: 0;
+}
+
+/* ==================== NÉV SZÍN RENDSZER (NAME COLORS) ==================== */
+/* Alapértelmezett és normál egyszínű nevek ragyogással */
+.name-color-white {
+    color: #ffffff !important;
+    background: none !important;
+    -webkit-text-fill-color: #ffffff !important;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.65), 0 0 20px rgba(255, 255, 255, 0.3) !important;
+    filter: none !important;
+}
+
+.name-color-cyan {
+    color: #38bdf8 !important;
+    background: none !important;
+    -webkit-text-fill-color: #38bdf8 !important;
+    text-shadow: 0 0 10px rgba(56, 189, 248, 0.75), 0 0 20px rgba(56, 189, 248, 0.4) !important;
+    filter: none !important;
+}
+
+.name-color-green {
+    color: #4ade80 !important;
+    background: none !important;
+    -webkit-text-fill-color: #4ade80 !important;
+    text-shadow: 0 0 10px rgba(74, 222, 128, 0.75), 0 0 20px rgba(74, 222, 128, 0.4) !important;
+    filter: none !important;
+}
+
+.name-color-gold {
+    color: #facc15 !important;
+    background: none !important;
+    -webkit-text-fill-color: #facc15 !important;
+    text-shadow: 0 0 10px rgba(250, 204, 21, 0.75), 0 0 20px rgba(250, 204, 21, 0.4) !important;
+    filter: none !important;
+}
+
+.name-color-orange {
+    color: #fb923c !important;
+    background: none !important;
+    -webkit-text-fill-color: #fb923c !important;
+    text-shadow: 0 0 10px rgba(251, 146, 60, 0.75), 0 0 20px rgba(251, 146, 60, 0.4) !important;
+    filter: none !important;
+}
+
+.name-color-pink {
+    color: #f472b6 !important;
+    background: none !important;
+    -webkit-text-fill-color: #f472b6 !important;
+    text-shadow: 0 0 10px rgba(244, 114, 182, 0.75), 0 0 20px rgba(244, 114, 182, 0.4) !important;
+    filter: none !important;
+}
+
+.name-color-purple {
+    color: #c084fc !important;
+    background: none !important;
+    -webkit-text-fill-color: #c084fc !important;
+    text-shadow: 0 0 10px rgba(192, 132, 252, 0.75), 0 0 20px rgba(192, 132, 252, 0.4) !important;
+    filter: none !important;
+}
+
+.name-color-red {
+    color: #f87171 !important;
+    background: none !important;
+    -webkit-text-fill-color: #f87171 !important;
+    text-shadow: 0 0 10px rgba(248, 113, 113, 0.75), 0 0 20px rgba(248, 113, 113, 0.4) !important;
+    filter: none !important;
+}
+
+/* SPECIÁLIS NÉV SZÍNEK (átmenetes, több színű, árnyékolt, ragyogó) */
+.name-special-cyber {
+    background: linear-gradient(135deg, #ffffff 10%, #38bdf8 45%, #c084fc 75%, #f472b6 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    text-shadow: none !important;
+    filter: drop-shadow(0 0 14px rgba(56, 189, 248, 0.6)) !important;
+}
+
+.name-special-gold {
+    background: linear-gradient(135deg, #fffbeb 0%, #fde047 30%, #f59e0b 70%, #d97706 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    text-shadow: none !important;
+    filter: drop-shadow(0 0 14px rgba(245, 158, 11, 0.7)) !important;
+}
+
+.name-special-cosmic {
+    background: linear-gradient(135deg, #e9d5ff 0%, #a855f7 35%, #38bdf8 70%, #06b6d4 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    text-shadow: none !important;
+    filter: drop-shadow(0 0 14px rgba(168, 85, 247, 0.7)) !important;
+}
+
+.name-special-flame {
+    background: linear-gradient(135deg, #fef08a 0%, #f97316 40%, #ef4444 75%, #991b1b 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    text-shadow: none !important;
+    filter: drop-shadow(0 0 14px rgba(239, 68, 68, 0.7)) !important;
+}
+
+.name-special-rainbow {
+    background: linear-gradient(90deg, #f43f5e, #fb923c, #facc15, #4ade80, #38bdf8, #a855f7, #f43f5e) !important;
+    background-size: 200% auto !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    text-shadow: none !important;
+    animation: specialTitleShine 3s linear infinite !important;
+    filter: drop-shadow(0 0 14px rgba(168, 85, 247, 0.5)) !important;
+}
+
+.name-special-plasma {
+    background: linear-gradient(135deg, #ecfccb 0%, #a3e635 40%, #10b981 75%, #047857 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    text-shadow: none !important;
+    filter: drop-shadow(0 0 14px rgba(163, 230, 53, 0.7)) !important;
+}
+
+.name-special-void {
+    background: linear-gradient(135deg, #ffffff 0%, #d8b4fe 30%, #7c3aed 70%, #4c1d95 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    text-shadow: none !important;
+    filter: drop-shadow(0 0 14px rgba(124, 58, 237, 0.75)) !important;
+}
+
+/* Név szín választó rács a profilban */
+.profile-name-color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.name-color-pick-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+    position: relative;
+    text-align: center;
+}
+
+.name-color-pick-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.name-color-pick-card.active {
+    border-color: #818cf8;
+    background: rgba(99, 102, 241, 0.2);
+    box-shadow: 0 0 12px rgba(129, 140, 248, 0.35);
+}
+
+.name-color-pick-card.locked {
+    opacity: 0.38;
+    cursor: not-allowed;
+    filter: grayscale(0.7);
+}
+
+.name-color-pick-card.locked:hover {
+    transform: none;
+    border-color: var(--border-subtle);
+}
+
+.name-color-preview-text {
+    font-size: 0.95rem;
+    font-weight: 800;
+    font-family: var(--font-display, 'Outfit', sans-serif);
+    letter-spacing: 0.5px;
+}
+
+.name-color-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 /* ==================== MECCS ELŐZMÉNYEK (MATCH HISTORY) ==================== */
