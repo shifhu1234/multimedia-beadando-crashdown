@@ -222,7 +222,11 @@
           <div class="theme-field-wrap">
             <div class="theme-label-row">
               <label for="themeSelect" class="control-label">Téma</label>
-              <div id="themeSelectPalette" class="theme-select-palette" title="Aktív témapaletta"></div>
+              <div
+                id="themeSelectPalette"
+                class="theme-select-palette"
+                title="Aktív témapaletta"
+              ></div>
             </div>
             <div class="select-wrapper">
               <select id="themeSelect">
@@ -396,10 +400,18 @@
               <!-- Játék beállítások előnézete indítás előtt -->
               <div id="overlaySettingsBox" class="overlay-settings-box">
                 <div class="overlay-setting-header">
-                  <span id="overlayModeBadge" class="overlay-mode-badge overlay-chip">🎯 Normál</span>
+                  <span
+                    id="overlayModeBadge"
+                    class="overlay-mode-badge overlay-chip"
+                    >🎯 Normál</span
+                  >
                   <div class="overlay-setting-pills">
-                    <span id="overlayTimeChip" class="overlay-chip">⏱️ 1 perc (60 mp)</span>
-                    <span id="overlayColorChip" class="overlay-chip">🎨 3 szín</span>
+                    <span id="overlayTimeChip" class="overlay-chip"
+                      >⏱️ 1 perc (60 mp)</span
+                    >
+                    <span id="overlayColorChip" class="overlay-chip"
+                      >🎨 3 szín</span
+                    >
                   </div>
                 </div>
                 <p id="overlayModeDesc" class="overlay-mode-desc">
@@ -407,7 +419,7 @@
                 </p>
               </div>
 
-              <p id="timeUpMessage" style="display: none;">Lejárt az idő!</p>
+              <p id="timeUpMessage" style="display: none">Lejárt az idő!</p>
 
               <div class="overlay-action-stack">
                 <button
@@ -474,7 +486,11 @@
             <h2>Ranglista</h2>
             <span id="leaderboardSyncTag" class="status-indicator"></span>
           </div>
-          <button id="openPlayersModalBtn" class="btn-user-profile-badge" title="Regisztrált játékosok és online jelenlét megtekintése">
+          <button
+            id="openPlayersModalBtn"
+            class="btn-user-profile-badge"
+            title="Regisztrált játékosok és online jelenlét megtekintése"
+          >
             <span>👥 Játékosok</span>
           </button>
         </div>
@@ -482,7 +498,11 @@
         <div class="leaderboard-filter-toolbar">
           <div class="lb-filter-box">
             <span class="lb-filter-icon">🎨</span>
-            <select id="lbFilterColor" class="lb-select-input" aria-label="Színek száma szűrő">
+            <select
+              id="lbFilterColor"
+              class="lb-select-input"
+              aria-label="Színek száma szűrő"
+            >
               <option value="all">Összes</option>
               <option value="2">2 szín</option>
               <option value="3">3 szín</option>
@@ -492,7 +512,11 @@
           </div>
           <div class="lb-filter-box">
             <span class="lb-filter-icon">🎯</span>
-            <select id="lbFilterMode" class="lb-select-input" aria-label="Játékmód szűrő">
+            <select
+              id="lbFilterMode"
+              class="lb-select-input"
+              aria-label="Játékmód szűrő"
+            >
               <option value="all">Összes</option>
               <option value="normal">Normál</option>
               <option value="chaos">Káosz</option>
@@ -503,7 +527,11 @@
           </div>
           <div class="lb-filter-box">
             <span class="lb-filter-icon">⏱️</span>
-            <select id="lbFilterTime" class="lb-select-input" aria-label="Játékidő szűrő">
+            <select
+              id="lbFilterTime"
+              class="lb-select-input"
+              aria-label="Játékidő szűrő"
+            >
               <option value="all">Összes</option>
               <option value="30">30 mp</option>
               <option value="60">1 perc</option>
@@ -766,9 +794,7 @@
               <span class="profile-stat-icon">📈</span>
               <div class="profile-stat-data">
                 <span class="profile-stat-label">Átlagpont / meccs</span>
-                <strong id="profileAvgScore" class="profile-stat-val"
-                  >0</strong
-                >
+                <strong id="profileAvgScore" class="profile-stat-val">0</strong>
               </div>
             </div>
           </div>
@@ -804,19 +830,15 @@
           </div>
 
           <!-- 4.5. Téma Választása -->
-          <div
-            id="profileThemeSection"
-            class="profile-section"
-          >
+          <div id="profileThemeSection" class="profile-section">
             <div class="profile-section-header">
               <div>
                 <h4 class="profile-section-title">🎨 Játéktéma Választása</h4>
-                <span class="auth-hint-text"
-                  >13 egyedi témavilág (kliens oldali megjelenés)</span
-                >
               </div>
               <div class="section-sort-wrapper">
-                <label for="sortThemesSelect" class="sort-label">Rendezés:</label>
+                <label for="sortThemesSelect" class="sort-label"
+                  >Rendezés:</label
+                >
                 <select id="sortThemesSelect" class="section-sort-select">
                   <option value="default">Alapértelmezett</option>
                   <option value="alpha_asc">ABC (A → Z)</option>
@@ -840,13 +862,14 @@
           >
             <div class="profile-section-header">
               <div>
-                <h4 class="profile-section-title">🎨 Név Színének Választása</h4>
-                <span class="auth-hint-text"
-                  >Egyszínű neonok & Speciális színátmenetek</span
-                >
+                <h4 class="profile-section-title">
+                  🎨 Név Színének Választása
+                </h4>
               </div>
               <div class="section-sort-wrapper">
-                <label for="sortNameColorsSelect" class="sort-label">Rendezés:</label>
+                <label for="sortNameColorsSelect" class="sort-label"
+                  >Rendezés:</label
+                >
                 <select id="sortNameColorsSelect" class="section-sort-select">
                   <option value="default">Alapértelmezett</option>
                   <option value="alpha_asc">ABC (A → Z)</option>
@@ -871,12 +894,11 @@
             <div class="profile-section-header">
               <div>
                 <h4 class="profile-section-title">🎖️ Rangcím Választása</h4>
-                <span class="auth-hint-text"
-                  >Mérföldkövekkel feloldható rangcímek</span
-                >
               </div>
               <div class="section-sort-wrapper">
-                <label for="sortTitlesSelect" class="sort-label">Rendezés:</label>
+                <label for="sortTitlesSelect" class="sort-label"
+                  >Rendezés:</label
+                >
                 <select id="sortTitlesSelect" class="section-sort-select">
                   <option value="default">Alapértelmezett</option>
                   <option value="alpha_asc">ABC (A → Z)</option>
@@ -901,12 +923,11 @@
             <div class="profile-section-header">
               <div>
                 <h4 class="profile-section-title">🖼️ Profilkép választása</h4>
-                <span class="auth-hint-text"
-                  >Mérföldkövekkel kinyitható szimbólumok</span
-                >
               </div>
               <div class="section-sort-wrapper">
-                <label for="sortAvatarsSelect" class="sort-label">Rendezés:</label>
+                <label for="sortAvatarsSelect" class="sort-label"
+                  >Rendezés:</label
+                >
                 <select id="sortAvatarsSelect" class="section-sort-select">
                   <option value="default">Alapértelmezett</option>
                   <option value="alpha_asc">ABC (A → Z)</option>
@@ -931,8 +952,13 @@
               </div>
               <div class="profile-badges-header-right">
                 <div class="section-sort-wrapper">
-                  <label for="sortAchievementsSelect" class="sort-label">Rendezés:</label>
-                  <select id="sortAchievementsSelect" class="section-sort-select">
+                  <label for="sortAchievementsSelect" class="sort-label"
+                    >Rendezés:</label
+                  >
+                  <select
+                    id="sortAchievementsSelect"
+                    class="section-sort-select"
+                  >
                     <option value="default">Alapértelmezett</option>
                     <option value="alpha_asc">ABC (A → Z)</option>
                     <option value="alpha_desc">ABC (Z → A)</option>
@@ -941,9 +967,27 @@
                     <option value="reward_first">Jutalmat adók elöl</option>
                   </select>
                 </div>
-                <div id="profileAdminBadgeActions" class="profile-admin-badge-actions" style="display: none;">
-                  <button id="profileAdminUnlockAllBtn" type="button" class="admin-inline-btn admin-inline-unlock" title="Összes jelvény feloldása">🔓 Mind felold</button>
-                  <button id="profileAdminLockAllBtn" type="button" class="admin-inline-btn admin-inline-lock" title="Összes jelvény visszazárása">🔒 Mind zár</button>
+                <div
+                  id="profileAdminBadgeActions"
+                  class="profile-admin-badge-actions"
+                  style="display: none"
+                >
+                  <button
+                    id="profileAdminUnlockAllBtn"
+                    type="button"
+                    class="admin-inline-btn admin-inline-unlock"
+                    title="Összes jelvény feloldása"
+                  >
+                    🔓 Mind felold
+                  </button>
+                  <button
+                    id="profileAdminLockAllBtn"
+                    type="button"
+                    class="admin-inline-btn admin-inline-lock"
+                    title="Összes jelvény visszazárása"
+                  >
+                    🔒 Mind zár
+                  </button>
                 </div>
               </div>
             </div>
@@ -994,9 +1038,7 @@
                 />
               </div>
               <div class="auth-field">
-                <label for="confirmNewPasswordInput"
-                  >Új jelszó ismétlése</label
-                >
+                <label for="confirmNewPasswordInput">Új jelszó ismétlése</label>
                 <input
                   type="password"
                   id="confirmNewPasswordInput"
@@ -1032,16 +1074,49 @@
           <div class="players-modal-header-info">
             <h3>👥 Játékosok & Jelenlét</h3>
             <div class="players-modal-counters">
-              <span id="onlinePlayersCountBadge" class="players-presence-pill online">🟢 0 online</span>
-              <span id="totalPlayersCountBadge" class="players-presence-pill total">0 regisztrált</span>
+              <span
+                id="onlinePlayersCountBadge"
+                class="players-presence-pill online"
+                >🟢 0 online</span
+              >
+              <span
+                id="totalPlayersCountBadge"
+                class="players-presence-pill total"
+                >0 regisztrált</span
+              >
             </div>
           </div>
-          <button id="closePlayersModalBtn" class="modal-close-x" title="Bezárás">&times;</button>
+          <button
+            id="closePlayersModalBtn"
+            class="modal-close-x"
+            title="Bezárás"
+          >
+            &times;
+          </button>
         </div>
 
-        <div class="players-modal-search-bar">
-          <span class="players-search-icon">🔍</span>
-          <input type="text" id="playerSearchInput" class="players-search-input" placeholder="Játékos keresése név szerint..." autocomplete="off" />
+        <div class="players-modal-toolbar">
+          <div class="players-modal-search-bar">
+            <span class="players-search-icon">🔍</span>
+            <input
+              type="text"
+              id="playerSearchInput"
+              class="players-search-input"
+              placeholder="Játékos keresése név szerint..."
+              autocomplete="off"
+            />
+          </div>
+          <div class="section-sort-wrapper players-sort-wrapper">
+            <label for="sortPlayersSelect" class="sort-label">Rendezés:</label>
+            <select id="sortPlayersSelect" class="section-sort-select">
+              <option value="online_first">🟢 Online elöl</option>
+              <option value="alpha_asc">ABC (A → Z)</option>
+              <option value="alpha_desc">ABC (Z → A)</option>
+              <option value="best_score">🏆 Legjobb pont</option>
+              <option value="total_matches">🎮 Meccsszám</option>
+              <option value="offline_first">⚪ Offline elöl</option>
+            </select>
+          </div>
         </div>
 
         <div id="playersListContainer" class="players-roster-list">

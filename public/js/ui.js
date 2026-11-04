@@ -1587,6 +1587,30 @@ async function openPlayerProfileModal(username, resetScroll = true) {
     }
   }
 
+  if (bestScoreEl) bestScoreEl.textContent = formatScore(stats.bestScore || 0);
+  if (matchesEl) matchesEl.textContent = `${stats.totalMatches || 0} meccs`;
+
+  // Összes pontszám és meccsenkénti átlagpont
+  const totalScoreEl = document.getElementById("profileTotalScore");
+  const avgScoreEl = document.getElementById("profileAvgScore");
+  const totalScoreVal = stats.totalScore || 0;
+  if (totalScoreEl) totalScoreEl.textContent = formatScore(totalScoreVal);
+  const avgVal =
+    stats.totalMatches > 0 ? Math.round(totalScoreVal / stats.totalMatches) : 0;
+  if (avgScoreEl) avgScoreEl.textContent = `${formatScore(avgVal)} p`;
+
+  const mins = Math.floor((stats.totalPlaytimeSeconds || 0) / 60);
+  const secs = (stats.totalPlaytimeSeconds || 0) % 60;
+  const timeStr =
+    mins > 0 ? `${mins} perc ${secs > 0 ? `${secs} mp` : ""}` : `${secs} mp`;
+  if (timeEl) timeEl.textContent = timeStr;
+
+  const achList = stats.achievements || [];
+  if (achCountEl)
+    achCountEl.textContent = `${achList.length} / ${ACHIEVEMENTS.length}`;
+  if (badgeSummaryEl)
+    badgeSummaryEl.textContent = `${achList.length} feloldva a ${ACHIEVEMENTS.length}-ből`;
+
   // Színmódok szerinti lebontás
   if (modesListEl) {
     const modes = ["2", "3", "4", "5"];
@@ -1703,7 +1727,7 @@ async function openPlayerProfileModal(username, resetScroll = true) {
     }
   }
 
-if (badgesListEl) {
+  if (badgesListEl) {
     const achSortSelect = document.getElementById("sortAchievementsSelect");
 
     function renderAchievements(sortMode = "default") {
@@ -1714,18 +1738,20 @@ if (badgesListEl) {
         "title"
       );
 
-      badgesListEl.innerHTML = sortedAchs.map((a) => {
-        const unlocked = achSet.has(a.id);
-        return `
-          <div class="profile-badge-item ${unlocked ? "unlocked" : "locked"} ${isAdmin ? "admin-clickable" : ""}" 
-               data-ach-id="${a.id}"
-               title="${isAdmin ? (unlocked ? 'Kattints a visszazáráshoz (Admin)' : 'Kattints a feloldáshoz (Admin)') : ''}">
-            ${isAdmin ? `<span class="badge-admin-dot ${unlocked ? 'unlocked' : 'locked'}">${unlocked ? '✓' : '🔒'}</span>` : ''}
-            <span class="profile-badge-icon">${a.icon}</span>
-            <span class="profile-badge-name">${a.title}</span>
-          </div>
-        `;
-      }).join("");
+      badgesListEl.innerHTML = sortedAchs
+        .map((a) => {
+          const unlocked = achSet.has(a.id);
+          return `
+            <div class="profile-badge-item ${unlocked ? "unlocked" : "locked"} ${isAdmin ? "admin-clickable" : ""}" 
+                 data-ach-id="${a.id}"
+                 title="${isAdmin ? (unlocked ? "Kattints a visszazáráshoz (Admin)" : "Kattints a feloldáshoz (Admin)") : ""}">
+              ${isAdmin ? `<span class="badge-admin-dot ${unlocked ? "unlocked" : "locked"}">${unlocked ? "✓" : "🔒"}</span>` : ""}
+              <span class="profile-badge-icon">${a.icon}</span>
+              <span class="profile-badge-name">${a.title}</span>
+            </div>
+          `;
+        })
+        .join("");
 
       const floatingTip = document.getElementById("profileBadgeFloatingTooltip");
       badgesListEl.querySelectorAll(".profile-badge-item").forEach((item) => {
@@ -1741,60 +1767,113 @@ if (badgesListEl) {
               ? getAchievementRewards(a.id)
               : [];
 
-          let rewardBadgeHtml = "";
+          let rewardHtml = "";
           if (rewList.length > 0) {
-            const tags = rewList
-              .map((r) => {
-                const spTag = r.isSpecial ? " (Speciális!)" : "";
-                return `<span class="ach-tooltip-reward-tag ${r.isSpecial ? "special" : ""}">${r.label}${spTag}</span>`;
-              })
-              .join(" ");
-            rewardBadgeHtml = `
-              <div class="ach-tooltip-reward-box">
-                <span class="ach-tooltip-reward-title">🎁 Jutalom feloldáskor:</span>
-                <div class="ach-tooltip-reward-list">${tags}</div>
+            rewardHtml = `
+              <div class="b-tooltip-reward">
+                <div class="reward-heading">Jutalmak:</div>
+                ${rewList.map((r) => `<div class="reward-line"><span>${r.text}</span></div>`).join("")}
+              </div>
+            `;
+          } else {
+            rewardHtml = `
+              <div class="b-tooltip-reward">
+                <div class="reward-heading">Jutalom:</div>
+                <div class="reward-line" style="color: var(--text-muted); font-style: italic;">Nincs külön tárgyi jutalom</div>
               </div>
             `;
           }
 
+          const adminHint = isAdmin
+            ? `<div class="b-tooltip-admin-hint">⚡ Kattints a ${unlocked ? "visszazáráshoz" : "feloldáshoz"}!</div>`
+            : "";
+
           floatingTip.innerHTML = `
-            <div class="ach-tooltip-header">
-              <span class="ach-tooltip-icon">${a.icon}</span>
-              <div class="ach-tooltip-title-wrap">
-                <span class="ach-tooltip-title">${a.title}</span>
-                <span class="ach-tooltip-status ${unlocked ? "unlocked" : "locked"}">${unlocked ? "✓ Teljesítve" : "🔒 Zárolva"}</span>
-              </div>
+            <div class="b-tooltip-header">
+              <span class="b-tooltip-title">${a.icon} ${a.title}</span>
+              <span class="b-tooltip-status ${unlocked ? "unlocked" : "locked"}">${unlocked ? "Megszerezve" : "Zárolva"}</span>
             </div>
-            <div class="ach-tooltip-desc">${a.desc}</div>
-            ${rewardBadgeHtml}
-            ${isAdmin ? '<div class="ach-tooltip-admin-hint">⚡ Admin kattintás: azonnali feloldás / zárolás</div>' : ""}
+            <p class="b-tooltip-desc">${a.desc}</p>
+            ${rewardHtml}
+            ${adminHint}
           `;
 
           floatingTip.style.display = "block";
+          floatingTip.style.opacity = "1";
+
+          const tipHeight = floatingTip.offsetHeight || 110;
           const rect = item.getBoundingClientRect();
-          const tipWidth = 260;
-          let leftPos = rect.left + rect.width / 2 - tipWidth / 2;
-          if (leftPos < 10) leftPos = 10;
-          if (leftPos + tipWidth > window.innerWidth - 10) {
-            leftPos = window.innerWidth - tipWidth - 10;
+          const tipWidth = 240;
+          let tipLeft = rect.left + rect.width / 2 - tipWidth / 2;
+          tipLeft = Math.max(
+            12,
+            Math.min(window.innerWidth - tipWidth - 12, tipLeft),
+          );
+
+          if (rect.top - tipHeight - 8 > 10) {
+            floatingTip.style.top = `${rect.top - tipHeight - 8}px`;
+          } else {
+            floatingTip.style.top = `${rect.bottom + 8}px`;
           }
-          let topPos = rect.top - floatingTip.offsetHeight - 8;
-          if (topPos < 10) {
-            topPos = rect.bottom + 8;
-          }
-          floatingTip.style.left = `${leftPos}px`;
-          floatingTip.style.top = `${topPos}px`;
+          floatingTip.style.left = `${tipLeft}px`;
         });
 
         item.addEventListener("mouseleave", () => {
-          floatingTip.style.display = "none";
+          if (floatingTip) {
+            floatingTip.style.display = "none";
+            floatingTip.style.opacity = "0";
+          }
         });
 
         if (isAdmin) {
-          item.addEventListener("click", async () => {
-            const isCurrentlyUnlocked = achSet.has(a.id);
-            floatingTip.style.display = "none";
-            await adminToggleSingleAchievement(stats.username, a.id, isCurrentlyUnlocked);
+          item.addEventListener("click", async (e) => {
+            e.stopPropagation();
+            if (item.dataset.busy === "1") return;
+            item.dataset.busy = "1";
+
+            if (floatingTip) {
+              floatingTip.style.display = "none";
+              floatingTip.style.opacity = "0";
+            }
+
+            const wasUnlocked = achSet.has(achId);
+            const nextUnlocked = !wasUnlocked;
+            item.classList.toggle("unlocked", nextUnlocked);
+            item.classList.toggle("locked", !nextUnlocked);
+            const dot = item.querySelector(".badge-admin-dot");
+            if (dot) {
+              dot.textContent = nextUnlocked ? "✓" : "🔒";
+              dot.className = `badge-admin-dot ${nextUnlocked ? "unlocked" : "locked"}`;
+            }
+
+            const nextSet = new Set(achSet);
+            if (nextUnlocked) {
+              nextSet.add(achId);
+            } else {
+              nextSet.delete(achId);
+            }
+            achSet.clear();
+            nextSet.forEach((x) => achSet.add(x));
+
+            const curAchCountEl = document.getElementById("profileAchievementsCount");
+            const curBadgeSummaryEl = document.getElementById("profileBadgeSummary");
+            if (curAchCountEl)
+              curAchCountEl.textContent = `${nextSet.size} / ${ACHIEVEMENTS.length}`;
+            if (curBadgeSummaryEl)
+              curBadgeSummaryEl.textContent = `${nextSet.size} feloldva a ${ACHIEVEMENTS.length}-ből`;
+
+            triggerHaptic("impact");
+            if (typeof hangKatt !== "undefined") playSound(hangKatt);
+            try {
+              await adminForceUpdateUserAchievements(
+                stats.username,
+                Array.from(nextSet),
+                null,
+                true
+              );
+            } finally {
+              delete item.dataset.busy;
+            }
           });
         }
       });
@@ -1807,6 +1886,18 @@ if (badgesListEl) {
       renderAchievements(achSortSelect.value);
     } else {
       renderAchievements("default");
+    }
+
+    const profileArea = document.querySelector(".profile-content-area");
+    if (profileArea && !profileArea._tooltipScrollBound) {
+      profileArea._tooltipScrollBound = true;
+      profileArea.addEventListener("scroll", () => {
+        const floatingTip = document.getElementById("profileBadgeFloatingTooltip");
+        if (floatingTip) {
+          floatingTip.style.display = "none";
+          floatingTip.style.opacity = "0";
+        }
+      }, { passive: true });
     }
   }
 
@@ -1914,6 +2005,15 @@ async function updatePlayersModalUI() {
   const container = document.getElementById("playersListContainer");
   if (!container) return;
 
+  const sortSelect = document.getElementById("sortPlayersSelect");
+  if (sortSelect && !sortSelect._hasChangeListener) {
+    sortSelect._hasChangeListener = true;
+    sortSelect.addEventListener("change", () => {
+      updatePlayersModalUI();
+    });
+  }
+  const sortMode = sortSelect ? sortSelect.value : "online_first";
+
   let players = [];
   if (
     window.leaderboardService &&
@@ -1942,7 +2042,7 @@ async function updatePlayersModalUI() {
     );
   }
 
-  // Rendezés: online játékosok elöl, utána legjobb pontszám szerint csökkenő
+  // Rendezés a kiválasztott szempont szerint
   filtered.sort((a, b) => {
     const aKey = encodeURIComponent(
       String(a.username || "").trim().toLowerCase(),
@@ -1952,7 +2052,22 @@ async function updatePlayersModalUI() {
     ).replace(/\./g, "%2E");
     const aOnline = presenceData[aKey]?.online === true;
     const bOnline = presenceData[bKey]?.online === true;
-    if (aOnline !== bOnline) return bOnline ? 1 : -1;
+
+    if (sortMode === "online_first") {
+      if (aOnline !== bOnline) return bOnline ? 1 : -1;
+      return (b.bestScore || 0) - (a.bestScore || 0);
+    } else if (sortMode === "offline_first") {
+      if (aOnline !== bOnline) return aOnline ? 1 : -1;
+      return (b.bestScore || 0) - (a.bestScore || 0);
+    } else if (sortMode === "alpha_asc") {
+      return String(a.username || "").localeCompare(String(b.username || ""), "hu");
+    } else if (sortMode === "alpha_desc") {
+      return String(b.username || "").localeCompare(String(a.username || ""), "hu");
+    } else if (sortMode === "best_score") {
+      return (b.bestScore || 0) - (a.bestScore || 0);
+    } else if (sortMode === "total_matches") {
+      return (b.totalMatches || 0) - (a.totalMatches || 0);
+    }
     return (b.bestScore || 0) - (a.bestScore || 0);
   });
 

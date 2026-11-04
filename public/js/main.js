@@ -169,6 +169,14 @@ if (playerSearchInput) {
         }
     });
 }
+const sortPlayersSelect = document.getElementById('sortPlayersSelect');
+if (sortPlayersSelect) {
+    sortPlayersSelect.addEventListener('change', () => {
+        if (typeof updatePlayersModalUI === 'function') {
+            updatePlayersModalUI();
+        }
+    });
+}
 
 // Felső fejléc saját profil gomb kattintás
 const openMyProfileBtn = document.getElementById('openMyProfileBtn');
