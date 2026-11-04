@@ -99,6 +99,7 @@ function applyTheme(themeKey) {
     themeKey = currentTheme || "retro";
   }
 
+  const oldPalette = THEME_PALETTES[currentTheme] || THEME_PALETTES.retro;
   currentTheme = themeKey;
   localStorage.setItem("crashdown_theme", themeKey);
 
@@ -107,7 +108,8 @@ function applyTheme(themeKey) {
     .trim();
   document.body.classList.add(`theme-${themeKey}`);
 
-  negyzetSzinek = THEME_PALETTES[themeKey] || THEME_PALETTES.retro;
+  const newPalette = THEME_PALETTES[themeKey] || THEME_PALETTES.retro;
+  negyzetSzinek = newPalette;
   const colorSelect = document.getElementById("colorSelect");
   if (colorSelect) {
     getSzinek(colorSelect.value);
@@ -120,7 +122,7 @@ function applyTheme(themeKey) {
     themeSelect.value = themeKey;
   }
 
-  // Canvas azonnali frissítése újraszínezéssel, előnézet alaphelyzetbe állítása nélkül!
+  // Canvas újraszínezése 1-az-1-es determinisztikus leképezéssel (nem randomizál!)
   const targetGrid =
     typeof grid !== "undefined" && grid && grid.length
       ? grid
@@ -139,17 +141,18 @@ function applyTheme(themeKey) {
             typeof powerUpColors !== "undefined" &&
             powerUpColors.has(cella.color)
           ) {
-            return; // Power-upok egyedi színét ne írjuk felül
+            return; // Power-upok egyedi színét sosem írjuk felül
           }
-          if (!szinek.includes(cella.color)) {
-            cella.color = szinek[Math.floor(Math.random() * szinek.length)];
+          const oldIdx = oldPalette.indexOf(cella.color);
+          if (oldIdx !== -1) {
+            cella.color = newPalette[oldIdx % newPalette.length];
+          } else if (!szinek.includes(cella.color)) {
+            cella.color = szinek[0];
           }
         }
       });
     });
     if (typeof drawGrid === "function") drawGrid();
-  } else {
-    if (typeof initPreviewBoard === "function") initPreviewBoard();
   }
 }
 
@@ -471,6 +474,10 @@ async function openPlayerProfileModal(username) {
                     ${rewardHtml}
                 `;
 
+        floatingTip.style.display = "block";
+        floatingTip.style.opacity = "1";
+
+        const tipHeight = floatingTip.offsetHeight || 110;
         const rect = item.getBoundingClientRect();
         const tipWidth = 240;
         let tipLeft = rect.left + rect.width / 2 - tipWidth / 2;
@@ -479,15 +486,13 @@ async function openPlayerProfileModal(username) {
           Math.min(window.innerWidth - tipWidth - 12, tipLeft),
         );
 
-        let tipTop = rect.top - (rewardRows.length > 0 ? 94 : 72);
-        if (tipTop < 10) {
-          tipTop = rect.bottom + 8;
+        // Mindig pontosan az elem teteje felett jelenjen meg
+        if (rect.top - tipHeight - 8 > 10) {
+          floatingTip.style.top = `${rect.top - tipHeight - 8}px`;
+        } else {
+          floatingTip.style.top = `${rect.bottom + 8}px`;
         }
-
         floatingTip.style.left = `${tipLeft}px`;
-        floatingTip.style.top = `${tipTop}px`;
-        floatingTip.style.display = "block";
-        floatingTip.style.opacity = "1";
       });
 
       item.addEventListener("mouseleave", () => {
@@ -496,7 +501,32 @@ async function openPlayerProfileModal(username) {
           floatingTip.style.opacity = "0";
         }
       });
+
+      // Mobilon kattintásra is nyitható és bezárható
+      item.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
     });
+
+    // Ha a felhasználó görget a profilon, vagy a tooltipre kattint, azonnal tűnjön el
+    const hideTooltip = () => {
+      if (floatingTip) {
+        floatingTip.style.display = "none";
+        floatingTip.style.opacity = "0";
+      }
+    };
+    floatingTip.onclick = hideTooltip;
+
+    const profileArea = document.querySelector(".profile-content-area");
+    if (profileArea) {
+      profileArea.addEventListener("scroll", hideTooltip, { passive: true });
+    }
+    window.addEventListener("scroll", hideTooltip, { passive: true });
+  }
+
+  const pwSection = document.getElementById("profileChangePasswordSection");
+  if (pwSection) {
+    pwSection.style.display = isOwnProfile ? "flex" : "none";
   }
 
   const historyListEl = document.getElementById("profileHistoryList");

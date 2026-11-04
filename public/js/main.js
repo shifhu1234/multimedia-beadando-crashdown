@@ -307,7 +307,13 @@ if (changePasswordForm) {
         }
 
         if (res.success) {
-            closeChangePasswordModal();
+            if (typeof closeChangePasswordModal === 'function') closeChangePasswordModal();
+            const input1 = document.getElementById('newPasswordInput');
+            const input2 = document.getElementById('confirmNewPasswordInput');
+            if (input1) input1.value = '';
+            if (input2) input2.value = '';
+            const errEl = document.getElementById('changePasswordErrorMsg');
+            if (errEl) errEl.style.display = 'none';
             showToast('✅ A jelszavad sikeresen megváltozott!', 'success');
         } else {
             showChangePwError(res.error || 'Hiba történt a jelszómódosítás során.');

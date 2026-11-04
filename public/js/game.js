@@ -512,13 +512,7 @@ function spawnFloatingText(col, row, text, color = '#ffffff') {
 }
 
 function handleClick(event) {
-    if (!jatekFut) {
-        if (typeof startMatch === 'function') {
-            startMatch();
-        }
-        return;
-    }
-    if (vegeAJateknak || kattOffset) return;
+    if (!jatekFut || vegeAJateknak || kattOffset) return;
 
     const rect = canvas.getBoundingClientRect();
     const scaleX = LOGICAL_SIZE / rect.width;
@@ -1223,6 +1217,9 @@ function initPreviewBoard() {
 }
 
 function jatekInditasa() {
+    const overlay = document.getElementById('canvasOverlay');
+    if (overlay) overlay.classList.add('hidden');
+
     kattOffset = false;
     jatekFut = true;
     vegeAJateknak = false;
@@ -1353,6 +1350,10 @@ function timer() {
             if (overlay) {
                 overlay.classList.remove('hidden');
                 if (overlayTitle) overlayTitle.textContent = `Végső pontszám: ${pontSzam} p`;
+                const btnText = document.getElementById('overlayStartBtnText');
+                if (btnText) btnText.textContent = 'Új játék indítása';
+                const timeUpMsg = document.getElementById('timeUpMessage');
+                if (timeUpMsg) timeUpMsg.style.display = 'block';
 
                 const overlaySaveBtn = document.getElementById('overlaySaveScoreBtn');
                 const modeSelectEl = document.getElementById('modeSelect');

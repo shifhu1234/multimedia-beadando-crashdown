@@ -15,7 +15,7 @@
       href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css?v=3.6" />
+    <link rel="stylesheet" href="style.css?v=3.7" />
 
     <!-- Firebase SDK (Compat - automatikus integráció) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -47,21 +47,6 @@
           <span id="currentUserNameLabel" class="current-user-name"
             >Játékos</span
           >
-        </button>
-
-        <!-- Különálló doboz: Jelszóváltás -->
-        <button
-          id="openChangePasswordModalBtn"
-          class="top-nav-btn btn-change-pw-box"
-          style="display: none"
-          title="Jelszó módosítása"
-        >
-          <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15">
-            <path
-              d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
-            />
-          </svg>
-          <span>Jelszóváltás</span>
         </button>
 
         <!-- Különálló doboz: Kilépés -->
@@ -366,15 +351,15 @@
 
         <div class="canvas-wrapper" id="canvasWrapper">
           <canvas id="crashdownCanvas" width="440" height="440"></canvas>
-          <!-- Az overlay alapértelmezetten rejtett, csak a játék végén/eredménynél jelenik meg! -->
-          <div id="canvasOverlay" class="canvas-overlay hidden">
+          <!-- Pálya feletti indító és játék végi overlay (kizárólag a pálya felett) -->
+          <div id="canvasOverlay" class="canvas-overlay">
             <div class="overlay-card">
-              <h2 id="overlayTitle">Crashdown</h2>
+              <h2 id="overlayTitle">Crashdown Arcade</h2>
               <p id="overlaySubtitle">
                 Kattints vagy érints legalább 3 azonos színű szomszédos blokkot
                 a törléshez!
               </p>
-              <p id="timeUpMessage">Lejárt az idő!</p>
+              <p id="timeUpMessage" style="display: none;">Lejárt az idő!</p>
 
               <div class="overlay-action-stack">
                 <button
@@ -404,7 +389,7 @@
                   >
                     <path d="M8 5v14l11-7z" />
                   </svg>
-                  <span>Játék indítása</span>
+                  <span id="overlayStartBtnText">Játék indítása</span>
                 </button>
               </div>
             </div>
@@ -687,74 +672,6 @@
       </div>
     </div>
 
-    <!-- ==================== JELSZÓVÁLTOZTATÁS MODAL ==================== -->
-    <div id="passwordChangeModal" class="modal-backdrop hidden">
-      <div class="auth-modal-card">
-        <div class="auth-modal-header">
-          <h3>Jelszó megváltoztatása</h3>
-          <button
-            id="closeChangePasswordModalBtn"
-            class="modal-close-x"
-            title="Bezárás"
-          >
-            &times;
-          </button>
-        </div>
-
-        <form
-          id="changePasswordForm"
-          class="auth-form-fields"
-          onsubmit="return false;"
-        >
-          <p class="auth-hint-text">
-            Fiók:
-            <strong
-              id="changePwEmailHint"
-              style="color: var(--color-cyan)"
-            ></strong>
-          </p>
-
-          <div class="auth-field">
-            <label for="newPasswordInput">Új jelszó</label>
-            <input
-              type="password"
-              id="newPasswordInput"
-              placeholder="Minimum 6 karakter"
-              required
-              minlength="6"
-              autocomplete="new-password"
-            />
-          </div>
-
-          <div class="auth-field">
-            <label for="confirmNewPasswordInput">Új jelszó ismétlése</label>
-            <input
-              type="password"
-              id="confirmNewPasswordInput"
-              placeholder="Ismételd meg az új jelszót"
-              required
-              minlength="6"
-              autocomplete="new-password"
-            />
-          </div>
-
-          <p
-            id="changePasswordErrorMsg"
-            class="auth-error-alert"
-            style="display: none"
-          ></p>
-
-          <button
-            type="submit"
-            id="changePasswordSubmitBtn"
-            class="btn btn-primary btn-block btn-lg"
-          >
-            Új jelszó mentése
-          </button>
-        </form>
-      </div>
-    </div>
-
     <!-- ==================== MÉRFÖLDKÖVEK & JELVÉNYEK KÁRTYÁS MODAL ==================== -->
     <div id="achievementsModal" class="modal-backdrop hidden">
       <div class="auth-modal-card achievements-modal-card">
@@ -815,13 +732,15 @@
       <div class="auth-modal-card player-profile-modal-card">
         <div class="auth-modal-header">
           <div class="profile-header-info">
-            <div id="profileAvatar" class="profile-avatar-circle">J</div>
-            <div class="profile-title-container">
-              <h3 id="profilePlayerName">Játékos Neve</h3>
-              <div class="profile-title-row">
-                <span id="profilePlayerTitle" class="profile-player-badge"
-                  >Crashdown Játékos</span
-                >
+            <div class="profile-header-top-row">
+              <div id="profileAvatar" class="profile-avatar-circle">J</div>
+              <div class="profile-title-container">
+                <h3 id="profilePlayerName">Játékos Neve</h3>
+                <div class="profile-title-row">
+                  <span id="profilePlayerTitle" class="profile-player-badge"
+                    >Crashdown Játékos</span
+                  >
+                </div>
               </div>
             </div>
             <div class="profile-title-select-wrap">
@@ -938,6 +857,61 @@
               <!-- Dinamikusan feltöltve script.js-ből -->
             </div>
           </div>
+
+          <!-- Jelszóváltoztatás szekció közvetlenül a profilon belül -->
+          <div
+            class="profile-section"
+            id="profileChangePasswordSection"
+            style="display: none"
+          >
+            <div class="profile-section-header">
+              <h4 class="profile-section-title">🔑 Jelszó Megváltoztatása</h4>
+            </div>
+            <form
+              id="changePasswordForm"
+              class="auth-form-fields"
+              onsubmit="return false;"
+              style="margin-top: 6px"
+            >
+              <div class="auth-field">
+                <label for="newPasswordInput">Új jelszó</label>
+                <input
+                  type="password"
+                  id="newPasswordInput"
+                  placeholder="Minimum 6 karakter"
+                  required
+                  minlength="6"
+                  autocomplete="new-password"
+                />
+              </div>
+              <div class="auth-field">
+                <label for="confirmNewPasswordInput"
+                  >Új jelszó ismétlése</label
+                >
+                <input
+                  type="password"
+                  id="confirmNewPasswordInput"
+                  placeholder="Ismételd meg az új jelszót"
+                  required
+                  minlength="6"
+                  autocomplete="new-password"
+                />
+              </div>
+              <p
+                id="changePasswordErrorMsg"
+                class="auth-error-alert"
+                style="display: none"
+              ></p>
+              <button
+                type="submit"
+                id="changePasswordSubmitBtn"
+                class="btn btn-primary btn-block"
+                style="height: 38px"
+              >
+                Új jelszó mentése
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
@@ -951,11 +925,11 @@
     <div id="toastContainer" class="toast-container"></div>
 
     <!-- Modularizált JavaScript modulok a villámgyors futásért és tiszta átláthatóságért -->
-    <script src="js/config.js?v=3.6"></script>
-    <script src="js/audio.js?v=3.6"></script>
-    <script src="js/achievements.js?v=3.6"></script>
-    <script src="js/ui.js?v=3.6"></script>
-    <script src="js/game.js?v=3.6"></script>
-    <script src="js/main.js?v=3.6"></script>
+    <script src="js/config.js?v=3.7"></script>
+    <script src="js/audio.js?v=3.7"></script>
+    <script src="js/achievements.js?v=3.7"></script>
+    <script src="js/ui.js?v=3.7"></script>
+    <script src="js/game.js?v=3.7"></script>
+    <script src="js/main.js?v=3.7"></script>
   </body>
 </html>

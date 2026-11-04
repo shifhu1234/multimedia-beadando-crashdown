@@ -420,7 +420,7 @@ select:disabled {
     width: 464px;
     align-items: center;
     justify-content: flex-start;
-    overflow: hidden;
+    overflow: visible;
 }
 
 /* HUD Felső sáv - Két zónás: felül az idő/powerup/pont, alul a lebegő info sáv */
@@ -754,7 +754,9 @@ select:disabled {
     flex-direction: column;
     align-items: center;
     gap: 6px;
-    margin-top: 2px;
+    margin-top: 4px;
+    padding-bottom: 6px;
+    min-height: 46px;
     flex-shrink: 0;
 }
 
@@ -766,25 +768,26 @@ select:disabled {
     align-items: center;
     justify-content: center;
     gap: 10px;
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    background: var(--color-blue);
     color: #ffffff;
     font-weight: 700;
     font-size: 0.86rem;
     border-radius: var(--radius-md);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4);
+    box-shadow: 0 3px 0 var(--color-blue-dark);
     cursor: pointer;
     transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.15s ease;
 }
 
 .btn-shuffle:hover:not(:disabled) {
+    filter: brightness(1.1);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.55);
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    box-shadow: 0 5px 0 var(--color-blue-dark);
 }
 
 .btn-shuffle:active:not(:disabled) {
     transform: translateY(0);
+    box-shadow: 0 1px 0 var(--color-blue-dark);
 }
 
 .btn-shuffle:disabled {
