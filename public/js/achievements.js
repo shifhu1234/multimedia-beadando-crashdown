@@ -769,6 +769,8 @@ function getAchievementRewards(achId) {
   if (linkedAv) {
     rewList.push({
       type: "avatar",
+      symbol: linkedAv.symbol,
+      name: linkedAv.name,
       text: `Profilkép: ${linkedAv.symbol}`,
     });
   }
@@ -777,6 +779,9 @@ function getAchievementRewards(achId) {
     const spec = linkedTitle.isSpecial ? " (speciális)" : "";
     rewList.push({
       type: "title",
+      titleName: cleanTitle,
+      specialClass: linkedTitle.specialClass || "",
+      isSpecial: linkedTitle.isSpecial,
       text: `Rangcím: ${cleanTitle}${spec}`,
     });
   }
@@ -785,6 +790,8 @@ function getAchievementRewards(achId) {
     const spec = linkedTheme.isSpecial ? " (speciális)" : "";
     rewList.push({
       type: "theme",
+      themeName: cleanTheme,
+      isSpecial: linkedTheme.isSpecial,
       text: `Téma: ${cleanTheme}${spec}`,
     });
   }
@@ -793,6 +800,9 @@ function getAchievementRewards(achId) {
     const spec = linkedColor.isSpecial ? " (speciális)" : "";
     rewList.push({
       type: "color",
+      colorName: cleanColor,
+      className: linkedColor.className,
+      isSpecial: linkedColor.isSpecial,
       text: `Név szín: ${cleanColor}${spec}`,
     });
   }
@@ -865,7 +875,8 @@ const PROFILE_TITLES = [
     name: "Lángoló Kezek",
     desc: "Érj el legalább 4×-es kombó szorzót",
     achId: "ach_combo_x4",
-    isSpecial: false,
+    specialClass: "title-theme-flame",
+    isSpecial: true,
     isUnlocked: (stats, achSet) => achSet.has("ach_combo_x4"),
   },
   {
@@ -889,7 +900,8 @@ const PROFILE_TITLES = [
     name: "Villámkezű",
     desc: "Kattints legalább 8 sikeres csoportra 10 másodpercen belül",
     achId: "ach_speed_demon_8",
-    isSpecial: false,
+    specialClass: "title-theme-electric",
+    isSpecial: true,
     isUnlocked: (stats, achSet) => achSet.has("ach_speed_demon_8"),
   },
   {
@@ -897,7 +909,8 @@ const PROFILE_TITLES = [
     name: "Színmester",
     desc: "Érj el legalább 2 000 pontot az 5 színű mester módban",
     achId: "ach_master_5_color",
-    isSpecial: false,
+    specialClass: "title-special-rainbow",
+    isSpecial: true,
     isUnlocked: (stats, achSet) => achSet.has("ach_master_5_color"),
   },
   {
@@ -905,7 +918,8 @@ const PROFILE_TITLES = [
     name: "Robbantómester",
     desc: "Tisztíts le pályát 25 db szín-bomba segítségével",
     achId: "ach_colorbomb_collector_25",
-    isSpecial: false,
+    specialClass: "title-theme-blast",
+    isSpecial: true,
     isUnlocked: (stats, achSet) => achSet.has("ach_colorbomb_collector_25"),
   },
   {
@@ -913,7 +927,8 @@ const PROFILE_TITLES = [
     name: "Jégkirály",
     desc: "Fagyaszd be az időt legalább 50 alkalommal",
     achId: "ach_freeze_collector_50",
-    isSpecial: false,
+    specialClass: "title-theme-frost",
+    isSpecial: true,
     isUnlocked: (stats, achSet) => achSet.has("ach_freeze_collector_50"),
   },
   {
@@ -921,7 +936,8 @@ const PROFILE_TITLES = [
     name: "Mágneses Erőmű",
     desc: "Robbants fel legalább 50 db TNT blokkot",
     achId: "ach_tnt_collector_50",
-    isSpecial: false,
+    specialClass: "title-theme-magnet",
+    isSpecial: true,
     isUnlocked: (stats, achSet) => achSet.has("ach_tnt_collector_50"),
   },
   {
@@ -1065,7 +1081,8 @@ const PROFILE_TITLES = [
     name: "Káosz Ura",
     desc: "Érj el legalább 5 000 pontot a Káosz módban",
     achId: "ach_mode_chaos_win",
-    isSpecial: false,
+    specialClass: "title-theme-chaos",
+    isSpecial: true,
     isUnlocked: (stats, achSet) => achSet.has("ach_mode_chaos_win"),
   },
   {
@@ -1073,7 +1090,8 @@ const PROFILE_TITLES = [
     name: "Mesterbombázó",
     desc: "Érj el legalább 5 000 pontot a Robbanás Mániában",
     achId: "ach_mode_bomb_win",
-    isSpecial: false,
+    specialClass: "title-theme-blast",
+    isSpecial: true,
     isUnlocked: (stats, achSet) => achSet.has("ach_mode_bomb_win"),
   },
   {
@@ -1081,7 +1099,8 @@ const PROFILE_TITLES = [
     name: "Időhajhász",
     desc: "Érj el legalább 5 000 pontot az Időhajsza módban",
     achId: "ach_mode_time_win",
-    isSpecial: false,
+    specialClass: "title-theme-electric",
+    isSpecial: true,
     isUnlocked: (stats, achSet) => achSet.has("ach_mode_time_win"),
   },
   {
@@ -1089,7 +1108,8 @@ const PROFILE_TITLES = [
     name: "Tisztakezű Zseni",
     desc: "Érj el legalább 3 000 pontot a Nyers módban",
     achId: "ach_mode_raw_win",
-    isSpecial: false,
+    specialClass: "title-theme-emerald",
+    isSpecial: true,
     isUnlocked: (stats, achSet) => achSet.has("ach_mode_raw_win"),
   },
   {
@@ -1097,7 +1117,8 @@ const PROFILE_TITLES = [
     name: "Bomba Szakértő",
     desc: "Robbants fel legalább 25 db TNT blokkot",
     achId: "ach_tnt_collector_25",
-    isSpecial: false,
+    specialClass: "title-theme-blast",
+    isSpecial: true,
     isUnlocked: (stats, achSet) => achSet.has("ach_tnt_collector_25"),
   },
   {
@@ -1105,7 +1126,8 @@ const PROFILE_TITLES = [
     name: "Mágnes Mester",
     desc: "Használj fel legalább 25 db mágnes power-upot",
     achId: "ach_magnet_collector_25",
-    isSpecial: false,
+    specialClass: "title-theme-magnet",
+    isSpecial: true,
     isUnlocked: (stats, achSet) => achSet.has("ach_magnet_collector_25"),
   },
   {
@@ -1113,7 +1135,8 @@ const PROFILE_TITLES = [
     name: "Fagyasztó Úr",
     desc: "Fagyaszd be az időt legalább 25 alkalommal",
     achId: "ach_freeze_collector_25",
-    isSpecial: false,
+    specialClass: "title-theme-frost",
+    isSpecial: true,
     isUnlocked: (stats, achSet) => achSet.has("ach_freeze_collector_25"),
   },
   {
@@ -1305,6 +1328,10 @@ function saveUserAchievementToProfile(username, achId) {
       }
     }
 
+    // Mindig a legfrissebb feloldott mérföldköveket mentsük el a profilba,
+    // nehogy a korábban betöltött lista felülírja az épp most megszerzett jelvényeket!
+    p.achievements = getUnlockedAchievements(username);
+
     profiles[username] = p;
     localStorage.setItem(key, JSON.stringify(profiles));
 
@@ -1321,6 +1348,85 @@ function saveUserAchievementToProfile(username, achId) {
     }
   } catch (e) {
     console.error("Hiba az elért mérföldkő mentésekor:", e);
+  }
+}
+
+const SCORE_MILESTONES = [
+  { score: 200, id: "ach_score_200" },
+  { score: 500, id: "ach_score_500", altId: "first_500" },
+  { score: 800, id: "ach_score_800" },
+  { score: 1000, id: "ach_score_1000" },
+  { score: 1500, id: "ach_score_1500", altId: "score_1500" },
+  { score: 5000, id: "ach_score_5000", altId: "score_5000" },
+  { score: 7500, id: "ach_score_7500" },
+  { score: 10000, id: "ach_score_10k", altId: "score_10k" },
+  { score: 15000, id: "ach_score_15k" },
+  { score: 25000, id: "ach_score_25k", altId: "score_25k" },
+  { score: 35000, id: "ach_score_35k" },
+  { score: 50000, id: "ach_score_50k", altId: "score_50k" },
+  { score: 60000, id: "ach_score_60k" },
+  { score: 75000, id: "ach_score_75k", altId: "score_75k" },
+  { score: 85000, id: "ach_score_85k" },
+  { score: 90000, id: "ach_score_90k" },
+  { score: 100000, id: "ach_score_100k", altId: "score_100k" },
+  { score: 110000, id: "ach_score_110k" },
+  { score: 125000, id: "ach_score_125k" },
+  { score: 150000, id: "ach_score_150k", altId: "score_150k" },
+  { score: 200000, id: "ach_score_200k" },
+  { score: 250000, id: "ach_score_250k", altId: "score_250k" },
+  { score: 300000, id: "ach_score_300k" },
+  { score: 500000, id: "ach_score_500k" },
+];
+
+function checkScoreAchievements(score, colorCount = null, modifier = null, durationSeconds = null) {
+  const numScore = parseInt(score, 10) || 0;
+  if (numScore <= 0) return;
+
+  for (let i = 0; i < SCORE_MILESTONES.length; i++) {
+    const m = SCORE_MILESTONES[i];
+    if (numScore >= m.score) {
+      checkAchievement(m.id);
+      if (m.altId) checkAchievement(m.altId);
+    }
+  }
+
+  const cVal = colorCount || (document.getElementById("colorSelect")?.value || "3");
+  if (String(cVal) === "5" && numScore >= 2000) {
+    checkAchievement("ach_master_5_color");
+    checkAchievement("master_5_color");
+  }
+
+  const mVal = modifier || (document.getElementById("modeSelect")?.value || "normal");
+  if (mVal === "chaos" && numScore >= 5000) {
+    checkAchievement("ach_mode_chaos_win");
+    checkAchievement("mode_chaos_win");
+  }
+  if (mVal === "bomb_frenzy" && numScore >= 5000) {
+    checkAchievement("ach_mode_bomb_win");
+    checkAchievement("mode_bomb_win");
+  }
+  if (mVal === "time_rush" && numScore >= 5000) {
+    checkAchievement("ach_mode_time_win");
+    checkAchievement("mode_time_win");
+  }
+  if (mVal === "no_powerups" && numScore >= 3000) {
+    checkAchievement("ach_mode_raw_win");
+    checkAchievement("mode_raw_win");
+  }
+
+  const dVal = durationSeconds !== null && durationSeconds !== undefined
+    ? parseInt(durationSeconds, 10)
+    : parseInt(document.getElementById("timeSelect")?.value || "60", 10);
+  if (dVal === 30 && numScore >= 5000) {
+    checkAchievement("ach_sprint_5k");
+    checkAchievement("sprint_5k");
+  }
+  if (dVal === 30 && numScore >= 8000) {
+    checkAchievement("ach_sprint_8k");
+  }
+  if (dVal === 180 && numScore >= 15000) {
+    checkAchievement("ach_marathon_15k");
+    checkAchievement("marathon_15k");
   }
 }
 

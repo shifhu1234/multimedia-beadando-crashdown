@@ -1466,6 +1466,12 @@ function timer() {
                 const overlaySaveBtn = document.getElementById('overlaySaveScoreBtn');
                 const modeSelectEl = document.getElementById('modeSelect');
                 const modVal = modeSelectEl ? modeSelectEl.value : 'normal';
+                const colorVal = szinValaszto ? szinValaszto.value : '3';
+
+                // Pont alapú mérföldkövek ellenőrzése a meccs végén minden játékmódban
+                if (typeof checkScoreAchievements === 'function') {
+                    checkScoreAchievements(pontSzam, colorVal, modVal, MAX_TIME);
+                }
 
                 if (currentUser) {
                     if (overlaySaveBtn) overlaySaveBtn.style.display = 'none';
@@ -1754,17 +1760,8 @@ canvas.addEventListener('mouseleave', function () {
 
 canvas.addEventListener('click', handleClick);
 
-const canvasOverlayEl = document.getElementById('canvasOverlay');
-if (canvasOverlayEl) {
-    canvasOverlayEl.addEventListener('click', function (e) {
-        if (e.target && (e.target.id === 'overlaySaveScoreBtn' || e.target.closest('#overlaySaveScoreBtn'))) {
-            return;
-        }
-        if (typeof startMatch === 'function') {
-            startMatch();
-        }
-    });
-}
+// A játékot kizárólag a gombokra kattintva lehessen elindítani (az overlay háttérre kattintva ne)
+// A startMatch eseménykezelő az #overlayStartBtn és #startGameButton gombokra van kötve.
 
 // Játék beállítások összefoglalójának frissítése a canvas overlayen
 function updateCanvasOverlaySettings() {

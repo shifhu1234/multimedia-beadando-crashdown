@@ -514,6 +514,98 @@
 }
 
 /* Speciális rangcímek ragyogó effektekkel (a viselt jelvényen és a választó kártyán is!) */
+/* Tematikus rangcímek ragyogó effektekkel */
+.title-theme-flame {
+  background: linear-gradient(90deg, #ef4444, #f97316, #dc2626) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.45) !important;
+}
+.profile-player-badge.title-theme-flame {
+  border-color: rgba(239, 68, 68, 0.6) !important;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.35) !important;
+  color: #f87171 !important;
+}
+
+.title-theme-frost {
+  background: linear-gradient(90deg, #38bdf8, #7dd3fc, #0284c7) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.45) !important;
+}
+.profile-player-badge.title-theme-frost {
+  border-color: rgba(56, 189, 248, 0.6) !important;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.35) !important;
+  color: #38bdf8 !important;
+}
+
+.title-theme-blast {
+  background: linear-gradient(90deg, #f97316, #fb923c, #ea580c) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+  text-shadow: 0 0 10px rgba(249, 115, 22, 0.45) !important;
+}
+.profile-player-badge.title-theme-blast {
+  border-color: rgba(249, 115, 22, 0.6) !important;
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.35) !important;
+  color: #fb923c !important;
+}
+
+.title-theme-chaos {
+  background: linear-gradient(90deg, #c084fc, #e879f9, #a855f7) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+  text-shadow: 0 0 10px rgba(192, 132, 252, 0.45) !important;
+}
+.profile-player-badge.title-theme-chaos {
+  border-color: rgba(192, 132, 252, 0.6) !important;
+  box-shadow: 0 0 10px rgba(192, 132, 252, 0.35) !important;
+  color: #c084fc !important;
+}
+
+.title-theme-electric {
+  background: linear-gradient(90deg, #facc15, #fef08a, #eab308) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+  text-shadow: 0 0 10px rgba(250, 204, 21, 0.45) !important;
+}
+.profile-player-badge.title-theme-electric {
+  border-color: rgba(250, 204, 21, 0.6) !important;
+  box-shadow: 0 0 10px rgba(250, 204, 21, 0.35) !important;
+  color: #facc15 !important;
+}
+
+.title-theme-emerald {
+  background: linear-gradient(90deg, #34d399, #6ee7b7, #10b981) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+  text-shadow: 0 0 10px rgba(52, 211, 153, 0.45) !important;
+}
+.profile-player-badge.title-theme-emerald {
+  border-color: rgba(52, 211, 153, 0.6) !important;
+  box-shadow: 0 0 10px rgba(52, 211, 153, 0.35) !important;
+  color: #34d399 !important;
+}
+
+.title-theme-magnet {
+  background: linear-gradient(90deg, #60a5fa, #93c5fd, #3b82f6) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+  text-shadow: 0 0 10px rgba(96, 165, 250, 0.45) !important;
+}
+.profile-player-badge.title-theme-magnet {
+  border-color: rgba(96, 165, 250, 0.6) !important;
+  box-shadow: 0 0 10px rgba(96, 165, 250, 0.35) !important;
+  color: #60a5fa !important;
+}
+
 .title-special-gold {
   background: linear-gradient(
     90deg,

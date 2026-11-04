@@ -307,19 +307,9 @@ function updateScoreUI(instant = false) {
   if (reqScore) {
     reqScore.classList.toggle("met", pontSzam >= 1000);
   }
-  if (pontSzam >= 500) checkAchievement("first_500");
-  if (pontSzam >= 1500) checkAchievement("score_1500");
-  if (pontSzam >= 5000) checkAchievement("score_5000");
-  if (pontSzam >= 10000) checkAchievement("score_10k");
-  if (pontSzam >= 25000) checkAchievement("score_25k");
-  if (pontSzam >= 50000) checkAchievement("score_50k");
-  if (pontSzam >= 75000) checkAchievement("score_75k");
-  if (pontSzam >= 100000) checkAchievement("score_100k");
-  if (pontSzam >= 150000) checkAchievement("score_150k");
-  if (pontSzam >= 250000) checkAchievement("score_250k");
-  const colorSelect = document.getElementById("colorSelect");
-  if (colorSelect && colorSelect.value === "5" && pontSzam >= 2000)
-    checkAchievement("master_5_color");
+  if (typeof checkScoreAchievements === "function") {
+    checkScoreAchievements(pontSzam);
+  }
 }
 
 // ==================== TÉMA KEZELÉS ====================
@@ -690,12 +680,11 @@ async function openPlayerProfileModal(username, resetScroll = true) {
 
   if (titleEl) {
     titleEl.textContent = stats.activeTitle.name;
-    titleEl.classList.remove(
-      "title-special-gold",
-      "title-special-cosmic",
-      "title-special-flame",
-      "title-special-rainbow",
-    );
+    Array.from(titleEl.classList).forEach((cls) => {
+      if (cls.startsWith("title-special-") || cls.startsWith("title-theme-")) {
+        titleEl.classList.remove(cls);
+      }
+    });
     if (stats.activeTitle.specialClass) {
       titleEl.classList.add(stats.activeTitle.specialClass);
     }
@@ -1421,7 +1410,7 @@ async function openPlayerProfileModal(username, resetScroll = true) {
                   </button>
                 ` : (!unlocked ? '<span class="avatar-lock-icon">🔒</span>' : "")}
                 <div class="avatar-pick-symbol">${av.symbol}</div>
-                <div class="avatar-pick-name">${av.name} ${specialBadge}</div>
+                <div class="avatar-pick-name">${av.name}</div>
             </div>
           `;
         }).join("");
@@ -1773,10 +1762,29 @@ async function openPlayerProfileModal(username, resetScroll = true) {
 
           let rewardHtml = "";
           if (rewList.length > 0) {
+            const displayName =
+              stats.username ||
+              window.authService?.getCurrentUser()?.displayName ||
+              "Játékos";
+            const renderedLines = rewList
+              .map((r) => {
+                if (r.type === "title") {
+                  return `<div class="reward-line"><span>Rangcím: </span><span class="profile-player-badge ${r.specialClass || ""}" style="display:inline-block; margin-left:4px; vertical-align:middle;">${r.titleName}</span></div>`;
+                } else if (r.type === "color") {
+                  return `<div class="reward-line"><span>Név szín: </span><span class="${r.className || ""}" style="font-weight:800; display:inline-block; margin-left:4px;">${displayName}</span></div>`;
+                } else if (r.type === "avatar") {
+                  return `<div class="reward-line"><span>Profilkép: </span><span style="font-size:1.15em; margin-left:4px;">${r.symbol}</span></div>`;
+                } else if (r.type === "theme") {
+                  return `<div class="reward-line"><span>Téma: </span><strong style="color:#38bdf8; margin-left:4px;">${r.themeName}</strong></div>`;
+                }
+                return `<div class="reward-line"><span>${r.text}</span></div>`;
+              })
+              .join("");
+
             rewardHtml = `
               <div class="b-tooltip-reward">
                 <div class="reward-heading">Jutalmak:</div>
-                ${rewList.map((r) => `<div class="reward-line"><span>${r.text}</span></div>`).join("")}
+                ${renderedLines}
               </div>
             `;
           } else {
