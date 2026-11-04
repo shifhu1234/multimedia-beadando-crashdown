@@ -1134,10 +1134,39 @@ function saveUserAchievementToProfile(username, achId) {
       p.achievements.push(achId);
     }
 
+    if (!Array.isArray(p.unlockedTitles)) p.unlockedTitles = ["title_beginner"];
+    if (!Array.isArray(p.unlockedColors)) p.unlockedColors = ["name_white"];
+    if (!Array.isArray(p.unlockedAvatars)) p.unlockedAvatars = ["avatar_default"];
+
+    if (typeof PROFILE_TITLES !== "undefined") {
+      const matchTitle = PROFILE_TITLES.find((t) => t.achId === achId);
+      if (matchTitle && !p.unlockedTitles.includes(matchTitle.id)) {
+        p.unlockedTitles.push(matchTitle.id);
+      }
+    }
+
+    const nColorCat = typeof NAME_COLORS_CATALOG !== "undefined" ? NAME_COLORS_CATALOG : [];
+    const matchColor = nColorCat.find((c) => c.achId === achId);
+    if (matchColor && !p.unlockedColors.includes(matchColor.id)) {
+      p.unlockedColors.push(matchColor.id);
+    }
+
+    if (typeof PROFILE_AVATARS !== "undefined") {
+      const matchAvatar = PROFILE_AVATARS.find((a) => a.achId === achId);
+      if (matchAvatar && !p.unlockedAvatars.includes(matchAvatar.id)) {
+        p.unlockedAvatars.push(matchAvatar.id);
+      }
+    }
+
     profiles[username] = p;
     localStorage.setItem(key, JSON.stringify(profiles));
 
     if (
+      window.leaderboardService &&
+      typeof window.leaderboardService.savePlayerProfile === "function"
+    ) {
+      window.leaderboardService.savePlayerProfile(username, p).catch(() => {});
+    } else if (
       window.databaseService &&
       typeof window.databaseService.savePlayerProfile === "function"
     ) {
@@ -1544,15 +1573,18 @@ function getPlayerProfileStats(username, allScores = [], onlineProfile = null) {
     }
     if (
       onlineProfile.achievements &&
-      Array.isArray(onlineProfile.achievements) &&
-      onlineProfile.achievements.length > 0
+      Array.isArray(onlineProfile.achievements)
     ) {
-      profile.achievements = Array.from(
-        new Set([
-          ...(profile.achievements || []),
-          ...onlineProfile.achievements,
-        ]),
-      );
+      profile.achievements = [...onlineProfile.achievements];
+    }
+    if (Array.isArray(onlineProfile.unlockedTitles)) {
+      profile.unlockedTitles = [...onlineProfile.unlockedTitles];
+    }
+    if (Array.isArray(onlineProfile.unlockedColors)) {
+      profile.unlockedColors = [...onlineProfile.unlockedColors];
+    }
+    if (Array.isArray(onlineProfile.unlockedAvatars)) {
+      profile.unlockedAvatars = [...onlineProfile.unlockedAvatars];
     }
     if (onlineProfile.chosenTitle)
       profile.chosenTitle = onlineProfile.chosenTitle;
@@ -1699,37 +1731,81 @@ function getPlayerProfileStats(username, allScores = [], onlineProfile = null) {
 
   const achSet = new Set(profile.achievements || []);
 
-  // Rangcím meghatározása:
-  // Alapjáraton mindig az alapértelmezett kezdő blokktörő marad,
-  // és CSAKIS akkor változik meg, ha a játékos maga átállítja a profilján!
+  const nameColorCatalog =
+    typeof NAME_COLORS_CATALOG !== "undefined" ? NAME_COLORS_CATALOG : [];
+
+  // Független feloldási listák inicializálása ha még nincsenek definiálva
+  if (!Array.isArray(profile.unlockedTitles)) {
+    const initTitles = ["title_beginner"];
+    PROFILE_TITLES.forEach((t) => {
+      if (t.id === "title_beginner") return;
+      if (t.achId && achSet.has(t.achId)) {
+        initTitles.push(t.id);
+      } else if (typeof t.isUnlocked === "function" && t.isUnlocked(profile, achSet)) {
+        initTitles.push(t.id);
+      }
+    });
+    profile.unlockedTitles = Array.from(new Set(initTitles));
+  }
+  if (!profile.unlockedTitles.includes("title_beginner")) {
+    profile.unlockedTitles.unshift("title_beginner");
+  }
+
+  if (!Array.isArray(profile.unlockedColors)) {
+    const initColors = ["name_white"];
+    nameColorCatalog.forEach((col) => {
+      if (col.id === "name_white") return;
+      if (!col.achId || achSet.has(col.achId)) {
+        initColors.push(col.id);
+      }
+    });
+    profile.unlockedColors = Array.from(new Set(initColors));
+  }
+  if (!profile.unlockedColors.includes("name_white")) {
+    profile.unlockedColors.unshift("name_white");
+  }
+
+  if (!Array.isArray(profile.unlockedAvatars)) {
+    const initAvatars = ["avatar_default"];
+    PROFILE_AVATARS.forEach((av) => {
+      if (av.id === "avatar_default") return;
+      if (!av.achId || achSet.has(av.achId)) {
+        initAvatars.push(av.id);
+      }
+    });
+    profile.unlockedAvatars = Array.from(new Set(initAvatars));
+  }
+  if (!profile.unlockedAvatars.includes("avatar_default")) {
+    profile.unlockedAvatars.unshift("avatar_default");
+  }
+
+  // Rangcím meghatározása: kizárólag a független unlockedTitles listától függ
   let activeTitle = null;
-  if (profile.chosenTitle) {
+  if (profile.chosenTitle && profile.unlockedTitles.includes(profile.chosenTitle)) {
     const foundTitle = PROFILE_TITLES.find((t) => t.id === profile.chosenTitle);
-    if (foundTitle && foundTitle.isUnlocked(profile, achSet)) {
+    if (foundTitle) {
       activeTitle = foundTitle;
     }
   }
   profile.activeTitle = activeTitle || PROFILE_TITLES[0];
 
-  // Profilkép (Avatar) meghatározása
+  // Profilkép (Avatar) meghatározása: kizárólag az unlockedAvatars listától függ
   let activeAvatar = null;
-  if (profile.chosenAvatar) {
+  if (profile.chosenAvatar && profile.unlockedAvatars.includes(profile.chosenAvatar)) {
     const foundAv = PROFILE_AVATARS.find((a) => a.id === profile.chosenAvatar);
-    if (foundAv && (!foundAv.achId || achSet.has(foundAv.achId))) {
+    if (foundAv) {
       activeAvatar = foundAv;
     }
   }
   profile.activeAvatar = activeAvatar || PROFILE_AVATARS[0];
 
-  // Név szín meghatározása
+  // Név szín meghatározása: kizárólag az unlockedColors listától függ
   let activeNameColor = null;
-  const nameColorCatalog =
-    typeof NAME_COLORS_CATALOG !== "undefined" ? NAME_COLORS_CATALOG : [];
-  if (profile.chosenNameColor) {
+  if (profile.chosenNameColor && profile.unlockedColors.includes(profile.chosenNameColor)) {
     const foundCol = nameColorCatalog.find(
       (c) => c.id === profile.chosenNameColor,
     );
-    if (foundCol && (!foundCol.achId || achSet.has(foundCol.achId))) {
+    if (foundCol) {
       activeNameColor = foundCol;
     }
   }

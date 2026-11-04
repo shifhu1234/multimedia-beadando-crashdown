@@ -21,7 +21,7 @@ function isAdminUser() {
 }
 
 /**
- * Adminisztrátori jogosultsággal mérföldkövek és testreszabások force unlockolása és lockolása
+ * Adminisztrátori jogosultsággal mérföldkövek force unlockolása és lockolása
  */
 async function adminForceUpdateUserAchievements(targetUsername, newAchievementsList, customToast = null) {
   if (!isAdminUser() || !targetUsername) return;
@@ -37,27 +37,6 @@ async function adminForceUpdateUserAchievements(targetUsername, newAchievementsL
   }
 
   profile.achievements = newAchievementsList;
-
-  // Ha visszazárunk elemeket, és az épp aktív cím/avatar/szín zárolttá vált, alaphelyzetbe állítjuk
-  const achSet = new Set(newAchievementsList);
-  if (profile.chosenTitle) {
-    const tObj = typeof PROFILE_TITLES !== "undefined" ? PROFILE_TITLES.find(t => t.id === profile.chosenTitle) : null;
-    if (tObj && tObj.achId && !achSet.has(tObj.achId) && !achSet.has(tObj.id)) {
-      profile.chosenTitle = "title_beginner";
-    }
-  }
-  if (profile.chosenAvatar) {
-    const aObj = typeof PROFILE_AVATARS !== "undefined" ? PROFILE_AVATARS.find(a => a.id === profile.chosenAvatar) : null;
-    if (aObj && aObj.achId && !achSet.has(aObj.achId) && !achSet.has(aObj.id)) {
-      profile.chosenAvatar = "avatar_default";
-    }
-  }
-  if (profile.chosenNameColor) {
-    const cObj = typeof NAME_COLORS_CATALOG !== "undefined" ? NAME_COLORS_CATALOG.find(c => c.id === profile.chosenNameColor) : null;
-    if (cObj && cObj.achId && !achSet.has(cObj.achId) && !achSet.has(cObj.id)) {
-      profile.chosenNameColor = "name_white";
-    }
-  }
 
   // Lokális mentés
   const profilesKey = "crashdown_player_profiles";
@@ -81,6 +60,110 @@ async function adminForceUpdateUserAchievements(targetUsername, newAchievementsL
 
   const toastMsg = customToast || `⚡ ${targetUsername} jelvényei frissítve (${newAchievementsList.length} db)!`;
   showToast(toastMsg, "success");
+
+  // Profil, Játékosok lista és Ranglista azonnali frissítése (görgetési pozíció megtartásával)
+  const pArea = document.querySelector(".profile-content-area");
+  const prevScroll = pArea ? pArea.scrollTop : 0;
+  await openPlayerProfileModal(targetUsername, false);
+  const pAreaAfter = document.querySelector(".profile-content-area");
+  if (pAreaAfter) {
+    pAreaAfter.scrollTop = prevScroll;
+  }
+  if (typeof updatePlayersModalUI === "function") {
+    updatePlayersModalUI();
+  }
+  if (typeof toplistaMegjelenites === "function") {
+    toplistaMegjelenites();
+  }
+}
+
+/**
+ * Adminisztrátori jogosultsággal rangcímek, névszínek és profilképek force unlockolása és lockolása
+ * (Kizárólag a független feloldási állapotokat kezeli, nem függ a meccs pontszámtól vagy achievementektől)
+ */
+async function adminForceUpdatePlayerCustomRewards(targetUsername, updates = {}, customToast = null) {
+  if (!isAdminUser() || !targetUsername) return;
+
+  let profile = null;
+  if (window.leaderboardService && typeof window.leaderboardService.getPlayerProfile === "function") {
+    profile = await window.leaderboardService.getPlayerProfile(targetUsername);
+  }
+  if (!profile) {
+    const key = "crashdown_player_profiles";
+    const localProfiles = JSON.parse(localStorage.getItem(key) || "{}");
+    profile = localProfiles[targetUsername] || { username: targetUsername };
+  }
+
+  if (!Array.isArray(profile.unlockedTitles)) profile.unlockedTitles = ["title_beginner"];
+  if (!Array.isArray(profile.unlockedColors)) profile.unlockedColors = ["name_white"];
+  if (!Array.isArray(profile.unlockedAvatars)) profile.unlockedAvatars = ["avatar_default"];
+
+  if (Array.isArray(updates.unlockedTitles)) profile.unlockedTitles = [...updates.unlockedTitles];
+  if (Array.isArray(updates.unlockedColors)) profile.unlockedColors = [...updates.unlockedColors];
+  if (Array.isArray(updates.unlockedAvatars)) profile.unlockedAvatars = [...updates.unlockedAvatars];
+
+  if (!profile.unlockedTitles.includes("title_beginner")) profile.unlockedTitles.unshift("title_beginner");
+  if (!profile.unlockedColors.includes("name_white")) profile.unlockedColors.unshift("name_white");
+  if (!profile.unlockedAvatars.includes("avatar_default")) profile.unlockedAvatars.unshift("avatar_default");
+
+  if (updates.chosenTitle !== undefined) profile.chosenTitle = updates.chosenTitle;
+  if (updates.chosenAvatar !== undefined) profile.chosenAvatar = updates.chosenAvatar;
+  if (updates.chosenNameColor !== undefined) profile.chosenNameColor = updates.chosenNameColor;
+
+  // Ha zároltunk egy aktív elemet, azonnal visszaléptetjük az alapértelmezettre
+  if (!profile.unlockedTitles.includes(profile.chosenTitle)) {
+    profile.chosenTitle = "title_beginner";
+  }
+  if (!profile.unlockedColors.includes(profile.chosenNameColor)) {
+    profile.chosenNameColor = "name_white";
+  }
+  if (!profile.unlockedAvatars.includes(profile.chosenAvatar)) {
+    profile.chosenAvatar = "avatar_default";
+  }
+
+  // Lokális mentés
+  const profilesKey = "crashdown_player_profiles";
+  const localProfiles = JSON.parse(localStorage.getItem(profilesKey) || "{}");
+  localProfiles[targetUsername] = profile;
+  localStorage.setItem(profilesKey, JSON.stringify(localProfiles));
+
+  // Toplista lokális frissítése az adott játékos rekordjainál valós időben
+  try {
+    const toplistaRaw = localStorage.getItem("toplista");
+    if (toplistaRaw) {
+      const toplista = JSON.parse(toplistaRaw);
+      let updated = false;
+      const uLower = targetUsername.trim().toLowerCase();
+      toplista.forEach((entry) => {
+        if (entry.name && entry.name.toLowerCase() === uLower) {
+          if (profile.chosenAvatar) entry.chosenAvatar = profile.chosenAvatar;
+          if (profile.chosenTitle) entry.chosenTitle = profile.chosenTitle;
+          if (profile.chosenNameColor) entry.chosenNameColor = profile.chosenNameColor;
+          updated = true;
+        }
+      });
+      if (updated) {
+        localStorage.setItem("toplista", JSON.stringify(toplista));
+      }
+    }
+  } catch (e) {}
+
+  // Ha a bejelentkezett felhasználó a célfelhasználó, a választott kulcsokat is szinkronizáljuk
+  const currentUser = window.authService?.getCurrentUser();
+  if (currentUser && currentUser.displayName && currentUser.displayName.toLowerCase() === targetUsername.toLowerCase()) {
+    if (profile.chosenTitle) localStorage.setItem("crashdown_chosen_title", profile.chosenTitle);
+    if (profile.chosenAvatar) localStorage.setItem("crashdown_chosen_avatar", profile.chosenAvatar);
+    if (profile.chosenNameColor) localStorage.setItem("crashdown_chosen_name_color", profile.chosenNameColor);
+  }
+
+  // Firebase profil mentés
+  if (window.leaderboardService && typeof window.leaderboardService.savePlayerProfile === "function") {
+    await window.leaderboardService.savePlayerProfile(targetUsername, profile);
+  }
+
+  if (customToast) {
+    showToast(customToast, "success");
+  }
 
   // Profil, Játékosok lista és Ranglista azonnali frissítése (görgetési pozíció megtartásával)
   const pArea = document.querySelector(".profile-content-area");
@@ -348,6 +431,11 @@ async function openPlayerProfileModal(username, resetScroll = true) {
 
   let onlineProfile = null;
   if (
+    window.leaderboardService &&
+    typeof window.leaderboardService.getPlayerProfile === "function"
+  ) {
+    onlineProfile = await window.leaderboardService.getPlayerProfile(username);
+  } else if (
     window.databaseService &&
     typeof window.databaseService.getPlayerProfile === "function"
   ) {
@@ -430,7 +518,7 @@ async function openPlayerProfileModal(username, resetScroll = true) {
       nameColorSection.style.display = "block";
       nameColorGrid.innerHTML = nameColorCatalog
         .map((col) => {
-          const unlocked = !col.achId || achSet.has(col.achId) || achSet.has(col.id);
+          const unlocked = (stats.unlockedColors || ["name_white"]).includes(col.id);
           const isSelected =
             stats.activeNameColor && stats.activeNameColor.id === col.id;
           const reqAch = col.achId
@@ -438,13 +526,13 @@ async function openPlayerProfileModal(username, resetScroll = true) {
             : null;
           const lockTitle = reqAch
             ? `Zárolva: ${reqAch.title} (${reqAch.desc}) szükséges hozzá!`
-            : "";
+            : "Zárolva";
           return `
             <div class="name-color-pick-card ${unlocked ? "" : "locked"} ${isSelected ? "active" : ""} ${isAdmin ? "admin-manageable" : ""}"
                  data-color-id="${col.id}"
                  data-unlocked="${unlocked ? "1" : "0"}"
-                 title="${isAdmin ? (unlocked ? `${col.name} (Kattints a beállításhoz, jobb felső ikonnal zárolhatod)` : `${lockTitle} (Admin: kattints a feloldáshoz)`) : (unlocked ? col.name : lockTitle)}">
-                ${isAdmin && col.achId ? `
+                 title="${isAdmin ? (unlocked ? `${col.name} (Kattints a beállításhoz, jobb felső gombbal zárolhatod)` : `${lockTitle} (Admin: kattints a feloldáshoz)`) : (unlocked ? col.name : lockTitle)}">
+                ${isAdmin && col.id !== "name_white" ? `
                   <button type="button" class="card-admin-toggle-badge ${unlocked ? "unlocked" : "locked"}" 
                           data-action="toggle-lock"
                           title="${unlocked ? "Zárolás (Admin)" : "Feloldás (Admin)"}">
@@ -470,24 +558,23 @@ async function openPlayerProfileModal(username, resetScroll = true) {
             const isUnlocked = this.getAttribute("data-unlocked") === "1";
 
             // Ha az admin a jobb felső státusz gombra kattint: feloldás/visszazárás kapcsolása
-            if (isToggleBtn && isAdmin && colObj.achId) {
+            if (isToggleBtn && isAdmin && colObj.id !== "name_white") {
               e.stopPropagation();
-              const nextSet = new Set(achSet);
+              let curColors = [...(stats.unlockedColors || ["name_white"])];
+              let newChosenColor = stats.chosenNameColor;
               if (isUnlocked) {
-                nextSet.delete(colObj.achId);
-                nextSet.delete(colObj.id);
-                if (stats.chosenNameColor === colId) {
-                  await syncPlayerCustomization(stats.username, { chosenNameColor: "name_white" });
+                curColors = curColors.filter((id) => id !== colId);
+                if (newChosenColor === colId || stats.activeNameColor?.id === colId) {
+                  newChosenColor = "name_white";
                 }
               } else {
-                nextSet.add(colObj.achId);
-                nextSet.add(colObj.id);
+                if (!curColors.includes(colId)) curColors.push(colId);
               }
               triggerHaptic("impact");
               if (typeof hangKatt !== "undefined") playSound(hangKatt);
-              await adminForceUpdateUserAchievements(
+              await adminForceUpdatePlayerCustomRewards(
                 stats.username,
-                Array.from(nextSet),
+                { unlockedColors: curColors, chosenNameColor: newChosenColor },
                 isUnlocked
                   ? `🔒 ${colObj.name} névszín zárolva (${stats.username})!`
                   : `🔓 ${colObj.name} névszín feloldva (${stats.username})!`
@@ -497,21 +584,14 @@ async function openPlayerProfileModal(username, resetScroll = true) {
 
             // Ha zárolt elemre kattintunk
             if (!isUnlocked) {
-              if (isAdmin && colObj.achId) {
-                const nextSet = new Set(achSet);
-                nextSet.add(colObj.achId);
-                nextSet.add(colObj.id);
-                if (isOwnProfile) {
-                  localStorage.setItem("crashdown_chosen_name_color", colId);
-                }
-                stats.chosenNameColor = colId;
-                stats.activeNameColor = colObj;
-                await syncPlayerCustomization(stats.username, { chosenNameColor: colId });
+              if (isAdmin && colObj.id !== "name_white") {
+                let curColors = [...(stats.unlockedColors || ["name_white"])];
+                if (!curColors.includes(colId)) curColors.push(colId);
                 triggerHaptic("impact");
                 if (typeof hangKatt !== "undefined") playSound(hangKatt);
-                await adminForceUpdateUserAchievements(
+                await adminForceUpdatePlayerCustomRewards(
                   stats.username,
-                  Array.from(nextSet),
+                  { unlockedColors: curColors, chosenNameColor: colId },
                   `⚡ ${colObj.name} névszín feloldva és beállítva (${stats.username})!`
                 );
                 return;
@@ -581,9 +661,7 @@ async function openPlayerProfileModal(username, resetScroll = true) {
     if (canManageCustomization) {
       titleSection.style.display = "block";
       titleGrid.innerHTML = PROFILE_TITLES.map((t) => {
-        const unlocked = (!t.achId && t.id === "title_beginner")
-          ? true
-          : (achSet.has(t.achId) || achSet.has(t.id) || (typeof t.isUnlocked === "function" && t.isUnlocked(stats, achSet)));
+        const unlocked = (stats.unlockedTitles || ["title_beginner"]).includes(t.id);
         const isSelected = stats.chosenTitle
           ? t.id === stats.chosenTitle
           : t.id === stats.activeTitle.id;
@@ -601,7 +679,7 @@ async function openPlayerProfileModal(username, resetScroll = true) {
           <div class="title-pick-card ${unlocked ? "" : "locked"} ${isSelected ? "active" : ""} ${isAdmin ? "admin-manageable" : ""}"
                data-title-id="${t.id}"
                data-unlocked="${unlocked ? "1" : "0"}"
-               title="${isAdmin ? (unlocked ? `${t.name} (Kattints a beállításhoz, jobb felső ikonnal zárolhatod)` : `${lockTitle} (Admin: kattints a feloldáshoz)`) : (unlocked ? t.name : lockTitle)}">
+               title="${isAdmin ? (unlocked ? `${t.name} (Kattints a beállításhoz, jobb felső gombbal zárolhatod)` : `${lockTitle} (Admin: kattints a feloldáshoz)`) : (unlocked ? t.name : lockTitle)}">
               ${isAdmin && t.id !== "title_beginner" ? `
                 <button type="button" class="card-admin-toggle-badge ${unlocked ? "unlocked" : "locked"}" 
                         data-action="toggle-lock"
@@ -629,22 +707,21 @@ async function openPlayerProfileModal(username, resetScroll = true) {
           // Ha az admin a jobb felső státusz gombra kattint: feloldás/visszazárás kapcsolása
           if (isToggleBtn && isAdmin && titleObj.id !== "title_beginner") {
             e.stopPropagation();
-            const nextSet = new Set(achSet);
+            let curTitles = [...(stats.unlockedTitles || ["title_beginner"])];
+            let newChosenTitle = stats.chosenTitle;
             if (isUnlocked) {
-              if (titleObj.achId) nextSet.delete(titleObj.achId);
-              nextSet.delete(titleObj.id);
-              if (stats.chosenTitle === chosenId || stats.activeTitle?.id === chosenId) {
-                await syncPlayerCustomization(stats.username, { chosenTitle: "title_beginner" });
+              curTitles = curTitles.filter((id) => id !== chosenId);
+              if (newChosenTitle === chosenId || stats.activeTitle?.id === chosenId) {
+                newChosenTitle = "title_beginner";
               }
             } else {
-              if (titleObj.achId) nextSet.add(titleObj.achId);
-              nextSet.add(titleObj.id);
+              if (!curTitles.includes(chosenId)) curTitles.push(chosenId);
             }
             triggerHaptic("impact");
             if (typeof hangKatt !== "undefined") playSound(hangKatt);
-            await adminForceUpdateUserAchievements(
+            await adminForceUpdatePlayerCustomRewards(
               stats.username,
-              Array.from(nextSet),
+              { unlockedTitles: curTitles, chosenTitle: newChosenTitle },
               isUnlocked
                 ? `🔒 ${titleObj.name} rangcím zárolva (${stats.username})!`
                 : `🔓 ${titleObj.name} rangcím feloldva (${stats.username})!`
@@ -655,20 +732,13 @@ async function openPlayerProfileModal(username, resetScroll = true) {
           // Ha zárolt elemre kattintunk
           if (!isUnlocked) {
             if (isAdmin && titleObj.id !== "title_beginner") {
-              const nextSet = new Set(achSet);
-              if (titleObj.achId) nextSet.add(titleObj.achId);
-              nextSet.add(titleObj.id);
-              if (isOwnProfile) {
-                localStorage.setItem("crashdown_chosen_title", chosenId);
-              }
-              stats.chosenTitle = chosenId;
-              stats.activeTitle = titleObj;
-              await syncPlayerCustomization(stats.username, { chosenTitle: chosenId });
+              let curTitles = [...(stats.unlockedTitles || ["title_beginner"])];
+              if (!curTitles.includes(chosenId)) curTitles.push(chosenId);
               triggerHaptic("impact");
               if (typeof hangKatt !== "undefined") playSound(hangKatt);
-              await adminForceUpdateUserAchievements(
+              await adminForceUpdatePlayerCustomRewards(
                 stats.username,
-                Array.from(nextSet),
+                { unlockedTitles: curTitles, chosenTitle: chosenId },
                 `⚡ ${titleObj.name} rangcím feloldva és beállítva (${stats.username})!`
               );
               return;
@@ -731,7 +801,7 @@ async function openPlayerProfileModal(username, resetScroll = true) {
     if (canManageCustomization) {
       avatarSection.style.display = "block";
       avatarGrid.innerHTML = PROFILE_AVATARS.map((av) => {
-        const unlocked = !av.achId || achSet.has(av.achId) || achSet.has(av.id);
+        const unlocked = (stats.unlockedAvatars || ["avatar_default"]).includes(av.id);
         const isSelected = stats.activeAvatar.id === av.id;
         const reqAch = av.achId
           ? ACHIEVEMENTS.find((a) => a.id === av.achId)
@@ -743,8 +813,8 @@ async function openPlayerProfileModal(username, resetScroll = true) {
           <div class="avatar-pick-card ${unlocked ? "" : "locked"} ${isSelected ? "active" : ""} ${isAdmin ? "admin-manageable" : ""}"
                data-avatar-id="${av.id}"
                data-unlocked="${unlocked ? "1" : "0"}"
-               title="${isAdmin ? (unlocked ? `${av.name} (Kattints a beállításhoz, jobb felső ikonnal zárolhatod)` : `${lockTitle} (Admin: kattints a feloldáshoz)`) : (unlocked ? av.name : lockTitle)}">
-              ${isAdmin && av.achId ? `
+               title="${isAdmin ? (unlocked ? `${av.name} (Kattints a beállításhoz, jobb felső gombbal zárolhatod)` : `${lockTitle} (Admin: kattints a feloldáshoz)`) : (unlocked ? av.name : lockTitle)}">
+              ${isAdmin && av.id !== "avatar_default" ? `
                 <button type="button" class="card-admin-toggle-badge ${unlocked ? "unlocked" : "locked"}" 
                         data-action="toggle-lock"
                         title="${unlocked ? "Zárolás (Admin)" : "Feloldás (Admin)"}">
@@ -766,24 +836,23 @@ async function openPlayerProfileModal(username, resetScroll = true) {
           const isUnlocked = this.getAttribute("data-unlocked") === "1";
 
           // Ha az admin a jobb felső státusz gombra kattint: feloldás/visszazárás kapcsolása
-          if (isToggleBtn && isAdmin && avObj.achId) {
+          if (isToggleBtn && isAdmin && avObj.id !== "avatar_default") {
             e.stopPropagation();
-            const nextSet = new Set(achSet);
+            let curAvatars = [...(stats.unlockedAvatars || ["avatar_default"])];
+            let newChosenAvatar = stats.chosenAvatar;
             if (isUnlocked) {
-              nextSet.delete(avObj.achId);
-              nextSet.delete(avObj.id);
-              if (stats.chosenAvatar === avId || stats.activeAvatar?.id === avId) {
-                await syncPlayerCustomization(stats.username, { chosenAvatar: "avatar_default" });
+              curAvatars = curAvatars.filter((id) => id !== avId);
+              if (newChosenAvatar === avId || stats.activeAvatar?.id === avId) {
+                newChosenAvatar = "avatar_default";
               }
             } else {
-              nextSet.add(avObj.achId);
-              nextSet.add(avObj.id);
+              if (!curAvatars.includes(avId)) curAvatars.push(avId);
             }
             triggerHaptic("impact");
             if (typeof hangKatt !== "undefined") playSound(hangKatt);
-            await adminForceUpdateUserAchievements(
+            await adminForceUpdatePlayerCustomRewards(
               stats.username,
-              Array.from(nextSet),
+              { unlockedAvatars: curAvatars, chosenAvatar: newChosenAvatar },
               isUnlocked
                 ? `🔒 ${avObj.symbol} ${avObj.name} profilkép zárolva (${stats.username})!`
                 : `🔓 ${avObj.symbol} ${avObj.name} profilkép feloldva (${stats.username})!`
@@ -793,21 +862,14 @@ async function openPlayerProfileModal(username, resetScroll = true) {
 
           // Ha zárolt elemre kattintunk
           if (!isUnlocked) {
-            if (isAdmin && avObj.achId) {
-              const nextSet = new Set(achSet);
-              nextSet.add(avObj.achId);
-              nextSet.add(avObj.id);
-              if (isOwnProfile) {
-                localStorage.setItem("crashdown_chosen_avatar", avId);
-              }
-              stats.chosenAvatar = avId;
-              stats.activeAvatar = avObj;
-              await syncPlayerCustomization(stats.username, { chosenAvatar: avId });
+            if (isAdmin && avObj.id !== "avatar_default") {
+              let curAvatars = [...(stats.unlockedAvatars || ["avatar_default"])];
+              if (!curAvatars.includes(avId)) curAvatars.push(avId);
               triggerHaptic("impact");
               if (typeof hangKatt !== "undefined") playSound(hangKatt);
-              await adminForceUpdateUserAchievements(
+              await adminForceUpdatePlayerCustomRewards(
                 stats.username,
-                Array.from(nextSet),
+                { unlockedAvatars: curAvatars, chosenAvatar: avId },
                 `⚡ ${avObj.symbol} ${avObj.name} profilkép feloldva és beállítva (${stats.username})!`
               );
               return;
@@ -846,7 +908,7 @@ async function openPlayerProfileModal(username, resetScroll = true) {
           this.classList.add("active");
 
           showToast(
-            `🖼️ Új profilkép beállítva (${stats.username}): ${avObj.symbol} ${avObj.name}!`,
+            `👤 Új profilkép beállítva (${stats.username}): ${avObj.symbol} ${avObj.name}!`,
             "success",
           );
           playSound(sikeresKatt);

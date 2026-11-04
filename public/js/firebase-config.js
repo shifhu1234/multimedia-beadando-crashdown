@@ -895,6 +895,9 @@ class LeaderboardService {
                     totalPlaytimeSeconds: profileData.totalPlaytimeSeconds || 0,
                     totalScore: profileData.totalScore || 0,
                     achievements: profileData.achievements || [],
+                    unlockedTitles: profileData.unlockedTitles || ['title_beginner'],
+                    unlockedColors: profileData.unlockedColors || ['name_white'],
+                    unlockedAvatars: profileData.unlockedAvatars || ['avatar_default'],
                     history: (profileData.history || []).slice(0, 10),
                     chosenTitle: profileData.chosenTitle || null,
                     chosenAvatar: profileData.chosenAvatar || 'avatar_default',
@@ -928,7 +931,7 @@ class LeaderboardService {
         }
     }
 
-    async updatePlayerCustomizations(username, { chosenTitle, chosenAvatar, chosenNameColor }) {
+    async updatePlayerCustomizations(username, { chosenTitle, chosenAvatar, chosenNameColor, unlockedTitles, unlockedColors, unlockedAvatars }) {
         if (!username) return;
         const safeKey = encodeURIComponent(username.trim().toLowerCase()).replace(/\./g, '%2E');
         if (this.isOnline && this.db) {
@@ -937,6 +940,9 @@ class LeaderboardService {
                 if (chosenTitle !== undefined) updates.chosenTitle = chosenTitle;
                 if (chosenAvatar !== undefined) updates.chosenAvatar = chosenAvatar;
                 if (chosenNameColor !== undefined) updates.chosenNameColor = chosenNameColor;
+                if (unlockedTitles !== undefined) updates.unlockedTitles = unlockedTitles;
+                if (unlockedColors !== undefined) updates.unlockedColors = unlockedColors;
+                if (unlockedAvatars !== undefined) updates.unlockedAvatars = unlockedAvatars;
                 updates.updatedAt = new Date().toISOString();
 
                 await this.db.ref('profiles/' + safeKey).update(updates);
