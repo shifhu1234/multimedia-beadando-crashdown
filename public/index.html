@@ -15,7 +15,7 @@
       href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css?v=3.7" />
+    <link rel="stylesheet" href="style.css?v=3.8" />
 
     <!-- Firebase SDK (Compat - automatikus integráció) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -359,6 +359,21 @@
                 Kattints vagy érints legalább 3 azonos színű szomszédos blokkot
                 a törléshez!
               </p>
+
+              <!-- Játék beállítások előnézete indítás előtt -->
+              <div id="overlaySettingsBox" class="overlay-settings-box">
+                <div class="overlay-setting-header">
+                  <span id="overlayModeBadge" class="overlay-mode-badge">🎯 Normál</span>
+                  <div class="overlay-setting-pills">
+                    <span id="overlayTimeChip" class="overlay-chip">⏱️ 1 perc (60 mp)</span>
+                    <span id="overlayColorChip" class="overlay-chip">🎨 3 szín</span>
+                  </div>
+                </div>
+                <p id="overlayModeDesc" class="overlay-mode-desc">
+                  Kiegyensúlyozott játékmenet minden elérhető power-uppal.
+                </p>
+              </div>
+
               <p id="timeUpMessage" style="display: none;">Lejárt az idő!</p>
 
               <div class="overlay-action-stack">
@@ -803,6 +818,26 @@
                 >
               </div>
             </div>
+
+            <div class="profile-stat-box">
+              <span class="profile-stat-icon">💎</span>
+              <div class="profile-stat-data">
+                <span class="profile-stat-label">Összes pontszám</span>
+                <strong id="profileTotalScore" class="profile-stat-val"
+                  >0</strong
+                >
+              </div>
+            </div>
+
+            <div class="profile-stat-box">
+              <span class="profile-stat-icon">📈</span>
+              <div class="profile-stat-data">
+                <span class="profile-stat-label">Átlagpont / meccs</span>
+                <strong id="profileAvgScore" class="profile-stat-val"
+                  >0</strong
+                >
+              </div>
+            </div>
           </div>
 
           <!-- Profilkép választó részleg (Saját profilnál feloldott avatárok) -->
@@ -828,7 +863,27 @@
               📊 Teljesítmény Színmódok szerint
             </h4>
             <div id="profileModesBreakdown" class="profile-modes-list">
-              <!-- Dinamikusan renderelve script.js-ből -->
+              <!-- Dinamikusan renderelve ui.js-ből -->
+            </div>
+          </div>
+
+          <!-- Játékmódok szerinti teljesítmény (Normál, Időhajsza, Robbanás Mánia, Káosz, Nyers) -->
+          <div class="profile-section">
+            <h4 class="profile-section-title">
+              🎯 Teljesítmény Játékmód szerint
+            </h4>
+            <div id="profileGameModesBreakdown" class="profile-modes-list">
+              <!-- Dinamikusan renderelve ui.js-ből -->
+            </div>
+          </div>
+
+          <!-- Játékidő szerinti teljesítmény (30s, 60s, 90s, 180s) -->
+          <div class="profile-section">
+            <h4 class="profile-section-title">
+              ⏱️ Teljesítmény Játékidő szerint
+            </h4>
+            <div id="profileDurationsBreakdown" class="profile-modes-list">
+              <!-- Dinamikusan renderelve ui.js-ből -->
             </div>
           </div>
 
@@ -925,11 +980,11 @@
     <div id="toastContainer" class="toast-container"></div>
 
     <!-- Modularizált JavaScript modulok a villámgyors futásért és tiszta átláthatóságért -->
-    <script src="js/config.js?v=3.7"></script>
-    <script src="js/audio.js?v=3.7"></script>
-    <script src="js/achievements.js?v=3.7"></script>
-    <script src="js/ui.js?v=3.7"></script>
-    <script src="js/game.js?v=3.7"></script>
-    <script src="js/main.js?v=3.7"></script>
+    <script src="js/config.js?v=3.8"></script>
+    <script src="js/audio.js?v=3.8"></script>
+    <script src="js/achievements.js?v=3.8"></script>
+    <script src="js/ui.js?v=3.8"></script>
+    <script src="js/game.js?v=3.8"></script>
+    <script src="js/main.js?v=3.8"></script>
   </body>
 </html>

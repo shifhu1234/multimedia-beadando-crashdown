@@ -61,7 +61,9 @@ function updateScoreUI(instant = false) {
   if (pontSzam >= 5000) checkAchievement("score_5000");
   if (pontSzam >= 10000) checkAchievement("score_10k");
   if (pontSzam >= 25000) checkAchievement("score_25k");
-  if (pontSzam >= 50000) checkAchievement("score_5000");
+  if (pontSzam >= 50000) checkAchievement("score_50k");
+  if (pontSzam >= 75000) checkAchievement("score_75k");
+  if (pontSzam >= 100000) checkAchievement("score_100k");
   const colorSelect = document.getElementById("colorSelect");
   if (colorSelect && colorSelect.value === "5" && pontSzam >= 2000)
     checkAchievement("master_5_color");
@@ -229,7 +231,18 @@ async function openPlayerProfileModal(username) {
     avatarEl.title = `Profilkép: ${stats.activeAvatar.name}`;
   }
 
-  if (titleEl) titleEl.textContent = stats.activeTitle.name;
+  if (titleEl) {
+    titleEl.textContent = stats.activeTitle.name;
+    titleEl.classList.remove(
+      "title-special-gold",
+      "title-special-cosmic",
+      "title-special-flame",
+      "title-special-rainbow",
+    );
+    if (stats.activeTitle.specialClass) {
+      titleEl.classList.add(stats.activeTitle.specialClass);
+    }
+  }
 
   if (titleSelectEl) {
     if (isOwnProfile) {
@@ -239,10 +252,11 @@ async function openPlayerProfileModal(username) {
         const isSelected = stats.chosenTitle
           ? t.id === stats.chosenTitle
           : t.id === stats.activeTitle.id;
+        const specialBadge = t.isSpecial ? " [SPECIÁLIS]" : "";
         if (unlocked) {
-          return `<option value="${t.id}" ${isSelected ? "selected" : ""}>${t.name}</option>`;
+          return `<option value="${t.id}" ${isSelected ? "selected" : ""}>${t.name}${specialBadge}</option>`;
         } else {
-          return `<option value="${t.id}" disabled>🔒 ${t.name} (${t.desc})</option>`;
+          return `<option value="${t.id}" disabled>🔒 ${t.name}${specialBadge} (${t.desc})</option>`;
         }
       }).join("");
 
@@ -268,7 +282,18 @@ async function openPlayerProfileModal(username) {
             );
           } catch (e) {}
 
-          if (titleEl) titleEl.textContent = titleObj.name;
+          if (titleEl) {
+            titleEl.textContent = titleObj.name;
+            titleEl.classList.remove(
+              "title-special-gold",
+              "title-special-cosmic",
+              "title-special-flame",
+              "title-special-rainbow",
+            );
+            if (titleObj.specialClass) {
+              titleEl.classList.add(titleObj.specialClass);
+            }
+          }
           showToast(`🎖️ Új rangcím beállítva: ${titleObj.name}!`, "success");
           playSound(sikeresKatt);
           triggerHaptic("success");
@@ -371,6 +396,15 @@ async function openPlayerProfileModal(username) {
   if (bestScoreEl) bestScoreEl.textContent = stats.bestScore.toLocaleString();
   if (matchesEl) matchesEl.textContent = `${stats.totalMatches} meccs`;
 
+  // Összes pontszám és meccsenkénti átlagpont
+  const totalScoreEl = document.getElementById("profileTotalScore");
+  const avgScoreEl = document.getElementById("profileAvgScore");
+  const totalScoreVal = stats.totalScore || 0;
+  if (totalScoreEl) totalScoreEl.textContent = totalScoreVal.toLocaleString();
+  const avgVal =
+    stats.totalMatches > 0 ? Math.round(totalScoreVal / stats.totalMatches) : 0;
+  if (avgScoreEl) avgScoreEl.textContent = `${avgVal.toLocaleString()} p`;
+
   const mins = Math.floor(stats.totalPlaytimeSeconds / 60);
   const secs = stats.totalPlaytimeSeconds % 60;
   const timeStr =
@@ -383,6 +417,7 @@ async function openPlayerProfileModal(username) {
   if (badgeSummaryEl)
     badgeSummaryEl.textContent = `${achList.length} feloldva a ${ACHIEVEMENTS.length}-ből`;
 
+  // Színmódok szerinti lebontás
   if (modesListEl) {
     const modes = ["2", "3", "4", "5"];
     modesListEl.innerHTML = modes
@@ -391,12 +426,69 @@ async function openPlayerProfileModal(username) {
         return `
                 <div class="profile-mode-card">
                     <div>
-                        <strong>${m} szín mód</strong>
+                        <strong>🎨 ${m} szín mód</strong>
                         <div style="font-size: 0.7rem; color: var(--text-secondary);">${data.matches} lejátszott meccs</div>
                     </div>
-                    <span>${data.bestScore > 0 ? `${data.bestScore}p` : "-"}</span>
+                    <span style="font-weight: 700;">${data.bestScore > 0 ? `${data.bestScore.toLocaleString()}p` : "-"}</span>
                 </div>
             `;
+      })
+      .join("");
+  }
+
+  // Játékmódok szerinti lebontás (Normál, Időhajsza, Robbanás Mánia, Káosz, Nyers)
+  const gameModesListEl = document.getElementById("profileGameModesBreakdown");
+  if (gameModesListEl) {
+    const modDefs = [
+      { id: "normal", name: "Normál Mód", icon: "🎯" },
+      { id: "time_rush", name: "Időhajsza", icon: "⏳" },
+      { id: "bomb_frenzy", name: "Robbanás Mánia", icon: "💣" },
+      { id: "chaos", name: "Káosz Mód", icon: "🌀" },
+      { id: "no_powerups", name: "Nyers Mód", icon: "🧱" },
+    ];
+    gameModesListEl.innerHTML = modDefs
+      .map((m) => {
+        const data = stats.modifierStats?.[m.id] || {
+          matches: 0,
+          bestScore: 0,
+        };
+        return `
+          <div class="profile-mode-card">
+            <div>
+              <strong>${m.icon} ${m.name}</strong>
+              <div style="font-size: 0.7rem; color: var(--text-secondary);">${data.matches} lejátszott meccs</div>
+            </div>
+            <span style="font-weight: 700;">${data.bestScore > 0 ? `${data.bestScore.toLocaleString()}p` : "-"}</span>
+          </div>
+        `;
+      })
+      .join("");
+  }
+
+  // Játékidő szerinti lebontás (30s, 60s, 90s, 180s)
+  const durationsListEl = document.getElementById("profileDurationsBreakdown");
+  if (durationsListEl) {
+    const durDefs = [
+      { id: "30", name: "30 mp (Villám)", icon: "⚡" },
+      { id: "60", name: "1 perc (Gyors)", icon: "⏱️" },
+      { id: "90", name: "90 mp (Klasszikus)", icon: "⏳" },
+      { id: "180", name: "3 perc (Maraton)", icon: "🏃" },
+    ];
+    durationsListEl.innerHTML = durDefs
+      .map((d) => {
+        const data = stats.durationStats?.[d.id] || {
+          matches: 0,
+          bestScore: 0,
+        };
+        return `
+          <div class="profile-mode-card">
+            <div>
+              <strong>${d.icon} ${d.name}</strong>
+              <div style="font-size: 0.7rem; color: var(--text-secondary);">${data.matches} lejátszott meccs</div>
+            </div>
+            <span style="font-weight: 700;">${data.bestScore > 0 ? `${data.bestScore.toLocaleString()}p` : "-"}</span>
+          </div>
+        `;
       })
       .join("");
   }
@@ -468,7 +560,7 @@ async function openPlayerProfileModal(username) {
         floatingTip.innerHTML = `
                     <div class="b-tooltip-header">
                         <span class="b-tooltip-title">${a.icon} ${a.title}</span>
-                        <span class="b-tooltip-status ${unlocked ? "unlocked" : "locked"}">${unlocked ? "Megszerezve ✓" : "🔒 Zárolva"}</span>
+                        <span class="b-tooltip-status ${unlocked ? "unlocked" : "locked"}">${unlocked ? "Megszerezve" : "Zárolva"}</span>
                     </div>
                     <p class="b-tooltip-desc">${a.desc}</p>
                     ${rewardHtml}

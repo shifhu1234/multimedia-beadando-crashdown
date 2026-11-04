@@ -479,6 +479,58 @@
     color: var(--text-primary);
     border: 1px solid var(--border-subtle);
     display: inline-block;
+    transition: all 0.2s ease;
+}
+
+/* Speciális rangcímek ragyogó effektekkel */
+.profile-player-badge.title-special-gold {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24, #fffbeb, #f59e0b) !important;
+    background-size: 200% auto !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    border-color: rgba(245, 158, 11, 0.6) !important;
+    animation: specialTitleShine 3s linear infinite !important;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.35) !important;
+    font-weight: 800 !important;
+}
+
+.profile-player-badge.title-special-cosmic {
+    background: linear-gradient(90deg, #c084fc, #38bdf8, #f472b6, #c084fc) !important;
+    background-size: 200% auto !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    border-color: rgba(192, 132, 252, 0.6) !important;
+    animation: specialTitleShine 3.5s linear infinite !important;
+    box-shadow: 0 0 10px rgba(192, 132, 252, 0.4) !important;
+    font-weight: 800 !important;
+}
+
+.profile-player-badge.title-special-flame {
+    background: linear-gradient(90deg, #ef4444, #f97316, #fde047, #ef4444) !important;
+    background-size: 200% auto !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    border-color: rgba(239, 68, 68, 0.6) !important;
+    animation: specialTitleShine 2.5s linear infinite !important;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.4) !important;
+    font-weight: 800 !important;
+}
+
+.profile-player-badge.title-special-rainbow {
+    background: linear-gradient(90deg, #f43f5e, #eab308, #10b981, #06b6d4, #8b5cf6, #f43f5e) !important;
+    background-size: 200% auto !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    border-color: rgba(139, 92, 246, 0.6) !important;
+    animation: specialTitleShine 4s linear infinite !important;
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.35) !important;
+    font-weight: 800 !important;
+}
+
+@keyframes specialTitleShine {
+    to {
+        background-position: 200% center;
+    }
 }
 
 .profile-title-select-wrap {

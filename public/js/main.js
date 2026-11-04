@@ -59,6 +59,9 @@ if (colorSelect) {
         if (!jatekFut && !vegeAJateknak && typeof initPreviewBoard === 'function') {
             initPreviewBoard();
         }
+        if (typeof updateCanvasOverlaySettings === 'function') {
+            updateCanvasOverlaySettings();
+        }
         showToast(`Nehézség beállítva: ${this.value} szín`, 'info');
     });
 }
@@ -74,7 +77,25 @@ if (timeSelect) {
         MAX_TIME = parseInt(this.value, 10);
         remainingTime = MAX_TIME;
         refreshTimerText();
+        if (typeof updateCanvasOverlaySettings === 'function') {
+            updateCanvasOverlaySettings();
+        }
         showToast(`Játékidő beállítva: ${this.options[this.selectedIndex].text}`, 'info');
+    });
+}
+
+// Játékmód választó
+const modeSelect = document.getElementById('modeSelect');
+if (modeSelect) {
+    const savedMode = localStorage.getItem('selectedGameMode');
+    if (savedMode) modeSelect.value = savedMode;
+
+    modeSelect.addEventListener('change', function () {
+        localStorage.setItem('selectedGameMode', this.value);
+        if (typeof updateCanvasOverlaySettings === 'function') {
+            updateCanvasOverlaySettings();
+        }
+        showToast(`Játékmód beállítva: ${this.options[this.selectedIndex].text}`, 'info');
     });
 }
 

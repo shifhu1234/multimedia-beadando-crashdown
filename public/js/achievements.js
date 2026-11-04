@@ -47,6 +47,38 @@ const ACHIEVEMENTS = [
     title: "Kozmikus Rekorder",
     desc: "Lépd át a felfoghatatlan 50 000 pontos rekordot!",
   },
+  {
+    id: "score_75k",
+    icon: "🌌",
+    title: "Kozmikus Legenda",
+    desc: "Érj el szédítő 75 000 pontot egy menetben!",
+  },
+  {
+    id: "score_100k",
+    icon: "👑",
+    title: "Halhatatlan Rekorder",
+    desc: "Lépd át a mitikus 100 000 pontos álomhatárt egy menetben!",
+  },
+
+  // 1.2 Összesített pontszám mérföldkövek
+  {
+    id: "total_score_100k",
+    icon: "💎",
+    title: "Pontgyűjtő Titán",
+    desc: "Gyűjts össze összesen legalább 100 000 összpontszámot a profilodon!",
+  },
+  {
+    id: "total_score_500k",
+    icon: "✨",
+    title: "Félmilliós Legenda",
+    desc: "Érj el összesen 500 000 pontot a játékaid során!",
+  },
+  {
+    id: "total_score_1m",
+    icon: "👑",
+    title: "Pontmilliomos",
+    desc: "Lépd át az 1 000 000 összesített rekord pontszámot!",
+  },
 
   // 2. Kombók & Láncreakciók
   {
@@ -149,6 +181,24 @@ const ACHIEVEMENTS = [
     title: "Power-up Titán",
     desc: "Aktiválj összesen legalább 50 db power-upot!",
   },
+  {
+    id: "powerup_100",
+    icon: "⚡",
+    title: "Power-up Fanatikus",
+    desc: "Aktiválj összesen legalább 100 db power-upot a meccseid alatt!",
+  },
+  {
+    id: "powerup_250",
+    icon: "💥",
+    title: "Power-up Vihar",
+    desc: "Aktiválj összesen legalább 250 db power-upot!",
+  },
+  {
+    id: "powerup_500",
+    icon: "🌟",
+    title: "Power-up Istenség",
+    desc: "Aktiválj félelmetes 500 db power-upot!",
+  },
 
   // 5. Stratégia & Játékmenet
   {
@@ -208,6 +258,18 @@ const ACHIEVEMENTS = [
     desc: "Játssz le legalább 50 teljes mérkőzést!",
   },
   {
+    id: "matches_100",
+    icon: "🎖️",
+    title: "Százados Veterán",
+    desc: "Játssz le legalább 100 teljes mérkőzést!",
+  },
+  {
+    id: "matches_250",
+    icon: "⚔️",
+    title: "Crashdown Örökös",
+    desc: "Játssz le legalább 250 mérkőzést az arénában!",
+  },
+  {
     id: "play_time_1m",
     icon: "⏱️",
     title: "Bemelegítés",
@@ -230,6 +292,44 @@ const ACHIEVEMENTS = [
     icon: "🌌",
     title: "Crashdown Fanatikus",
     desc: "Tölts el legalább 30 percet a játékban!",
+  },
+  {
+    id: "play_time_1h",
+    icon: "⌛",
+    title: "Időutazó Mester",
+    desc: "Érj el legalább 1 óra (60 perc) összesített játékidőt!",
+  },
+  {
+    id: "play_time_2h",
+    icon: "🪐",
+    title: "Megállíthatatlan",
+    desc: "Tölts el legalább 2 órát (120 perc) az arénában!",
+  },
+
+  // 7. Játékmód Mesterek
+  {
+    id: "mode_chaos_win",
+    icon: "🌀",
+    title: "Káosz Túlélő",
+    desc: "Érj el legalább 5 000 pontot a Káosz módban!",
+  },
+  {
+    id: "mode_bomb_win",
+    icon: "💣",
+    title: "Bombaszakértő",
+    desc: "Érj el legalább 5 000 pontot a Robbanás Mániában!",
+  },
+  {
+    id: "mode_time_win",
+    icon: "⏳",
+    title: "Időfutam Bajnok",
+    desc: "Érj el legalább 5 000 pontot az Időhajsza módban!",
+  },
+  {
+    id: "mode_raw_win",
+    icon: "🧱",
+    title: "Tisztakezű Zseni",
+    desc: "Érj el legalább 3 000 pontot a Nyers (power-up mentes) módban!",
   },
 ];
 
@@ -306,6 +406,36 @@ const PROFILE_AVATARS = [
     symbol: "💥",
     name: "Plazmagömb",
     achId: "powerup_50",
+  },
+  {
+    id: "avatar_aurora",
+    symbol: "🌌",
+    name: "Sarki Fény",
+    achId: "powerup_100",
+  },
+  {
+    id: "avatar_void",
+    symbol: "🔮",
+    name: "Misztikus Void",
+    achId: "score_75k",
+  },
+  {
+    id: "avatar_gold_emperor",
+    symbol: "👑",
+    name: "Császári Arany",
+    achId: "score_100k",
+  },
+  {
+    id: "avatar_clock",
+    symbol: "⌛",
+    name: "Örökkévalóság",
+    achId: "play_time_1h",
+  },
+  {
+    id: "avatar_century",
+    symbol: "🎖️",
+    name: "Százados",
+    achId: "matches_100",
   },
 ];
 
@@ -529,6 +659,110 @@ const PROFILE_TITLES = [
     achId: "combo_x4",
     isUnlocked: (stats, achSet) => achSet.has("combo_x4"),
   },
+
+  // Új rangcímek és SPECIÁLIS ragyogó rangcímek
+  {
+    id: "title_powerup_100",
+    name: "⚡ Power-up Fanatikus",
+    desc: "Aktiválj legalább 100 db power-upot",
+    achId: "powerup_100",
+    isUnlocked: (stats, achSet) => achSet.has("powerup_100"),
+  },
+  {
+    id: "title_matches_100",
+    name: "🎖️ Százados Zúzó",
+    desc: "Játssz le legalább 100 teljes mérkőzést",
+    achId: "matches_100",
+    isUnlocked: (stats, achSet) =>
+      stats.totalMatches >= 100 || achSet.has("matches_100"),
+  },
+  {
+    id: "title_play_1h",
+    name: "⌛ Időutazó Mester",
+    desc: "Érj el legalább 1 óra összesített játékidőt",
+    achId: "play_time_1h",
+    isUnlocked: (stats, achSet) =>
+      stats.totalPlaytimeSeconds >= 3600 || achSet.has("play_time_1h"),
+  },
+  {
+    id: "title_chaos_lord",
+    name: "🌀 Káosz Ura",
+    desc: "Érj el legalább 5 000 pontot a Káosz módban",
+    achId: "mode_chaos_win",
+    isUnlocked: (stats, achSet) => achSet.has("mode_chaos_win"),
+  },
+  {
+    id: "title_bomb_master",
+    name: "💣 Mesterbombázó",
+    desc: "Érj el legalább 5 000 pontot a Robbanás Mániában",
+    achId: "mode_bomb_win",
+    isUnlocked: (stats, achSet) => achSet.has("mode_bomb_win"),
+  },
+  {
+    id: "title_time_master",
+    name: "⏳ Időhajhász",
+    desc: "Érj el legalább 5 000 pontot az Időhajsza módban",
+    achId: "mode_time_win",
+    isUnlocked: (stats, achSet) => achSet.has("mode_time_win"),
+  },
+  {
+    id: "title_purist",
+    name: "🧱 Tisztakezű Zseni",
+    desc: "Érj el legalább 3 000 pontot a Nyers módban",
+    achId: "mode_raw_win",
+    isUnlocked: (stats, achSet) => achSet.has("mode_raw_win"),
+  },
+
+  // SPECIÁLIS RANGCÍMEK (Ragyogó, animált színátmenetes címek)
+  {
+    id: "title_cosmic_destroyer",
+    name: "⚡ Kozmikus Pusztító ✨",
+    desc: "Érj el legalább 75 000 pontot egy meccsben",
+    achId: "score_75k",
+    specialClass: "title-special-cosmic",
+    isSpecial: true,
+    isUnlocked: (stats, achSet) =>
+      stats.bestScore >= 75000 || achSet.has("score_75k"),
+  },
+  {
+    id: "title_golden_emperor",
+    name: "👑 Halhatatlan Blokkuralkodó 🌟",
+    desc: "Lépd át a 100 000 pontos álomhatárt egy menetben!",
+    achId: "score_100k",
+    specialClass: "title-special-gold",
+    isSpecial: true,
+    isUnlocked: (stats, achSet) =>
+      stats.bestScore >= 100000 || achSet.has("score_100k"),
+  },
+  {
+    id: "title_firestorm_god",
+    name: "🔥 Tűzvihar Istenség 💥",
+    desc: "Aktiválj legalább 500 db power-upot!",
+    achId: "powerup_500",
+    specialClass: "title-special-flame",
+    isSpecial: true,
+    isUnlocked: (stats, achSet) => achSet.has("powerup_500"),
+  },
+  {
+    id: "title_infinite_legend",
+    name: "🌌 Végtelen Krónikás 🌈",
+    desc: "Játssz le legalább 250 mérkőzést az arénában!",
+    achId: "matches_250",
+    specialClass: "title-special-rainbow",
+    isSpecial: true,
+    isUnlocked: (stats, achSet) =>
+      stats.totalMatches >= 250 || achSet.has("matches_250"),
+  },
+  {
+    id: "title_millionaire",
+    name: "💎 Pontmilliomos 🌟",
+    desc: "Gyűjts össze összesen legalább 1 000 000 pontot a profilodon!",
+    achId: "total_score_1m",
+    specialClass: "title-special-gold",
+    isSpecial: true,
+    isUnlocked: (stats, achSet) =>
+      (stats.totalScore || 0) >= 1000000 || achSet.has("total_score_1m"),
+  },
 ];
 
 let recentSuccessfulClicks = [];
@@ -690,35 +924,57 @@ function updatePlayerStatsRecord(
       username: username,
       totalMatches: 0,
       totalPlaytimeSeconds: 0,
+      totalScore: 0,
       bestScore: 0,
       achievements: [],
       modes: {},
       durations: {},
+      modifierStats: {},
+      durationStats: {},
       history: [],
       chosenTitle: null,
       chosenAvatar: "avatar_default",
     };
 
     if (!p.history) p.history = [];
+    if (!p.modes) p.modes = {};
+    if (!p.modifierStats) p.modifierStats = {};
+    if (!p.durationStats) p.durationStats = {};
 
-    if (score > 0 || durationSeconds > 0) {
-      p.totalMatches += 1;
-      p.totalPlaytimeSeconds += parseInt(durationSeconds, 10) || 120;
-      if (score > p.bestScore) p.bestScore = score;
+    const numericScore = parseInt(score, 10) || 0;
+    const durSec = parseInt(durationSeconds, 10) || 60;
+    const modKey = modifier || "normal";
+    const cKey = String(colorCount || "3");
 
-      const cKey = String(colorCount || "3");
+    if (numericScore > 0 || durSec > 0) {
+      p.totalMatches = (p.totalMatches || 0) + 1;
+      p.totalPlaytimeSeconds = (p.totalPlaytimeSeconds || 0) + durSec;
+      p.totalScore = (p.totalScore || 0) + numericScore;
+      if (numericScore > (p.bestScore || 0)) p.bestScore = numericScore;
+
+      // Színmód statisztika
       if (!p.modes[cKey]) p.modes[cKey] = { matches: 0, bestScore: 0 };
       p.modes[cKey].matches += 1;
-      if (score > p.modes[cKey].bestScore) p.modes[cKey].bestScore = score;
+      if (numericScore > p.modes[cKey].bestScore) p.modes[cKey].bestScore = numericScore;
 
-      const dKey = String(durationSeconds || "120");
-      p.durations[dKey] = (p.durations[dKey] || 0) + 1;
+      // Játékmód statisztika
+      if (!p.modifierStats[modKey]) p.modifierStats[modKey] = { matches: 0, bestScore: 0, totalScore: 0 };
+      p.modifierStats[modKey].matches += 1;
+      p.modifierStats[modKey].totalScore += numericScore;
+      if (numericScore > p.modifierStats[modKey].bestScore) p.modifierStats[modKey].bestScore = numericScore;
+
+      // Időtartam statisztika
+      const dKey = String(durSec);
+      if (!p.durationStats[dKey]) p.durationStats[dKey] = { matches: 0, bestScore: 0, totalScore: 0 };
+      p.durationStats[dKey].matches += 1;
+      p.durationStats[dKey].totalScore += numericScore;
+      if (numericScore > p.durationStats[dKey].bestScore) p.durationStats[dKey].bestScore = numericScore;
 
       p.history.unshift({
-        score: score,
+        score: numericScore,
         color: cKey,
-        modifier: modifier || "normal",
-        duration: parseInt(durationSeconds, 10) || 120,
+        modifier: modKey,
+        duration: durSec,
         timestamp: new Date().toISOString(),
       });
       if (p.history.length > 10) {
@@ -737,15 +993,32 @@ function updatePlayerStatsRecord(
         "avatar_default";
     }
 
+    // Mérkőzésszám mérföldkövek
     if (p.totalMatches >= 5) checkAchievement("play_5_matches");
     if (p.totalMatches >= 10) checkAchievement("matches_10");
     if (p.totalMatches >= 20) checkAchievement("play_20_matches");
     if (p.totalMatches >= 50) checkAchievement("matches_50");
+    if (p.totalMatches >= 100) checkAchievement("matches_100");
+    if (p.totalMatches >= 250) checkAchievement("matches_250");
 
+    // Játékidő mérföldkövek
     if (p.totalPlaytimeSeconds >= 60) checkAchievement("play_time_1m");
     if (p.totalPlaytimeSeconds >= 300) checkAchievement("play_time_5m");
     if (p.totalPlaytimeSeconds >= 900) checkAchievement("play_time_15m");
     if (p.totalPlaytimeSeconds >= 1800) checkAchievement("play_time_30m");
+    if (p.totalPlaytimeSeconds >= 3600) checkAchievement("play_time_1h");
+    if (p.totalPlaytimeSeconds >= 7200) checkAchievement("play_time_2h");
+
+    // Összesített pontszám mérföldkövek
+    if (p.totalScore >= 100000) checkAchievement("total_score_100k");
+    if (p.totalScore >= 500000) checkAchievement("total_score_500k");
+    if (p.totalScore >= 1000000) checkAchievement("total_score_1m");
+
+    // Mód szerinti győzelmek / jó eredmények
+    if (modKey === "chaos" && numericScore >= 5000) checkAchievement("mode_chaos_win");
+    if (modKey === "bomb_frenzy" && numericScore >= 5000) checkAchievement("mode_bomb_win");
+    if (modKey === "time_rush" && numericScore >= 5000) checkAchievement("mode_time_win");
+    if (modKey === "no_powerups" && numericScore >= 3000) checkAchievement("mode_raw_win");
 
     profiles[username] = p;
     localStorage.setItem(key, JSON.stringify(profiles));
@@ -772,6 +1045,9 @@ function regisztraljPowerupHasznalatot() {
   if (count >= 10) checkAchievement("powerup_10");
   if (count >= 25) checkAchievement("powerup_25");
   if (count >= 50) checkAchievement("powerup_50");
+  if (count >= 100) checkAchievement("powerup_100");
+  if (count >= 250) checkAchievement("powerup_250");
+  if (count >= 500) checkAchievement("powerup_500");
 }
 
 function getPlayerProfileStats(username, allScores = [], onlineProfile = null) {
@@ -792,16 +1068,22 @@ function getPlayerProfileStats(username, allScores = [], onlineProfile = null) {
       username: username,
       totalMatches: 0,
       totalPlaytimeSeconds: 0,
+      totalScore: 0,
       bestScore: 0,
       achievements: [],
       modes: {},
       durations: {},
+      modifierStats: {},
+      durationStats: {},
       history: [],
       chosenTitle: null,
       chosenAvatar: "avatar_default",
     };
   }
   if (!profile.history) profile.history = [];
+  if (!profile.modes) profile.modes = {};
+  if (!profile.modifierStats) profile.modifierStats = {};
+  if (!profile.durationStats) profile.durationStats = {};
 
   // Online profil adatainak összefésülése
   if (onlineProfile) {
@@ -828,23 +1110,49 @@ function getPlayerProfileStats(username, allScores = [], onlineProfile = null) {
       profile.chosenTitle = onlineProfile.chosenTitle;
     if (onlineProfile.chosenAvatar)
       profile.chosenAvatar = onlineProfile.chosenAvatar;
-    if ((onlineProfile.bestScore || 0) > profile.bestScore)
+    if ((onlineProfile.bestScore || 0) > (profile.bestScore || 0))
       profile.bestScore = onlineProfile.bestScore;
-    if ((onlineProfile.totalMatches || 0) > profile.totalMatches)
+    if ((onlineProfile.totalMatches || 0) > (profile.totalMatches || 0))
       profile.totalMatches = onlineProfile.totalMatches;
+    if ((onlineProfile.totalScore || 0) > (profile.totalScore || 0))
+      profile.totalScore = onlineProfile.totalScore;
     if (
-      (onlineProfile.totalPlaytimeSeconds || 0) > profile.totalPlaytimeSeconds
+      (onlineProfile.totalPlaytimeSeconds || 0) > (profile.totalPlaytimeSeconds || 0)
     )
       profile.totalPlaytimeSeconds = onlineProfile.totalPlaytimeSeconds;
+    if (onlineProfile.modifierStats) {
+      profile.modifierStats = { ...profile.modifierStats, ...onlineProfile.modifierStats };
+    }
+    if (onlineProfile.durationStats) {
+      profile.durationStats = { ...profile.durationStats, ...onlineProfile.durationStats };
+    }
   }
 
+  // Statisztikák kiegészítése a meccsek listájából
+  let aggTotalScore = profile.totalScore || 0;
   playerScores.forEach((s) => {
     const sc = parseInt(s.score, 10) || 0;
-    if (sc > profile.bestScore) profile.bestScore = sc;
+    if (sc > (profile.bestScore || 0)) profile.bestScore = sc;
+
     const cKey = String(s.color || "3");
     if (!profile.modes[cKey])
       profile.modes[cKey] = { matches: 0, bestScore: 0 };
+    profile.modes[cKey].matches += 1;
     if (sc > profile.modes[cKey].bestScore) profile.modes[cKey].bestScore = sc;
+
+    const mKey = s.modifier || "normal";
+    if (!profile.modifierStats[mKey])
+      profile.modifierStats[mKey] = { matches: 0, bestScore: 0, totalScore: 0 };
+    profile.modifierStats[mKey].matches += 1;
+    profile.modifierStats[mKey].totalScore += sc;
+    if (sc > profile.modifierStats[mKey].bestScore) profile.modifierStats[mKey].bestScore = sc;
+
+    const dKey = String(s.duration || "60");
+    if (!profile.durationStats[dKey])
+      profile.durationStats[dKey] = { matches: 0, bestScore: 0, totalScore: 0 };
+    profile.durationStats[dKey].matches += 1;
+    profile.durationStats[dKey].totalScore += sc;
+    if (sc > profile.durationStats[dKey].bestScore) profile.durationStats[dKey].bestScore = sc;
   });
 
   if (profile.totalMatches < playerScores.length) {
@@ -852,8 +1160,17 @@ function getPlayerProfileStats(username, allScores = [], onlineProfile = null) {
   }
   if (profile.totalPlaytimeSeconds === 0 && playerScores.length > 0) {
     playerScores.forEach((s) => {
-      profile.totalPlaytimeSeconds += parseInt(s.duration, 10) || 120;
+      profile.totalPlaytimeSeconds += parseInt(s.duration, 10) || 60;
     });
+  }
+
+  // Ha totalScore még mindig 0, számoljuk ki a meccsekből
+  if (!profile.totalScore || profile.totalScore === 0) {
+    if (playerScores.length > 0) {
+      profile.totalScore = playerScores.reduce((sum, s) => sum + (parseInt(s.score, 10) || 0), 0);
+    } else if (profile.history && profile.history.length > 0) {
+      profile.totalScore = profile.history.reduce((sum, h) => sum + (parseInt(h.score, 10) || 0), 0);
+    }
   }
 
   // Ha az előzmények üresek, de vannak meccsei a ranglistán, töltsük be azokat!
@@ -873,22 +1190,26 @@ function getPlayerProfileStats(username, allScores = [], onlineProfile = null) {
   // Ha nincsenek szinkronizált mérföldkövei, a statisztikái alapján következtessük ki
   if (!profile.achievements || profile.achievements.length === 0) {
     const inferred = [];
-    if (profile.bestScore >= 500) inferred.push("first_blood");
-    if (profile.bestScore >= 1000) inferred.push("score_1000");
-    if (profile.bestScore >= 2500) inferred.push("score_2500");
+    if (profile.bestScore >= 500) inferred.push("first_500");
+    if (profile.bestScore >= 1500) inferred.push("score_1500");
     if (profile.bestScore >= 5000) inferred.push("score_5000");
     if (profile.bestScore >= 10000) inferred.push("score_10k");
     if (profile.bestScore >= 25000) inferred.push("score_25k");
     if (profile.bestScore >= 50000) inferred.push("score_50k");
-    if (profile.totalMatches >= 1) inferred.push("first_game");
+    if (profile.bestScore >= 75000) inferred.push("score_75k");
+    if (profile.bestScore >= 100000) inferred.push("score_100k");
     if (profile.totalMatches >= 5) inferred.push("play_5_matches");
     if (profile.totalMatches >= 10) inferred.push("matches_10");
     if (profile.totalMatches >= 20) inferred.push("play_20_matches");
     if (profile.totalMatches >= 50) inferred.push("matches_50");
+    if (profile.totalMatches >= 100) inferred.push("matches_100");
+    if (profile.totalMatches >= 250) inferred.push("matches_250");
     if (profile.totalPlaytimeSeconds >= 60) inferred.push("play_time_1m");
     if (profile.totalPlaytimeSeconds >= 300) inferred.push("play_time_5m");
     if (profile.totalPlaytimeSeconds >= 900) inferred.push("play_time_15m");
     if (profile.totalPlaytimeSeconds >= 1800) inferred.push("play_time_30m");
+    if (profile.totalPlaytimeSeconds >= 3600) inferred.push("play_time_1h");
+    if (profile.totalPlaytimeSeconds >= 7200) inferred.push("play_time_2h");
     profile.achievements = inferred;
   }
 
@@ -909,20 +1230,14 @@ function getPlayerProfileStats(username, allScores = [], onlineProfile = null) {
 
   const achSet = new Set(profile.achievements || []);
 
-  // Rangcím meghatározása
+  // Rangcím meghatározása:
+  // Alapjáraton mindig az alapértelmezett kezdő blokktörő marad,
+  // és CSAKIS akkor változik meg, ha a játékos maga átállítja a profilján!
   let activeTitle = null;
   if (profile.chosenTitle) {
     const foundTitle = PROFILE_TITLES.find((t) => t.id === profile.chosenTitle);
     if (foundTitle && foundTitle.isUnlocked(profile, achSet)) {
       activeTitle = foundTitle;
-    }
-  }
-  if (!activeTitle) {
-    for (let i = PROFILE_TITLES.length - 1; i >= 0; i--) {
-      if (PROFILE_TITLES[i].isUnlocked(profile, achSet)) {
-        activeTitle = PROFILE_TITLES[i];
-        break;
-      }
     }
   }
   profile.activeTitle = activeTitle || PROFILE_TITLES[0];

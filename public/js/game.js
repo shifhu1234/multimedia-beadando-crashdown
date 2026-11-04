@@ -1354,6 +1354,8 @@ function timer() {
                 if (btnText) btnText.textContent = 'Új játék indítása';
                 const timeUpMsg = document.getElementById('timeUpMessage');
                 if (timeUpMsg) timeUpMsg.style.display = 'block';
+                const overlaySettingsBox = document.getElementById('overlaySettingsBox');
+                if (overlaySettingsBox) overlaySettingsBox.style.display = 'none';
 
                 const overlaySaveBtn = document.getElementById('overlaySaveScoreBtn');
                 const modeSelectEl = document.getElementById('modeSelect');
@@ -1498,16 +1500,19 @@ function ujJatekInditasaFunc() {
     const overlayBtn = document.getElementById('overlayStartBtn');
     const overlaySaveBtn = document.getElementById('overlaySaveScoreBtn');
     const timeUpMsg = document.getElementById('timeUpMessage');
+    const overlaySettingsBox = document.getElementById('overlaySettingsBox');
 
-    // Kezdő nézetben az overlay rejtve marad, a pálya azonnal látható és használható!
-    if (overlay) overlay.classList.add('hidden');
-    if (overlayTitle) overlayTitle.textContent = 'Crashdown';
+    // Játék indítás előtt mindig megjelenik az indító overlay a kiválasztott beállításokkal!
+    if (overlay) overlay.classList.remove('hidden');
+    if (overlayTitle) overlayTitle.textContent = 'Crashdown Arcade';
     if (overlaySubtitle) overlaySubtitle.textContent = 'Kattints vagy érints legalább 3 azonos színű szomszédos blokkot a törléshez!';
     if (overlaySaveBtn) overlaySaveBtn.style.display = 'none';
     if (timeUpMsg) timeUpMsg.style.display = 'none';
+    if (overlaySettingsBox) overlaySettingsBox.style.display = 'flex';
     if (overlayBtn) {
-        overlayBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M8 5v14l11-7z"/></svg><span>Játék indítása</span>';
+        overlayBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M8 5v14l11-7z"/></svg><span id="overlayStartBtnText">Játék indítása</span>';
     }
+    updateCanvasOverlaySettings();
 
     setComboStatus('Készen állsz?', false);
     showToast('Alaphelyzet: válassz nehézséget, módot és játékidőt, majd indítsd a játékot!', 'info');
@@ -1653,3 +1658,51 @@ if (canvasOverlayEl) {
         }
     });
 }
+
+// Játék beállítások összefoglalójának frissítése a canvas overlayen
+function updateCanvasOverlaySettings() {
+    const overlayModeBadge = document.getElementById('overlayModeBadge');
+    const overlayTimeChip = document.getElementById('overlayTimeChip');
+    const overlayColorChip = document.getElementById('overlayColorChip');
+    const overlayModeDesc = document.getElementById('overlayModeDesc');
+    
+    const modeSelectEl = document.getElementById('modeSelect');
+    const timeSelectEl = document.getElementById('timeSelect');
+    const colorSelectEl = document.getElementById('colorSelect');
+
+    const modeVal = modeSelectEl ? modeSelectEl.value : 'normal';
+    const timeVal = timeSelectEl ? timeSelectEl.value : '60';
+    const colorVal = colorSelectEl ? colorSelectEl.value : '3';
+
+    const modeInfoMap = {
+        'normal': { badge: '🎯 Normál', desc: 'Kiegyensúlyozott játékmenet minden elérhető power-uppal.' },
+        'time_rush': { badge: '⏳ Időhajsza', desc: 'Gyors tempó! Csakis időfagyasztó és 2× pontduplázó power-upok ritkított eséllyel.' },
+        'bomb_frenzy': { badge: '💣 Robbanás Mánia', desc: 'Láncreakciók és pusztítás! Kizárólag TNT robbanó blokkok bukkannak fel.' },
+        'chaos': { badge: '🌀 Káosz Mód', desc: 'Maximális intenzitás! Gyakori power-up zápor és villámgyors tempó.' },
+        'no_powerups': { badge: '🧱 Nyers Mód', desc: 'Színtiszta blokktörő kihívás, semmilyen power-up nem jelenik meg.' }
+    };
+
+    const timeTextMap = {
+        '30': '⏱️ 30 mp (Villám)',
+        '60': '⏱️ 1 perc (Gyors)',
+        '90': '⏱️ 90 mp (Klasszikus)',
+        '180': '⏱️ 3 perc (Maraton)'
+    };
+
+    const colorTextMap = {
+        '2': '🎨 2 szín (Könnyű)',
+        '3': '🎨 3 szín (Normál)',
+        '4': '🎨 4 szín (Nehéz)',
+        '5': '🎨 5 szín (Mester)'
+    };
+
+    const curMode = modeInfoMap[modeVal] || modeInfoMap['normal'];
+    if (overlayModeBadge) overlayModeBadge.textContent = curMode.badge;
+    if (overlayModeDesc) overlayModeDesc.textContent = curMode.desc;
+    if (overlayTimeChip) overlayTimeChip.textContent = timeTextMap[timeVal] || `⏱️ ${timeVal} mp`;
+    if (overlayColorChip) overlayColorChip.textContent = colorTextMap[colorVal] || `🎨 ${colorVal} szín`;
+}
+
+// Inicializálás
+updateCanvasOverlaySettings();
+window.updateCanvasOverlaySettings = updateCanvasOverlaySettings;

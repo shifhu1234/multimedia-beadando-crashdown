@@ -98,4 +98,31 @@ function initAudioListeners() {
             applyAudioSettings();
         });
     }
+
+    // Telefon elsötétülés / képernyő zárolás / háttérbe küldés kezelése
+    let wasMusicPlayingBeforeHidden = false;
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            if (!hatterZene.paused) {
+                wasMusicPlayingBeforeHidden = true;
+                try { hatterZene.pause(); } catch (_) {}
+            } else {
+                wasMusicPlayingBeforeHidden = false;
+            }
+        } else {
+            // Visszatéréskor csak akkor indítjuk újra, ha szólt előtte és a játék még fut és nincs némítva
+            const isGameActive = typeof jatekFut !== 'undefined' && jatekFut && (typeof vegeAJateknak === 'undefined' || !vegeAJateknak);
+            if (wasMusicPlayingBeforeHidden && !toggledVOlume && masterVolume > 0 && isGameActive) {
+                try {
+                    const p = hatterZene.play();
+                    if (p && typeof p.catch === 'function') p.catch(() => {});
+                } catch (_) {}
+            }
+        }
+    });
+
+    window.addEventListener('pagehide', () => {
+        try { hatterZene.pause(); } catch (_) {}
+    });
 }

@@ -7,30 +7,38 @@ const sorok = 10;
 const oszlopok = 10;
 const negyzetMeret = LOGICAL_SIZE / oszlopok; // 44px
 
-// 9 Színtéma palettái
+// 13 Színtéma palettái (Klasszikus és Speciális témák)
 const THEME_PALETTES = {
-    retro:  ['#ef4444', '#10b981', '#f59e0b', '#06b6d4', '#8b5cf6'],
-    cyber:  ['#FF2E4C', '#22C55E', '#FACC15', '#3B82F6', '#D946EF'],
-    candy:  ['#fb7185', '#34d399', '#fde047', '#38bdf8', '#c084fc'],
-    space:  ['#f43f5e', '#10b981', '#eab308', '#4f46e5', '#ec4899'],
-    sunset: ['#f43f5e', '#fb923c', '#facc15', '#a855f7', '#6366f1'],
-    forest: ['#10b981', '#84cc16', '#14b8a6', '#059669', '#0284c7'],
-    lava:   ['#dc2626', '#ea580c', '#f59e0b', '#7f1d1d', '#f97316'],
-    noir:   ['#e2e8f0', '#94a3b8', '#64748b', '#475569', '#334155'],
-    ocean:  ['#06b6d4', '#0284c7', '#3b82f6', '#0d9488', '#6366f1']
+    retro:       ['#ef4444', '#10b981', '#f59e0b', '#06b6d4', '#8b5cf6'],
+    cyber:       ['#FF2E4C', '#22C55E', '#FACC15', '#3B82F6', '#D946EF'],
+    candy:       ['#fb7185', '#34d399', '#fde047', '#38bdf8', '#c084fc'],
+    space:       ['#f43f5e', '#10b981', '#eab308', '#4f46e5', '#ec4899'],
+    sunset:      ['#f43f5e', '#fb923c', '#facc15', '#a855f7', '#6366f1'],
+    forest:      ['#10b981', '#84cc16', '#14b8a6', '#059669', '#0284c7'],
+    lava:        ['#dc2626', '#ea580c', '#f59e0b', '#7f1d1d', '#f97316'],
+    noir:        ['#e2e8f0', '#94a3b8', '#64748b', '#475569', '#334155'],
+    ocean:       ['#06b6d4', '#0284c7', '#3b82f6', '#0d9488', '#6366f1'],
+    aurora:      ['#2dd4bf', '#a855f7', '#38bdf8', '#10b981', '#ec4899'],
+    vaporwave:   ['#06b6d4', '#f43f5e', '#a855f7', '#3b82f6', '#fb7185'],
+    cosmic_void: ['#c084fc', '#818cf8', '#38bdf8', '#a855f7', '#f472b6'],
+    golden:      ['#f59e0b', '#eab308', '#fbbf24', '#d97706', '#fef08a']
 };
 
-// Téma katalógus az unlockoláshoz (Magyarosított elnevezésekkel)
+// Téma katalógus az unlockoláshoz (Magyarosított elnevezésekkel, speciális témák jelölésével)
 const THEMES_CATALOG = [
-    { id: 'retro', name: 'Retro Játékterem', achId: null },
-    { id: 'cyber', name: 'Kiber Neon', achId: null },
-    { id: 'candy', name: 'Cukorka Pop', achId: 'first_500' },
-    { id: 'space', name: 'Mélyűr Odüsszeia', achId: 'score_1500' },
-    { id: 'sunset', name: 'Naplemente Szintetizátor', achId: 'powerup_10' },
-    { id: 'forest', name: 'Smaragd Vadon', achId: 'play_time_5m' },
-    { id: 'lava', name: 'Tűzhányó Láva', achId: 'powerup_25' },
-    { id: 'noir', name: 'Éjféli Noir', achId: 'inspect_profile' },
-    { id: 'ocean', name: 'Mélytengeri Misztikum', achId: 'score_5000' }
+    { id: 'retro', name: 'Retro Játékterem', achId: null, isSpecial: false },
+    { id: 'cyber', name: 'Kiber Neon', achId: null, isSpecial: false },
+    { id: 'candy', name: 'Cukorka Pop', achId: 'first_500', isSpecial: false },
+    { id: 'space', name: 'Mélyűr Odüsszeia', achId: 'score_1500', isSpecial: false },
+    { id: 'sunset', name: 'Naplemente Szintetizátor', achId: 'powerup_10', isSpecial: false },
+    { id: 'forest', name: 'Smaragd Vadon', achId: 'play_time_5m', isSpecial: false },
+    { id: 'lava', name: 'Tűzhányó Láva', achId: 'powerup_25', isSpecial: false },
+    { id: 'noir', name: 'Éjféli Noir', achId: 'inspect_profile', isSpecial: false },
+    { id: 'ocean', name: 'Mélytengeri Misztikum', achId: 'score_5000', isSpecial: false },
+    { id: 'aurora', name: 'Sarki Fény (Aurora)', achId: 'powerup_100', isSpecial: false },
+    { id: 'vaporwave', name: '80s Synthwave', achId: 'play_time_1h', isSpecial: false },
+    { id: 'cosmic_void', name: '✨ Kozmikus Void (Speciális)', achId: 'score_75k', isSpecial: true },
+    { id: 'golden', name: '👑 Birodalmi Arany (Speciális)', achId: 'score_100k', isSpecial: true }
 ];
 
 // Játékmódok / Modifierek definíciói
@@ -82,6 +90,12 @@ const COLOR_STYLES = {
     '#475569': { top: '#64748b', bottom: '#1e293b', border: '#94a3b8' },
     '#334155': { top: '#475569', bottom: '#0f172a', border: '#64748b' },
     '#0d9488': { top: '#14b8a6', bottom: '#115e59', border: '#99f6e4' },
+
+    // Aurora, Void, Vaporwave, Golden új témaszínek
+    '#2dd4bf': { top: '#5eead4', bottom: '#0f766e', border: '#99f6e4' },
+    '#fbbf24': { top: '#fde047', bottom: '#d97706', border: '#fef3c7' },
+    '#d97706': { top: '#f59e0b', bottom: '#b45309', border: '#fde68a' },
+    '#fef08a': { top: '#fef9c3', bottom: '#eab308', border: '#ffffff' },
 
     // Power-up színek és ikonfeliratok
     'cyan':      { top: '#38bdf8', bottom: '#0284c7', border: '#bae6fd', label: '2×' },
