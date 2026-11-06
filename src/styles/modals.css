@@ -694,6 +694,491 @@
   }
 }
 
+/* ==================== EGYSZÍNŰ RANGCÍMEK (MESTER - CSÁSZÁR) ==================== */
+.title-solid-master {
+  color: #38bdf8 !important;
+  font-weight: 800 !important;
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.55) !important;
+}
+.profile-player-badge.title-solid-master {
+  border-color: rgba(56, 189, 248, 0.6) !important;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.35) !important;
+  color: #38bdf8 !important;
+}
+
+.title-solid-grandmaster {
+  color: #c084fc !important;
+  font-weight: 800 !important;
+  text-shadow: 0 0 10px rgba(192, 132, 252, 0.55) !important;
+}
+.profile-player-badge.title-solid-grandmaster {
+  border-color: rgba(192, 132, 252, 0.6) !important;
+  box-shadow: 0 0 10px rgba(192, 132, 252, 0.35) !important;
+  color: #c084fc !important;
+}
+
+.title-solid-knight {
+  color: #34d399 !important;
+  font-weight: 800 !important;
+  text-shadow: 0 0 10px rgba(52, 211, 153, 0.55) !important;
+}
+.profile-player-badge.title-solid-knight {
+  border-color: rgba(52, 211, 153, 0.6) !important;
+  box-shadow: 0 0 10px rgba(52, 211, 153, 0.35) !important;
+  color: #34d399 !important;
+}
+
+.title-solid-commander {
+  color: #fb923c !important;
+  font-weight: 800 !important;
+  text-shadow: 0 0 10px rgba(251, 146, 60, 0.55) !important;
+}
+.profile-player-badge.title-solid-commander {
+  border-color: rgba(251, 146, 60, 0.6) !important;
+  box-shadow: 0 0 10px rgba(251, 146, 60, 0.35) !important;
+  color: #fb923c !important;
+}
+
+.title-solid-ruler {
+  color: #f87171 !important;
+  font-weight: 800 !important;
+  text-shadow: 0 0 10px rgba(248, 113, 113, 0.55) !important;
+}
+.profile-player-badge.title-solid-ruler {
+  border-color: rgba(248, 113, 113, 0.6) !important;
+  box-shadow: 0 0 10px rgba(248, 113, 113, 0.35) !important;
+  color: #f87171 !important;
+}
+
+.title-solid-emperor {
+  color: #facc15 !important;
+  font-weight: 800 !important;
+  text-shadow: 0 0 10px rgba(250, 204, 21, 0.55) !important;
+}
+.profile-player-badge.title-solid-emperor {
+  border-color: rgba(250, 204, 21, 0.6) !important;
+  box-shadow: 0 0 10px rgba(250, 204, 21, 0.35) !important;
+  color: #facc15 !important;
+}
+
+/* ==================== SPECIÁLIS 2 SZÍNŰ GRADIENTEK (TITÁN - KORSZAKALKOTÓ) ==================== */
+.title-gradient-titan {
+  background: linear-gradient(90deg, #06b6d4, #3b82f6) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.profile-player-badge.title-gradient-titan {
+  border-color: rgba(6, 182, 212, 0.6) !important;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.4) !important;
+  color: #38bdf8 !important;
+}
+
+.title-gradient-hero {
+  background: linear-gradient(90deg, #f59e0b, #ef4444) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.profile-player-badge.title-gradient-hero {
+  border-color: rgba(245, 158, 11, 0.6) !important;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4) !important;
+  color: #f97316 !important;
+}
+
+.title-gradient-mage {
+  background: linear-gradient(90deg, #8b5cf6, #ec4899) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.profile-player-badge.title-gradient-mage {
+  border-color: rgba(139, 92, 246, 0.6) !important;
+  box-shadow: 0 0 10px rgba(236, 72, 153, 0.4) !important;
+  color: #c084fc !important;
+}
+
+.title-gradient-guardian {
+  background: linear-gradient(90deg, #10b981, #06b6d4) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.profile-player-badge.title-gradient-guardian {
+  border-color: rgba(16, 185, 129, 0.6) !important;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.4) !important;
+  color: #34d399 !important;
+}
+
+.title-gradient-phoenix {
+  background: linear-gradient(90deg, #f59e0b, #dc2626) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.profile-player-badge.title-gradient-phoenix {
+  border-color: rgba(245, 158, 11, 0.6) !important;
+  box-shadow: 0 0 10px rgba(220, 38, 38, 0.4) !important;
+  color: #fb923c !important;
+}
+
+.title-gradient-legend {
+  background: linear-gradient(90deg, #3b82f6, #9333ea) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.profile-player-badge.title-gradient-legend {
+  border-color: rgba(59, 130, 246, 0.6) !important;
+  box-shadow: 0 0 10px rgba(147, 51, 234, 0.4) !important;
+  color: #60a5fa !important;
+}
+
+.title-gradient-fateweaver {
+  background: linear-gradient(90deg, #f43f5e, #7c3aed) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.profile-player-badge.title-gradient-fateweaver {
+  border-color: rgba(244, 63, 94, 0.6) !important;
+  box-shadow: 0 0 10px rgba(124, 58, 237, 0.4) !important;
+  color: #fb7185 !important;
+}
+
+.title-gradient-cosmic {
+  background: linear-gradient(90deg, #38bdf8, #c084fc) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.profile-player-badge.title-gradient-cosmic {
+  border-color: rgba(56, 189, 248, 0.6) !important;
+  box-shadow: 0 0 10px rgba(192, 132, 252, 0.4) !important;
+  color: #7dd3fc !important;
+}
+
+.title-gradient-immortal {
+  background: linear-gradient(90deg, #f1f5f9, #0ea5e9) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.profile-player-badge.title-gradient-immortal {
+  border-color: rgba(241, 245, 249, 0.7) !important;
+  box-shadow: 0 0 10px rgba(14, 165, 233, 0.4) !important;
+  color: #f8fafc !important;
+}
+
+.title-gradient-god {
+  background: linear-gradient(90deg, #fde047, #ea580c) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.profile-player-badge.title-gradient-god {
+  border-color: rgba(253, 224, 71, 0.6) !important;
+  box-shadow: 0 0 10px rgba(234, 88, 12, 0.4) !important;
+  color: #fde047 !important;
+}
+
+.title-gradient-colossus {
+  background: linear-gradient(90deg, #d97706, #facc15) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.profile-player-badge.title-gradient-colossus {
+  border-color: rgba(217, 119, 6, 0.6) !important;
+  box-shadow: 0 0 10px rgba(250, 204, 21, 0.4) !important;
+  color: #facc15 !important;
+}
+
+.title-gradient-epoch {
+  background: linear-gradient(90deg, #14b8a6, #6366f1) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.profile-player-badge.title-gradient-epoch {
+  border-color: rgba(20, 184, 166, 0.6) !important;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.4) !important;
+  color: #2dd4bf !important;
+}
+
+/* ==================== MÍTIKUS 3 SZÍNŰ GRADIENTEK (VILÁGPUSZTÍTÓ - OMNIPOTENS) ==================== */
+.title-mythic-worldbreaker {
+  background: linear-gradient(90deg, #ef4444, #f97316, #7c3aed, #ef4444) !important;
+  background-size: 250% auto !important;
+  animation: specialTitleShine 3s linear infinite !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 900 !important;
+}
+.profile-player-badge.title-mythic-worldbreaker {
+  border-color: rgba(239, 68, 68, 0.8) !important;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.5), inset 0 0 6px rgba(124, 58, 237, 0.3) !important;
+  color: #f87171 !important;
+}
+
+.title-mythic-eternal {
+  background: linear-gradient(90deg, #10b981, #06b6d4, #facc15, #10b981) !important;
+  background-size: 250% auto !important;
+  animation: specialTitleShine 3s linear infinite !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 900 !important;
+}
+.profile-player-badge.title-mythic-eternal {
+  border-color: rgba(16, 185, 129, 0.8) !important;
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.5), inset 0 0 6px rgba(250, 204, 21, 0.3) !important;
+  color: #34d399 !important;
+}
+
+.title-mythic-starcleaver {
+  background: linear-gradient(90deg, #38bdf8, #a855f7, #fb7185, #38bdf8) !important;
+  background-size: 250% auto !important;
+  animation: specialTitleShine 3s linear infinite !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 900 !important;
+}
+.profile-player-badge.title-mythic-starcleaver {
+  border-color: rgba(168, 85, 247, 0.8) !important;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.5), inset 0 0 6px rgba(251, 113, 133, 0.3) !important;
+  color: #c084fc !important;
+}
+
+.title-mythic-dimension {
+  background: linear-gradient(90deg, #4ade80, #22d3ee, #818cf8, #4ade80) !important;
+  background-size: 250% auto !important;
+  animation: specialTitleShine 3s linear infinite !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 900 !important;
+}
+.profile-player-badge.title-mythic-dimension {
+  border-color: rgba(34, 211, 238, 0.8) !important;
+  box-shadow: 0 0 12px rgba(34, 211, 238, 0.5), inset 0 0 6px rgba(129, 140, 248, 0.3) !important;
+  color: #22d3ee !important;
+}
+
+.title-mythic-omnipotent {
+  background: linear-gradient(90deg, #facc15, #ffffff, #c084fc, #facc15) !important;
+  background-size: 250% auto !important;
+  animation: specialTitleShine 2.5s linear infinite !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 900 !important;
+  filter: drop-shadow(0 0 6px rgba(250, 204, 21, 0.8)) !important;
+}
+.profile-player-badge.title-mythic-omnipotent {
+  border-color: rgba(250, 204, 21, 0.9) !important;
+  box-shadow: 0 0 14px rgba(250, 204, 21, 0.6), inset 0 0 8px rgba(192, 132, 252, 0.4) !important;
+  color: #fde047 !important;
+}
+
+/* ==================== TOTAL SCORE - SIMA EGYSZÍNŰ RANGCÍMEK (EZÜST - PLATINA) ==================== */
+.title-solid-silver {
+  color: #e2e8f0 !important;
+  font-weight: 800 !important;
+  text-shadow: 0 0 10px rgba(226, 232, 240, 0.6) !important;
+}
+.profile-player-badge.title-solid-silver {
+  border-color: rgba(226, 232, 240, 0.6) !important;
+  box-shadow: 0 0 10px rgba(226, 232, 240, 0.35) !important;
+  color: #e2e8f0 !important;
+}
+
+.title-solid-topaz {
+  color: #f59e0b !important;
+  font-weight: 800 !important;
+  text-shadow: 0 0 10px rgba(245, 158, 11, 0.6) !important;
+}
+.profile-player-badge.title-solid-topaz {
+  border-color: rgba(245, 158, 11, 0.6) !important;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.35) !important;
+  color: #f59e0b !important;
+}
+
+.title-solid-gold-rec {
+  color: #facc15 !important;
+  font-weight: 800 !important;
+  text-shadow: 0 0 10px rgba(250, 204, 21, 0.6) !important;
+}
+.profile-player-badge.title-solid-gold-rec {
+  border-color: rgba(250, 204, 21, 0.6) !important;
+  box-shadow: 0 0 10px rgba(250, 204, 21, 0.35) !important;
+  color: #facc15 !important;
+}
+
+.title-solid-amethyst {
+  color: #c084fc !important;
+  font-weight: 800 !important;
+  text-shadow: 0 0 10px rgba(192, 132, 252, 0.6) !important;
+}
+.profile-player-badge.title-solid-amethyst {
+  border-color: rgba(192, 132, 252, 0.6) !important;
+  box-shadow: 0 0 10px rgba(192, 132, 252, 0.35) !important;
+  color: #c084fc !important;
+}
+
+.title-solid-platinum {
+  color: #93c5fd !important;
+  font-weight: 800 !important;
+  text-shadow: 0 0 10px rgba(147, 197, 253, 0.6) !important;
+}
+.profile-player-badge.title-solid-platinum {
+  border-color: rgba(147, 197, 253, 0.6) !important;
+  box-shadow: 0 0 10px rgba(147, 197, 253, 0.35) !important;
+  color: #93c5fd !important;
+}
+
+/* ==================== TOTAL SCORE - SPECIÁLIS 2 SZÍNŰ GRADIENTEK (TITÁN - KÁOSZKŐ) ==================== */
+.title-gradient-titan-rec {
+  background: linear-gradient(90deg, #94a3b8, #06b6d4) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.profile-player-badge.title-gradient-titan-rec {
+  border-color: rgba(6, 182, 212, 0.6) !important;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.4) !important;
+  color: #38bdf8 !important;
+}
+
+.title-gradient-diamond {
+  background: linear-gradient(90deg, #38bdf8, #ffffff) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.profile-player-badge.title-gradient-diamond {
+  border-color: rgba(56, 189, 248, 0.6) !important;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.4) !important;
+  color: #e0f2fe !important;
+}
+
+.title-gradient-emerald {
+  background: linear-gradient(90deg, #059669, #34d399) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.profile-player-badge.title-gradient-emerald {
+  border-color: rgba(16, 185, 129, 0.6) !important;
+  box-shadow: 0 0 10px rgba(52, 211, 153, 0.4) !important;
+  color: #34d399 !important;
+}
+
+.title-gradient-tungsten {
+  background: linear-gradient(90deg, #64748b, #f97316) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.profile-player-badge.title-gradient-tungsten {
+  border-color: rgba(249, 115, 22, 0.6) !important;
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.4) !important;
+  color: #fb923c !important;
+}
+
+.title-gradient-obsidian {
+  background: linear-gradient(90deg, #581c87, #c084fc) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.profile-player-badge.title-gradient-obsidian {
+  border-color: rgba(168, 85, 247, 0.6) !important;
+  box-shadow: 0 0 10px rgba(192, 132, 252, 0.4) !important;
+  color: #c084fc !important;
+}
+
+.title-gradient-chaosstone {
+  background: linear-gradient(90deg, #7c3aed, #ef4444) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.profile-player-badge.title-gradient-chaosstone {
+  border-color: rgba(239, 68, 68, 0.6) !important;
+  box-shadow: 0 0 10px rgba(124, 58, 237, 0.4) !important;
+  color: #f87171 !important;
+}
+
+/* ==================== TOTAL SCORE - MÍTIKUS 3 SZÍNŰ GRADIENTEK (METEORIT - ANTIANYAG) ==================== */
+.title-mythic-meteorite {
+  background: linear-gradient(90deg, #ef4444, #f97316, #facc15, #ef4444) !important;
+  background-size: 250% auto !important;
+  animation: specialTitleShine 3s linear infinite !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 900 !important;
+}
+.profile-player-badge.title-mythic-meteorite {
+  border-color: rgba(249, 115, 22, 0.8) !important;
+  box-shadow: 0 0 12px rgba(249, 115, 22, 0.5), inset 0 0 6px rgba(239, 68, 68, 0.3) !important;
+  color: #fb923c !important;
+}
+
+.title-mythic-stariron {
+  background: linear-gradient(90deg, #38bdf8, #818cf8, #f472b6, #38bdf8) !important;
+  background-size: 250% auto !important;
+  animation: specialTitleShine 3s linear infinite !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 900 !important;
+}
+.profile-player-badge.title-mythic-stariron {
+  border-color: rgba(129, 140, 248, 0.8) !important;
+  box-shadow: 0 0 12px rgba(129, 140, 248, 0.5), inset 0 0 6px rgba(244, 114, 182, 0.3) !important;
+  color: #a5b4fc !important;
+}
+
+.title-mythic-quantum {
+  background: linear-gradient(90deg, #10b981, #06b6d4, #c084fc, #10b981) !important;
+  background-size: 250% auto !important;
+  animation: specialTitleShine 3s linear infinite !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 900 !important;
+}
+.profile-player-badge.title-mythic-quantum {
+  border-color: rgba(6, 182, 212, 0.8) !important;
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.5), inset 0 0 6px rgba(192, 132, 252, 0.3) !important;
+  color: #22d3ee !important;
+}
+
+.title-mythic-darkmatter {
+  background: linear-gradient(90deg, #6b21a8, #2563eb, #c084fc, #6b21a8) !important;
+  background-size: 250% auto !important;
+  animation: specialTitleShine 3s linear infinite !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 900 !important;
+}
+.profile-player-badge.title-mythic-darkmatter {
+  border-color: rgba(147, 51, 234, 0.8) !important;
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.5), inset 0 0 6px rgba(192, 132, 252, 0.3) !important;
+  color: #c084fc !important;
+}
+
+.title-mythic-antimatter {
+  background: linear-gradient(90deg, #fde047, #ffffff, #ec4899, #fde047) !important;
+  background-size: 250% auto !important;
+  animation: specialTitleShine 2.5s linear infinite !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 900 !important;
+  filter: drop-shadow(0 0 6px rgba(253, 224, 71, 0.8)) !important;
+}
+.profile-player-badge.title-mythic-antimatter {
+  border-color: rgba(253, 224, 71, 0.9) !important;
+  box-shadow: 0 0 14px rgba(253, 224, 71, 0.6), inset 0 0 8px rgba(236, 72, 153, 0.4) !important;
+  color: #fde047 !important;
+}
+
 .profile-title-select-wrap {
   margin-left: auto;
   margin-right: 12px;
@@ -1611,6 +2096,19 @@
   letter-spacing: 0.5px;
 }
 
+.title-pick-mythic-tag {
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.25), rgba(168, 85, 247, 0.35));
+  color: #f472b6;
+  border: 1px solid rgba(244, 114, 182, 0.5);
+  box-shadow: 0 0 8px rgba(236, 72, 153, 0.4);
+  letter-spacing: 0.5px;
+}
+
 /* ==================== MECCS ELŐZMÉNYEK (MATCH HISTORY) ==================== */
 .profile-history-list {
   display: flex;
@@ -2325,6 +2823,11 @@
   }
 
   .title-pick-special-tag {
+    font-size: 0.5rem !important;
+    padding: 1px 3px !important;
+  }
+
+  .title-pick-mythic-tag {
     font-size: 0.5rem !important;
     padding: 1px 3px !important;
   }
