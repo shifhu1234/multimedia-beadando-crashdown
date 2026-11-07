@@ -2970,6 +2970,15 @@ export function initCrashdownRuntime() {
   // ==================== RANGCÍMEK (TITLES) RENDSZER ====================
   const PROFILE_TITLES = [
     {
+      id: "title_none",
+      name: "Nincs (Alapértelmezett)",
+      desc: "Ne jelenjen meg semmilyen rangcím a neved mellett",
+      achId: null,
+      isSpecial: false,
+      isMythic: false,
+      isUnlocked: (stats, achSet) => true,
+    },
+    {
       id: "title_beginner",
       name: "Kezdő Blokktörő",
       desc: "Alapértelmezett kezdő rangcím minden játékosnak",
@@ -3366,7 +3375,8 @@ export function initCrashdownRuntime() {
       isSpecial: false,
       isMythic: false,
       isUnlocked: (stats, achSet) =>
-        achSet.has("ach_total_score_100k") || Number(stats?.totalScore) >= 100000,
+        achSet.has("ach_total_score_100k") ||
+        Number(stats?.totalScore) >= 100000,
     },
     // 250 000 - 1 000 000: Sima egyszínű színek (Ezüsttel indítva)
     {
@@ -3378,7 +3388,8 @@ export function initCrashdownRuntime() {
       isSpecial: false,
       isMythic: false,
       isUnlocked: (stats, achSet) =>
-        achSet.has("ach_total_score_250k") || Number(stats?.totalScore) >= 250000,
+        achSet.has("ach_total_score_250k") ||
+        Number(stats?.totalScore) >= 250000,
     },
     {
       id: "title_tot_topaz",
@@ -3389,7 +3400,8 @@ export function initCrashdownRuntime() {
       isSpecial: false,
       isMythic: false,
       isUnlocked: (stats, achSet) =>
-        achSet.has("ach_total_score_350k") || Number(stats?.totalScore) >= 350000,
+        achSet.has("ach_total_score_350k") ||
+        Number(stats?.totalScore) >= 350000,
     },
     {
       id: "title_tot_gold",
@@ -3400,7 +3412,8 @@ export function initCrashdownRuntime() {
       isSpecial: false,
       isMythic: false,
       isUnlocked: (stats, achSet) =>
-        achSet.has("ach_total_score_500k") || Number(stats?.totalScore) >= 500000,
+        achSet.has("ach_total_score_500k") ||
+        Number(stats?.totalScore) >= 500000,
     },
     {
       id: "title_tot_amethyst",
@@ -3411,7 +3424,8 @@ export function initCrashdownRuntime() {
       isSpecial: false,
       isMythic: false,
       isUnlocked: (stats, achSet) =>
-        achSet.has("ach_total_score_750k") || Number(stats?.totalScore) >= 750000,
+        achSet.has("ach_total_score_750k") ||
+        Number(stats?.totalScore) >= 750000,
     },
     {
       id: "title_tot_platinum",
@@ -3422,7 +3436,8 @@ export function initCrashdownRuntime() {
       isSpecial: false,
       isMythic: false,
       isUnlocked: (stats, achSet) =>
-        achSet.has("ach_total_score_1m") || Number(stats?.totalScore) >= 1000000,
+        achSet.has("ach_total_score_1m") ||
+        Number(stats?.totalScore) >= 1000000,
     },
     // 1 500 000 - 7 500 000: Speciális 2 színű gradientek (Titánnal kezdve)
     {
@@ -3434,7 +3449,8 @@ export function initCrashdownRuntime() {
       isSpecial: true,
       isMythic: false,
       isUnlocked: (stats, achSet) =>
-        achSet.has("ach_total_score_1_5m") || Number(stats?.totalScore) >= 1500000,
+        achSet.has("ach_total_score_1_5m") ||
+        Number(stats?.totalScore) >= 1500000,
     },
     {
       id: "title_tot_diamond",
@@ -3445,7 +3461,8 @@ export function initCrashdownRuntime() {
       isSpecial: true,
       isMythic: false,
       isUnlocked: (stats, achSet) =>
-        achSet.has("ach_total_score_2m") || Number(stats?.totalScore) >= 2000000,
+        achSet.has("ach_total_score_2m") ||
+        Number(stats?.totalScore) >= 2000000,
     },
     {
       id: "title_tot_emerald",
@@ -3456,7 +3473,8 @@ export function initCrashdownRuntime() {
       isSpecial: true,
       isMythic: false,
       isUnlocked: (stats, achSet) =>
-        achSet.has("ach_total_score_3m") || Number(stats?.totalScore) >= 3000000,
+        achSet.has("ach_total_score_3m") ||
+        Number(stats?.totalScore) >= 3000000,
     },
     {
       id: "title_tot_tungsten",
@@ -3467,7 +3485,8 @@ export function initCrashdownRuntime() {
       isSpecial: true,
       isMythic: false,
       isUnlocked: (stats, achSet) =>
-        achSet.has("ach_total_score_4m") || Number(stats?.totalScore) >= 4000000,
+        achSet.has("ach_total_score_4m") ||
+        Number(stats?.totalScore) >= 4000000,
     },
     {
       id: "title_tot_obsidian",
@@ -3478,7 +3497,8 @@ export function initCrashdownRuntime() {
       isSpecial: true,
       isMythic: false,
       isUnlocked: (stats, achSet) =>
-        achSet.has("ach_total_score_5m") || Number(stats?.totalScore) >= 5000000,
+        achSet.has("ach_total_score_5m") ||
+        Number(stats?.totalScore) >= 5000000,
     },
     {
       id: "title_tot_chaosstone",
@@ -3489,7 +3509,8 @@ export function initCrashdownRuntime() {
       isSpecial: true,
       isMythic: false,
       isUnlocked: (stats, achSet) =>
-        achSet.has("ach_total_score_7_5m") || Number(stats?.totalScore) >= 7500000,
+        achSet.has("ach_total_score_7_5m") ||
+        Number(stats?.totalScore) >= 7500000,
     },
     // 10 000 000 - 25 000 000: Mítikus 3 színű animált gradientek (Meteorittal kezdve felfele)
     {
@@ -3501,7 +3522,8 @@ export function initCrashdownRuntime() {
       isSpecial: true,
       isMythic: true,
       isUnlocked: (stats, achSet) =>
-        achSet.has("ach_total_score_10m") || Number(stats?.totalScore) >= 10000000,
+        achSet.has("ach_total_score_10m") ||
+        Number(stats?.totalScore) >= 10000000,
     },
     {
       id: "title_tot_stariron",
@@ -3512,7 +3534,8 @@ export function initCrashdownRuntime() {
       isSpecial: true,
       isMythic: true,
       isUnlocked: (stats, achSet) =>
-        achSet.has("ach_total_score_12_5m") || Number(stats?.totalScore) >= 12500000,
+        achSet.has("ach_total_score_12_5m") ||
+        Number(stats?.totalScore) >= 12500000,
     },
     {
       id: "title_tot_quantum",
@@ -3523,7 +3546,8 @@ export function initCrashdownRuntime() {
       isSpecial: true,
       isMythic: true,
       isUnlocked: (stats, achSet) =>
-        achSet.has("ach_total_score_15m") || Number(stats?.totalScore) >= 15000000,
+        achSet.has("ach_total_score_15m") ||
+        Number(stats?.totalScore) >= 15000000,
     },
     {
       id: "title_tot_darkmatter",
@@ -3534,7 +3558,8 @@ export function initCrashdownRuntime() {
       isSpecial: true,
       isMythic: true,
       isUnlocked: (stats, achSet) =>
-        achSet.has("ach_total_score_20m") || Number(stats?.totalScore) >= 20000000,
+        achSet.has("ach_total_score_20m") ||
+        Number(stats?.totalScore) >= 20000000,
     },
     {
       id: "title_tot_antimatter",
@@ -3545,7 +3570,8 @@ export function initCrashdownRuntime() {
       isSpecial: true,
       isMythic: true,
       isUnlocked: (stats, achSet) =>
-        achSet.has("ach_total_score_25m") || Number(stats?.totalScore) >= 25000000,
+        achSet.has("ach_total_score_25m") ||
+        Number(stats?.totalScore) >= 25000000,
     },
     {
       id: "title_titan_crusher",
@@ -3920,7 +3946,7 @@ export function initCrashdownRuntime() {
       }
 
       if (!Array.isArray(p.unlockedTitles))
-        p.unlockedTitles = ["title_beginner"];
+        p.unlockedTitles = ["title_none", "title_beginner"];
       if (!Array.isArray(p.unlockedColors)) p.unlockedColors = ["name_white"];
       if (!Array.isArray(p.unlockedAvatars))
         p.unlockedAvatars = ["avatar_default"];
@@ -4014,28 +4040,6 @@ export function initCrashdownRuntime() {
     { score: 650000, id: "ach_score_650k" },
     { score: 800000, id: "ach_score_800k" },
     { score: 1000000, id: "ach_score_1m" },
-  ];
-
-  const TOTAL_SCORE_MILESTONES = [
-    { score: 25000, id: "ach_total_score_25k" },
-    { score: 50000, id: "ach_total_score_50k" },
-    { score: 100000, id: "ach_total_score_100k", altId: "total_score_100k" },
-    { score: 250000, id: "ach_total_score_250k" },
-    { score: 350000, id: "ach_total_score_350k" },
-    { score: 500000, id: "ach_total_score_500k", altId: "total_score_500k" },
-    { score: 750000, id: "ach_total_score_750k" },
-    { score: 1000000, id: "ach_total_score_1m", altId: "total_score_1m" },
-    { score: 1500000, id: "ach_total_score_1_5m" },
-    { score: 2000000, id: "ach_total_score_2m" },
-    { score: 3000000, id: "ach_total_score_3m" },
-    { score: 4000000, id: "ach_total_score_4m" },
-    { score: 5000000, id: "ach_total_score_5m", altId: "total_score_5m" },
-    { score: 7500000, id: "ach_total_score_7_5m" },
-    { score: 10000000, id: "ach_total_score_10m" },
-    { score: 12500000, id: "ach_total_score_12_5m" },
-    { score: 15000000, id: "ach_total_score_15m" },
-    { score: 20000000, id: "ach_total_score_20m" },
-    { score: 25000000, id: "ach_total_score_25m" },
   ];
 
   function checkScoreAchievements(
@@ -4412,13 +4416,34 @@ export function initCrashdownRuntime() {
           checkAchievement("ach_play_time_3h");
         }
 
-        // Összesített pontszám mérföldkövek (egységesen TOTAL_SCORE_MILESTONES alapján)
-        for (let i = 0; i < TOTAL_SCORE_MILESTONES.length; i++) {
-          const m = TOTAL_SCORE_MILESTONES[i];
-          if (p.totalScore >= m.score) {
-            checkAchievement(m.id);
-            if (m.altId) checkAchievement(m.altId);
-          }
+        // Összesített pontszám mérföldkövek
+        if (p.totalScore >= 50000) {
+          checkAchievement("ach_total_score_50k");
+        }
+        if (p.totalScore >= 100000) {
+          checkAchievement("ach_total_score_100k");
+          checkAchievement("total_score_100k");
+        }
+        if (p.totalScore >= 250000) {
+          checkAchievement("ach_total_score_250k");
+        }
+        if (p.totalScore >= 500000) {
+          checkAchievement("ach_total_score_500k");
+          checkAchievement("total_score_500k");
+        }
+        if (p.totalScore >= 1000000) {
+          checkAchievement("ach_total_score_1m");
+          checkAchievement("total_score_1m");
+        }
+        if (p.totalScore >= 2000000) {
+          checkAchievement("ach_total_score_2m");
+        }
+        if (p.totalScore >= 5000000) {
+          checkAchievement("ach_total_score_5m");
+          checkAchievement("total_score_5m");
+        }
+        if (p.totalScore >= 10000000) {
+          checkAchievement("ach_total_score_10m");
         }
 
         // Pontszám rekord mérföldkövek (egységesen SCORE_MILESTONES alapján)
@@ -4701,6 +4726,7 @@ export function initCrashdownRuntime() {
         onlineProfile.unlockedTitles !== null
       ) {
         profile.unlockedTitles = ensureArray(onlineProfile.unlockedTitles, [
+          "title_none",
           "title_beginner",
         ]);
       }
@@ -4896,9 +4922,9 @@ export function initCrashdownRuntime() {
       profile.unlockedTitles === undefined ||
       profile.unlockedTitles === null
     ) {
-      const initTitles = ["title_beginner"];
+      const initTitles = ["title_none", "title_beginner"];
       PROFILE_TITLES.forEach((t) => {
-        if (t.id === "title_beginner") return;
+        if (t.id === "title_none" || t.id === "title_beginner") return;
         if (t.achId && achSet.has(t.achId)) {
           initTitles.push(t.id);
         } else if (
@@ -4911,11 +4937,15 @@ export function initCrashdownRuntime() {
       profile.unlockedTitles = Array.from(new Set(initTitles));
     } else {
       profile.unlockedTitles = ensureArray(profile.unlockedTitles, [
+        "title_none",
         "title_beginner",
       ]);
     }
+    if (!profile.unlockedTitles.includes("title_none")) {
+      profile.unlockedTitles.unshift("title_none");
+    }
     if (!profile.unlockedTitles.includes("title_beginner")) {
-      profile.unlockedTitles.unshift("title_beginner");
+      profile.unlockedTitles.push("title_beginner");
     }
 
     if (
@@ -5870,14 +5900,20 @@ export function initCrashdownRuntime() {
     }
 
     if (titleEl) {
-      titleEl.textContent = stats.activeTitle.name;
-      Array.from(titleEl.classList).forEach((cls) => {
-        if (cls.startsWith("title-") && cls !== "profile-player-badge") {
-          titleEl.classList.remove(cls);
+      if (!stats.activeTitle || stats.activeTitle.id === "title_none") {
+        titleEl.textContent = "";
+        titleEl.style.display = "none";
+      } else {
+        titleEl.textContent = stats.activeTitle.name;
+        titleEl.style.display = "inline-block";
+        Array.from(titleEl.classList).forEach((cls) => {
+          if (cls.startsWith("title-") && cls !== "profile-player-badge") {
+            titleEl.classList.remove(cls);
+          }
+        });
+        if (stats.activeTitle.specialClass) {
+          titleEl.classList.add(stats.activeTitle.specialClass);
         }
-      });
-      if (stats.activeTitle.specialClass) {
-        titleEl.classList.add(stats.activeTitle.specialClass);
       }
     }
 
@@ -6425,13 +6461,13 @@ export function initCrashdownRuntime() {
 
         function renderTitles(sortMode = "default") {
           const sortedTitles = sortCatalogItems(PROFILE_TITLES, sortMode, (t) =>
-            (stats.unlockedTitles || ["title_beginner"]).includes(t.id),
+            (stats.unlockedTitles || ["title_none", "title_beginner"]).includes(t.id),
           );
 
           titleGrid.innerHTML = sortedTitles
             .map((t) => {
               const unlocked = (
-                stats.unlockedTitles || ["title_beginner"]
+                stats.unlockedTitles || ["title_none", "title_beginner"]
               ).includes(t.id);
               const isSelected = stats.chosenTitle
                 ? t.id === stats.chosenTitle
@@ -6454,7 +6490,7 @@ export function initCrashdownRuntime() {
                  data-unlocked="${unlocked ? "1" : "0"}"
                  title="${isAdmin ? (unlocked ? `${t.name} (Kattints a beállításhoz, jobb felső gombbal zárolhatod)` : `${lockTitle} (Admin: kattints a feloldáshoz)`) : unlocked ? t.name : lockTitle}">
                 ${
-                  isAdmin && t.id !== "title_beginner"
+                  isAdmin && t.id !== "title_none" && t.id !== "title_beginner"
                     ? `
                   <button type="button" class="card-admin-toggle-badge ${unlocked ? "unlocked" : "locked"}" 
                           data-action="toggle-lock"
@@ -6486,7 +6522,7 @@ export function initCrashdownRuntime() {
               );
               const isUnlocked = this.getAttribute("data-unlocked") === "1";
 
-              if (isToggleBtn && isAdmin && titleObj.id !== "title_beginner") {
+              if (isToggleBtn && isAdmin && titleObj.id !== "title_none" && titleObj.id !== "title_beginner") {
                 e.stopPropagation();
                 if (this.dataset.busy === "1") return;
                 this.dataset.busy = "1";
@@ -6506,14 +6542,14 @@ export function initCrashdownRuntime() {
                 }
 
                 let curTitles = [
-                  ...(stats.unlockedTitles || ["title_beginner"]),
+                  ...(stats.unlockedTitles || ["title_none", "title_beginner"]),
                 ];
                 if (nextUnlocked) {
                   if (!curTitles.includes(chosenId)) curTitles.push(chosenId);
                 } else {
                   curTitles = curTitles.filter((id) => id !== chosenId);
                   if (stats.chosenTitle === chosenId)
-                    stats.chosenTitle = "title_beginner";
+                    stats.chosenTitle = "title_none";
                   this.classList.remove("active");
                 }
                 stats.unlockedTitles = curTitles;
@@ -6539,7 +6575,7 @@ export function initCrashdownRuntime() {
               }
 
               if (!isUnlocked) {
-                if (isAdmin && titleObj.id !== "title_beginner") {
+                if (isAdmin && titleObj.id !== "title_none" && titleObj.id !== "title_beginner") {
                   this.setAttribute("data-unlocked", "1");
                   this.classList.remove("locked");
                   const toggleBtnEl = this.querySelector(
@@ -6552,7 +6588,7 @@ export function initCrashdownRuntime() {
                   }
 
                   let curTitles = [
-                    ...(stats.unlockedTitles || ["title_beginner"]),
+                    ...(stats.unlockedTitles || ["title_none", "title_beginner"]),
                   ];
                   if (!curTitles.includes(chosenId)) curTitles.push(chosenId);
                   stats.unlockedTitles = curTitles;
@@ -6560,14 +6596,23 @@ export function initCrashdownRuntime() {
                   stats.activeTitle = titleObj;
 
                   if (titleEl) {
-                    titleEl.textContent = titleObj.name;
-                    Array.from(titleEl.classList).forEach((cls) => {
-                      if (cls.startsWith("title-") && cls !== "profile-player-badge") {
-                        titleEl.classList.remove(cls);
+                    if (titleObj.id === "title_none") {
+                      titleEl.textContent = "";
+                      titleEl.style.display = "none";
+                    } else {
+                      titleEl.textContent = titleObj.name;
+                      titleEl.style.display = "inline-block";
+                      Array.from(titleEl.classList).forEach((cls) => {
+                        if (
+                          cls.startsWith("title-") &&
+                          cls !== "profile-player-badge"
+                        ) {
+                          titleEl.classList.remove(cls);
+                        }
+                      });
+                      if (titleObj.specialClass) {
+                        titleEl.classList.add(titleObj.specialClass);
                       }
-                    });
-                    if (titleObj.specialClass) {
-                      titleEl.classList.add(titleObj.specialClass);
                     }
                   }
 
@@ -6626,14 +6671,23 @@ export function initCrashdownRuntime() {
               }
 
               if (titleEl) {
-                titleEl.textContent = titleObj.name;
-                Array.from(titleEl.classList).forEach((cls) => {
-                  if (cls.startsWith("title-") && cls !== "profile-player-badge") {
-                    titleEl.classList.remove(cls);
+                if (titleObj.id === "title_none") {
+                  titleEl.textContent = "";
+                  titleEl.style.display = "none";
+                } else {
+                  titleEl.textContent = titleObj.name;
+                  titleEl.style.display = "inline-block";
+                  Array.from(titleEl.classList).forEach((cls) => {
+                    if (
+                      cls.startsWith("title-") &&
+                      cls !== "profile-player-badge"
+                    ) {
+                      titleEl.classList.remove(cls);
+                    }
+                  });
+                  if (titleObj.specialClass) {
+                    titleEl.classList.add(titleObj.specialClass);
                   }
-                });
-                if (titleObj.specialClass) {
-                  titleEl.classList.add(titleObj.specialClass);
                 }
               }
 
@@ -7511,7 +7565,8 @@ export function initCrashdownRuntime() {
 
         const nameClass = nameColorObj?.className || "";
         const titleClass = titleObj?.specialClass || "";
-        const titleText = titleObj?.name || "Kezdő Blokktörő";
+        const showTitle = titleObj && titleObj.id !== "title_none";
+        const titleText = titleObj?.name || "";
         const bestScoreText = formatScore(p.bestScore || 0);
 
         return `
@@ -7523,7 +7578,7 @@ export function initCrashdownRuntime() {
           </div>
           <div class="player-roster-info">
             <strong class="player-roster-name ${nameClass}">${p.username}</strong>
-            <div class="player-roster-title ${titleClass}">${titleText}</div>
+            ${showTitle ? `<div class="player-roster-title ${titleClass}">${titleText}</div>` : ""}
           </div>
         </div>
         <div class="player-roster-right">
