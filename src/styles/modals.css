@@ -2034,6 +2034,294 @@
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 3px rgba(124, 58, 237, 0.4)) !important;
 }
 
+/* ==================== ÚJ JUTALOM NÉV SZÍNEK (EGYSZÍNŰEK) ==================== */
+.name-color-novice {
+  color: #10b981 !important;
+  background: none !important;
+  -webkit-text-fill-color: #10b981 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+  filter: drop-shadow(0 0 2px rgba(16, 185, 129, 0.4)) !important;
+}
+.name-color-practiced {
+  color: #cbd5e1 !important;
+  background: none !important;
+  -webkit-text-fill-color: #cbd5e1 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+  filter: drop-shadow(0 0 2px rgba(203, 213, 225, 0.4)) !important;
+}
+.name-color-hardened {
+  color: #3b82f6 !important;
+  background: none !important;
+  -webkit-text-fill-color: #3b82f6 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+  filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.4)) !important;
+}
+.name-color-veteran {
+  color: #f97316 !important;
+  background: none !important;
+  -webkit-text-fill-color: #f97316 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+  filter: drop-shadow(0 0 2px rgba(249, 115, 22, 0.4)) !important;
+}
+.name-color-elite {
+  color: #06b6d4 !important;
+  background: none !important;
+  -webkit-text-fill-color: #06b6d4 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+  filter: drop-shadow(0 0 2px rgba(6, 182, 212, 0.4)) !important;
+}
+.name-color-champion {
+  color: #f59e0b !important;
+  background: none !important;
+  -webkit-text-fill-color: #f59e0b !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+  filter: drop-shadow(0 0 2px rgba(245, 158, 11, 0.4)) !important;
+}
+.name-color-copper {
+  color: #d97706 !important;
+  background: none !important;
+  -webkit-text-fill-color: #d97706 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+  filter: drop-shadow(0 0 2px rgba(217, 119, 6, 0.4)) !important;
+}
+.name-color-silver {
+  color: #e2e8f0 !important;
+  background: none !important;
+  -webkit-text-fill-color: #e2e8f0 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+  filter: drop-shadow(0 0 2px rgba(226, 232, 240, 0.4)) !important;
+}
+.name-color-gold-rec {
+  color: #eab308 !important;
+  background: none !important;
+  -webkit-text-fill-color: #eab308 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+  filter: drop-shadow(0 0 2px rgba(234, 179, 8, 0.4)) !important;
+}
+.name-color-arena-green {
+  color: #22c55e !important;
+  background: none !important;
+  -webkit-text-fill-color: #22c55e !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+  filter: drop-shadow(0 0 2px rgba(34, 197, 94, 0.4)) !important;
+}
+.name-color-arena-blue {
+  color: #38bdf8 !important;
+  background: none !important;
+  -webkit-text-fill-color: #38bdf8 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+  filter: drop-shadow(0 0 2px rgba(56, 189, 248, 0.4)) !important;
+}
+.name-color-arena-orange {
+  color: #fb923c !important;
+  background: none !important;
+  -webkit-text-fill-color: #fb923c !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+  filter: drop-shadow(0 0 2px rgba(251, 146, 60, 0.4)) !important;
+}
+
+/* ==================== ÚJ JUTALOM NÉV SZÍNEK (SPECIÁLIS 2 SZÍNŰ ÁTMENETEK) ==================== */
+.name-special-master {
+  background: linear-gradient(135deg, #c084fc, #3b82f6) !important;
+  display: inline-block !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 3px rgba(168, 85, 247, 0.4)) !important;
+}
+.name-special-knight {
+  background: linear-gradient(135deg, #93c5fd, #64748b) !important;
+  display: inline-block !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 3px rgba(147, 197, 253, 0.4)) !important;
+}
+.name-special-titan {
+  background: linear-gradient(135deg, #facc15, #ec4899) !important;
+  display: inline-block !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 3px rgba(250, 204, 21, 0.4)) !important;
+}
+.name-special-phoenix {
+  background: linear-gradient(135deg, #fde047, #ef4444) !important;
+  display: inline-block !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 3px rgba(239, 68, 68, 0.4)) !important;
+}
+.name-special-immortal {
+  background: linear-gradient(135deg, #6ee7b7, #0284c7) !important;
+  display: inline-block !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 3px rgba(110, 231, 183, 0.4)) !important;
+}
+.name-special-platinum {
+  background: linear-gradient(135deg, #f8fafc, #60a5fa) !important;
+  display: inline-block !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 3px rgba(96, 165, 250, 0.4)) !important;
+}
+.name-special-emerald {
+  background: linear-gradient(135deg, #34d399, #a3e635) !important;
+  display: inline-block !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 3px rgba(52, 211, 153, 0.4)) !important;
+}
+.name-special-obsidian {
+  background: linear-gradient(135deg, #a855f7, #dc2626) !important;
+  display: inline-block !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 3px rgba(220, 38, 38, 0.4)) !important;
+}
+.name-special-addict {
+  background: linear-gradient(135deg, #f472b6, #a855f7) !important;
+  display: inline-block !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 3px rgba(244, 114, 182, 0.4)) !important;
+}
+.name-special-centurion {
+  background: linear-gradient(135deg, #fbbf24, #ef4444) !important;
+  display: inline-block !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 3px rgba(251, 191, 36, 0.4)) !important;
+}
+.name-special-pillar {
+  background: linear-gradient(135deg, #c084fc, #06b6d4) !important;
+  display: inline-block !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 3px rgba(6, 182, 212, 0.4)) !important;
+}
+
+/* ==================== ÚJ JUTALOM NÉV SZÍNEK (MÍTIKUS ANIMÁLT ÁTMENETEK) ==================== */
+.name-mythic-worldbreaker {
+  background: linear-gradient(90deg, #ef4444, #f97316, #fbbf24, #a855f7, #ef4444) !important;
+  background-size: 280% auto !important;
+  animation: mythicGradientFlow 3.5s ease-in-out infinite !important;
+  display: inline-block !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 4px rgba(239, 68, 68, 0.45)) !important;
+}
+.name-mythic-eternal {
+  background: linear-gradient(90deg, #10b981, #06b6d4, #fde047, #14b8a6, #10b981) !important;
+  background-size: 280% auto !important;
+  animation: mythicGradientFlow 3.5s ease-in-out infinite !important;
+  display: inline-block !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 4px rgba(6, 182, 212, 0.45)) !important;
+}
+.name-mythic-starcleaver {
+  background: linear-gradient(90deg, #38bdf8, #818cf8, #c084fc, #f472b6, #38bdf8) !important;
+  background-size: 280% auto !important;
+  animation: mythicGradientFlow 3.5s ease-in-out infinite !important;
+  display: inline-block !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 4px rgba(192, 132, 252, 0.45)) !important;
+}
+.name-mythic-omnipotent {
+  background: linear-gradient(90deg, #ffffff, #facc15, #ec4899, #a855f7, #38bdf8, #ffffff) !important;
+  background-size: 300% auto !important;
+  animation: mythicGradientFlow 3s ease-in-out infinite !important;
+  display: inline-block !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 4px rgba(250, 204, 21, 0.5)) !important;
+}
+.name-mythic-meteorite {
+  background: linear-gradient(90deg, #dc2626, #ea580c, #f59e0b, #fde047, #dc2626) !important;
+  background-size: 280% auto !important;
+  animation: mythicGradientFlow 3.5s ease-in-out infinite !important;
+  display: inline-block !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 4px rgba(234, 88, 12, 0.45)) !important;
+}
+.name-mythic-quantum {
+  background: linear-gradient(90deg, #34d399, #22d3ee, #06b6d4, #a855f7, #34d399) !important;
+  background-size: 280% auto !important;
+  animation: mythicGradientFlow 3.5s ease-in-out infinite !important;
+  display: inline-block !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 4px rgba(34, 211, 238, 0.45)) !important;
+}
+.name-mythic-antimatter {
+  background: linear-gradient(90deg, #ec4899, #8b5cf6, #3b82f6, #a855f7, #ec4899) !important;
+  background-size: 280% auto !important;
+  animation: mythicGradientFlow 3.5s ease-in-out infinite !important;
+  display: inline-block !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 4px rgba(236, 72, 153, 0.45)) !important;
+}
+.name-mythic-unstoppable {
+  background: linear-gradient(90deg, #ef4444, #f97316, #facc15, #a855f7, #ef4444) !important;
+  background-size: 280% auto !important;
+  animation: mythicGradientFlow 3.5s ease-in-out infinite !important;
+  display: inline-block !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 4px rgba(239, 68, 68, 0.45)) !important;
+}
+.name-mythic-infinite {
+  background: linear-gradient(90deg, #10b981, #06b6d4, #6366f1, #f472b6, #10b981) !important;
+  background-size: 280% auto !important;
+  animation: mythicGradientFlow 3.5s ease-in-out infinite !important;
+  display: inline-block !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 4px rgba(6, 182, 212, 0.45)) !important;
+}
+
 /* Név szín választó rács a profilban */
 .profile-name-color-grid {
   display: grid;
@@ -2287,9 +2575,8 @@
   background: linear-gradient(135deg, rgba(236, 72, 153, 0.25), rgba(168, 85, 247, 0.35));
   color: #f472b6;
   border: 1px solid rgba(244, 114, 182, 0.5);
-  box-shadow: 0 0 6px rgba(236, 72, 153, 0.35);
+  box-shadow: 0 0 4px rgba(236, 72, 153, 0.25);
   letter-spacing: 0.5px;
-  animation: mythicTagGlow 2.5s ease-in-out infinite;
 }
 
 /* ==================== MECCS ELŐZMÉNYEK (MATCH HISTORY) ==================== */

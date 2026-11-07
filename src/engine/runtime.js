@@ -1721,47 +1721,21 @@ export function initCrashdownRuntime() {
       }
     }
 
-    const cVal =
-      colorCount || document.getElementById("colorSelect")?.value || "3";
-    if (String(cVal) === "5" && numScore >= 2000) {
-      checkAchievement("ach_master_5_color");
-      checkAchievement("master_5_color");
-    }
-
     const mVal =
       modifier || document.getElementById("modeSelect")?.value || "normal";
-    if (mVal === "chaos" && numScore >= 5000) {
-      checkAchievement("ach_mode_chaos_win");
-      checkAchievement("mode_chaos_win");
-    }
-    if (mVal === "bomb_frenzy" && numScore >= 5000) {
-      checkAchievement("ach_mode_bomb_win");
-      checkAchievement("mode_bomb_win");
-    }
-    if (mVal === "time_rush" && numScore >= 5000) {
-      checkAchievement("ach_mode_time_win");
-      checkAchievement("mode_time_win");
-    }
-    if (mVal === "no_powerups" && numScore >= 3000) {
-      checkAchievement("ach_mode_raw_win");
-      checkAchievement("mode_raw_win");
-    }
-
-    const dVal =
-      durationSeconds !== null && durationSeconds !== undefined
-        ? parseInt(durationSeconds, 10)
-        : parseInt(document.getElementById("timeSelect")?.value || "60", 10);
-    if (dVal === 30 && numScore >= 5000) {
-      checkAchievement("ach_sprint_5k");
-      checkAchievement("sprint_5k");
-    }
-    if (dVal === 30 && numScore >= 8000) {
-      checkAchievement("ach_sprint_8k");
-    }
-    if (dVal === 180 && numScore >= 15000) {
-      checkAchievement("ach_marathon_15k");
-      checkAchievement("marathon_15k");
-    }
+    const checkModeScores = (mode, prefix) => {
+      if (mVal === mode) {
+        if (numScore >= 5000) checkAchievement(`${prefix}_5k`);
+        if (numScore >= 25000) checkAchievement(`${prefix}_25k`);
+        if (numScore >= 50000) checkAchievement(`${prefix}_50k`);
+        if (numScore >= 100000) checkAchievement(`${prefix}_100k`);
+        if (numScore >= 250000) checkAchievement(`${prefix}_250k`);
+      }
+    };
+    checkModeScores("chaos", "ach_chaos");
+    checkModeScores("bomb_frenzy", "ach_bomb");
+    checkModeScores("time_rush", "ach_timerush");
+    checkModeScores("no_powerups", "ach_raw");
   }
 
   function checkAchievement(id) {
@@ -2086,36 +2060,20 @@ export function initCrashdownRuntime() {
           }
         }
 
-        // Mód szerinti győzelmek
-        if (modKey === "chaos" && numericScore >= 5000) {
-          checkAchievement("ach_mode_chaos_win");
-          checkAchievement("mode_chaos_win");
-        }
-        if (modKey === "bomb_frenzy" && numericScore >= 5000) {
-          checkAchievement("ach_mode_bomb_win");
-          checkAchievement("mode_bomb_win");
-        }
-        if (modKey === "time_rush" && numericScore >= 5000) {
-          checkAchievement("ach_mode_time_win");
-          checkAchievement("mode_time_win");
-        }
-        if (modKey === "no_powerups" && numericScore >= 3000) {
-          checkAchievement("ach_mode_raw_win");
-          checkAchievement("mode_raw_win");
-        }
-
-        // Időtartam rekordok
-        if (durSec === 30 && numericScore >= 5000) {
-          checkAchievement("ach_sprint_5k");
-          checkAchievement("sprint_5k");
-        }
-        if (durSec === 30 && numericScore >= 8000) {
-          checkAchievement("ach_sprint_8k");
-        }
-        if (durSec === 180 && numericScore >= 15000) {
-          checkAchievement("ach_marathon_15k");
-          checkAchievement("marathon_15k");
-        }
+        // Mód szerinti pontszámok (5 szint a 4 speciális játékmódhoz)
+        const checkEndModeScores = (mode, prefix) => {
+          if (modKey === mode) {
+            if (numericScore >= 5000) checkAchievement(`${prefix}_5k`);
+            if (numericScore >= 25000) checkAchievement(`${prefix}_25k`);
+            if (numericScore >= 50000) checkAchievement(`${prefix}_50k`);
+            if (numericScore >= 100000) checkAchievement(`${prefix}_100k`);
+            if (numericScore >= 250000) checkAchievement(`${prefix}_250k`);
+          }
+        };
+        checkEndModeScores("chaos", "ach_chaos");
+        checkEndModeScores("bomb_frenzy", "ach_bomb");
+        checkEndModeScores("time_rush", "ach_timerush");
+        checkEndModeScores("no_powerups", "ach_raw");
 
         // Változatosság mérföldkövek
         const all5Modes = [
@@ -2146,10 +2104,6 @@ export function initCrashdownRuntime() {
         if (allColors.every((c) => p.modes[c] && p.modes[c].matches > 0)) {
           checkAchievement("ach_all_colors_played");
           checkAchievement("all_colors_played");
-        }
-        if (cKey === "5" && numericScore >= 2000) {
-          checkAchievement("ach_master_5_color");
-          checkAchievement("master_5_color");
         }
       }
 
@@ -3496,9 +3450,10 @@ export function initCrashdownRuntime() {
     const themeSortSelect = document.getElementById("sortThemesSelect");
 
     if (themeSection && themeGrid) {
-      themeSection.style.display = "block";
+      if (canManageCustomization) {
+        themeSection.style.display = "block";
 
-      let clientUnlockedThemes = ["retro", "cyber"];
+        let clientUnlockedThemes = ["retro", "cyber"];
       const myUser = window.authService?.getCurrentUser();
       if (myUser && myUser.displayName) {
         try {
@@ -3766,7 +3721,10 @@ export function initCrashdownRuntime() {
       } else {
         renderThemeCards("default");
       }
+    } else {
+      themeSection.style.display = "none";
     }
+  }
 
     // 5. Név színének választása (kártyás nézet, rendezhető)
     const nameColorSection = document.getElementById("profileNameColorSection");
@@ -5883,29 +5841,6 @@ export function initCrashdownRuntime() {
     comboStreak++;
     comboMultiplier = Math.min(6, 1 + Math.floor(comboStreak / 2));
 
-    if (comboMultiplier >= 2) {
-      checkAchievement("combo_x2");
-      checkAchievement("ach_combo_x2");
-    }
-    if (comboMultiplier >= 3) {
-      checkAchievement("combo_x3");
-      checkAchievement("ach_combo_x3");
-    }
-    if (comboMultiplier >= 4) {
-      checkAchievement("combo_x4");
-      checkAchievement("ach_combo_x4");
-    }
-    if (comboMultiplier >= 5) {
-      checkAchievement("combo_x5");
-      checkAchievement("ach_combo_x5");
-    }
-    if (comboMultiplier >= 6) {
-      checkAchievement("lightning_combo_6");
-      checkAchievement("ach_lightning_combo_6");
-    }
-    if (comboStreak >= 7) checkAchievement("ach_combo_x7");
-    if (comboStreak >= 8) checkAchievement("ach_combo_x8");
-
     if (comboResetTimeout) clearTimeout(comboResetTimeout);
     comboResetTimeout = setTimeout(() => {
       comboStreak = 0;
@@ -6122,6 +6057,28 @@ export function initCrashdownRuntime() {
       triggerHaptic("success");
       checkAchievement("perfect_clear");
       checkAchievement("ach_perfect_clear_board");
+      checkAchievement("ach_perfect_clear_1");
+
+      let pCount = 1;
+      const currentUser = window.authService?.getCurrentUser();
+      const username = currentUser?.displayName;
+      if (username) {
+        try {
+          const key = "crashdown_profiles_data";
+          const profiles = JSON.parse(localStorage.getItem(key) || "{}");
+          if (profiles[username]) {
+            profiles[username].totalPerfectClears =
+              (profiles[username].totalPerfectClears || 0) + 1;
+            pCount = profiles[username].totalPerfectClears;
+            localStorage.setItem(key, JSON.stringify(profiles));
+          }
+        } catch (_) {}
+      }
+      if (pCount >= 5) checkAchievement("ach_perfect_clear_5");
+      if (pCount >= 15) checkAchievement("ach_perfect_clear_15");
+      if (pCount >= 25) checkAchievement("ach_perfect_clear_25");
+      if (pCount >= 50) checkAchievement("ach_perfect_clear_50");
+      if (pCount >= 100) checkAchievement("ach_perfect_clear_100");
 
       shockwaves.push({
         x: LOGICAL_SIZE / 2,
@@ -6520,30 +6477,50 @@ export function initCrashdownRuntime() {
         triggerHaptic("light");
         checkAchievement("first_match");
         checkAchievement("ach_first_click");
-        if (torlendoNegyzetek.length >= 8) {
+        const count = torlendoNegyzetek.length;
+        if (count >= 4) checkAchievement("ach_clear_blocks_4");
+        if (count >= 6) checkAchievement("ach_clear_blocks_6");
+        if (count >= 8) {
           checkAchievement("mega_clear");
           checkAchievement("ach_mega_clear_8");
+          checkAchievement("ach_clear_blocks_8");
         }
-        if (torlendoNegyzetek.length >= 12) {
+        if (count >= 10) checkAchievement("ach_clear_blocks_10");
+        if (count >= 12) {
           checkAchievement("hyper_clear");
           checkAchievement("ach_hyper_clear_12");
+          checkAchievement("ach_clear_blocks_12");
         }
-        if (torlendoNegyzetek.length >= 16) {
+        if (count >= 14) checkAchievement("ach_clear_blocks_14");
+        if (count >= 16) {
           checkAchievement("massive_clear_16");
           checkAchievement("ach_massive_clear_16");
+          checkAchievement("ach_clear_blocks_16");
         }
-        if (torlendoNegyzetek.length >= 20) {
+        if (count >= 18) checkAchievement("ach_clear_blocks_18");
+        if (count >= 20) {
           checkAchievement("ach_massive_clear_20");
+          checkAchievement("ach_clear_blocks_20");
         }
+        if (count >= 24) checkAchievement("ach_clear_blocks_24");
+        if (count >= 28) checkAchievement("ach_clear_blocks_28");
+        if (count >= 32) checkAchievement("ach_clear_blocks_32");
+        if (count >= 36) checkAchievement("ach_clear_blocks_36");
+        if (count >= 40) checkAchievement("ach_clear_blocks_40");
 
         recentSuccessfulClicks.push(Date.now());
         recentSuccessfulClicks = recentSuccessfulClicks.filter(
           (t) => Date.now() - t <= 10000,
         );
-        if (recentSuccessfulClicks.length >= 8) {
+        const rCount = recentSuccessfulClicks.length;
+        if (rCount >= 8) {
           checkAchievement("speed_demon");
           checkAchievement("ach_speed_demon_8");
         }
+        if (rCount >= 12) checkAchievement("ach_speed_demon_12");
+        if (rCount >= 16) checkAchievement("ach_speed_demon_16");
+        if (rCount >= 24) checkAchievement("ach_speed_demon_24");
+        if (rCount >= 32) checkAchievement("ach_speed_demon_32");
         const mult = regisztraljKomboLepest();
 
         for (let i = 0; i < torlendoNegyzetek.length; i++) {
