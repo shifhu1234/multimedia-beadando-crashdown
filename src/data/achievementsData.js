@@ -1126,12 +1126,17 @@ export function getAchievementRewards(achId, catalogs = {}) {
   }
   if (linkedColor) {
     const cleanColor = cleanSymbolText(linkedColor.name);
-    const spec = linkedColor.isSpecial ? " (speciális)" : "";
+    const spec = linkedColor.isMythic
+      ? " (mítikus)"
+      : linkedColor.isSpecial
+        ? " (speciális)"
+        : "";
     rewList.push({
       type: "color",
       colorName: cleanColor,
       className: linkedColor.className,
       isSpecial: linkedColor.isSpecial,
+      isMythic: linkedColor.isMythic,
       text: `Név szín: ${cleanColor}${spec}`,
     });
   }

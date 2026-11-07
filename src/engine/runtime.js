@@ -3757,6 +3757,11 @@ export function initCrashdownRuntime() {
               const lockTitle = reqAch
                 ? `Zárolva: ${reqAch.title} (${reqAch.desc}) szükséges hozzá!`
                 : "Zárolva";
+              const colorBadge = col.isMythic
+                ? '<span class="title-pick-mythic-tag">Mítikus</span>'
+                : col.isSpecial
+                  ? '<span class="title-pick-special-tag">Speciális</span>'
+                  : "";
               return `
               <div class="name-color-pick-card ${unlocked ? "" : "locked"} ${isSelected ? "active" : ""} ${isAdmin ? "admin-manageable" : ""}"
                    data-color-id="${col.id}"
@@ -3776,7 +3781,7 @@ export function initCrashdownRuntime() {
                         : ""
                   }
                   <span class="name-color-preview-text ${col.className}">Aa</span>
-                  <span class="name-color-label">${col.name}${col.isSpecial ? " (speciális)" : ""}</span>
+                  <span class="name-color-label">${col.name} ${colorBadge}</span>
               </div>
             `;
             })

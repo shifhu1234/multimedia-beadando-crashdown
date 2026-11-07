@@ -138,11 +138,12 @@ export function PlayerProfileModal() {
                   defaultValue="default"
                 >
                   <option value="default">Alapértelmezett</option>
-                  <option value="alpha_asc">ABC (A → Z)</option>
-                  <option value="alpha_desc">ABC (Z → A)</option>
+                  <option value="mythic_first">Mítikus elöl</option>
+                  <option value="special_first">Speciális elöl</option>
                   <option value="unlocked_first">Feloldott elöl</option>
                   <option value="locked_first">Zárolt elöl</option>
-                  <option value="special_first">Speciális elöl</option>
+                  <option value="alpha_asc">ABC (A → Z)</option>
+                  <option value="alpha_desc">ABC (Z → A)</option>
                 </select>
               </div>
             </div>
@@ -171,11 +172,12 @@ export function PlayerProfileModal() {
                   defaultValue="default"
                 >
                   <option value="default">Alapértelmezett</option>
-                  <option value="alpha_asc">ABC (A → Z)</option>
-                  <option value="alpha_desc">ABC (Z → A)</option>
+                  <option value="mythic_first">Mítikus elöl</option>
+                  <option value="special_first">Speciális elöl</option>
                   <option value="unlocked_first">Feloldott elöl</option>
                   <option value="locked_first">Zárolt elöl</option>
-                  <option value="special_first">Speciális elöl</option>
+                  <option value="alpha_asc">ABC (A → Z)</option>
+                  <option value="alpha_desc">ABC (Z → A)</option>
                 </select>
               </div>
             </div>
@@ -237,11 +239,12 @@ export function PlayerProfileModal() {
                   defaultValue="default"
                 >
                   <option value="default">Alapértelmezett</option>
-                  <option value="alpha_asc">ABC (A → Z)</option>
-                  <option value="alpha_desc">ABC (Z → A)</option>
+                  <option value="mythic_first">Mítikus elöl</option>
+                  <option value="special_first">Speciális elöl</option>
                   <option value="unlocked_first">Feloldott elöl</option>
                   <option value="locked_first">Zárolt elöl</option>
-                  <option value="special_first">Speciális elöl</option>
+                  <option value="alpha_asc">ABC (A → Z)</option>
+                  <option value="alpha_desc">ABC (Z → A)</option>
                 </select>
               </div>
             </div>
