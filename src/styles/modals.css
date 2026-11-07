@@ -1210,6 +1210,162 @@
   color: #fde047 !important;
 }
 
+/* ==================== MÉRKŐZÉSSZÁM (MATCHES) RANGCÍMEK ==================== */
+/* Sima színek (10 - 30 meccs) */
+.title-solid-regular-arena {
+  color: #38bdf8 !important;
+  font-weight: 800 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7), 0 0 4px rgba(56, 189, 248, 0.35) !important;
+}
+.profile-player-badge.title-solid-regular-arena {
+  border-color: rgba(56, 189, 248, 0.6) !important;
+  box-shadow: 0 0 6px rgba(56, 189, 248, 0.25) !important;
+  color: #38bdf8 !important;
+}
+
+.title-solid-steadfast-arena {
+  color: #34d399 !important;
+  font-weight: 800 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7), 0 0 4px rgba(52, 211, 153, 0.35) !important;
+}
+.profile-player-badge.title-solid-steadfast-arena {
+  border-color: rgba(52, 211, 153, 0.6) !important;
+  box-shadow: 0 0 6px rgba(52, 211, 153, 0.25) !important;
+  color: #34d399 !important;
+}
+
+.title-solid-resolute-arena {
+  color: #fb923c !important;
+  font-weight: 800 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7), 0 0 4px rgba(251, 146, 60, 0.35) !important;
+}
+.profile-player-badge.title-solid-resolute-arena {
+  border-color: rgba(251, 146, 60, 0.6) !important;
+  box-shadow: 0 0 6px rgba(251, 146, 60, 0.25) !important;
+  color: #fb923c !important;
+}
+
+.title-solid-core-arena {
+  color: #facc15 !important;
+  font-weight: 800 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7), 0 0 4px rgba(250, 204, 21, 0.35) !important;
+}
+.profile-player-badge.title-solid-core-arena {
+  border-color: rgba(250, 204, 21, 0.6) !important;
+  box-shadow: 0 0 6px rgba(250, 204, 21, 0.25) !important;
+  color: #facc15 !important;
+}
+
+/* Speciális 2 színű átmenetek (50 - 150 meccs) */
+.title-gradient-addict-arena {
+  background: linear-gradient(90deg, #ec4899, #8b5cf6) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.profile-player-badge.title-gradient-addict-arena {
+  border-color: rgba(236, 72, 153, 0.6) !important;
+  box-shadow: 0 0 6px rgba(139, 92, 246, 0.3) !important;
+  color: #f472b6 !important;
+}
+
+.title-gradient-unbreakable-arena {
+  background: linear-gradient(90deg, #0ea5e9, #10b981) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.profile-player-badge.title-gradient-unbreakable-arena {
+  border-color: rgba(14, 165, 233, 0.6) !important;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.3) !important;
+  color: #38bdf8 !important;
+}
+
+.title-gradient-centurion-arena {
+  background: linear-gradient(90deg, #f59e0b, #dc2626) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.profile-player-badge.title-gradient-centurion-arena {
+  border-color: rgba(245, 158, 11, 0.6) !important;
+  box-shadow: 0 0 6px rgba(220, 38, 38, 0.3) !important;
+  color: #f97316 !important;
+}
+
+.title-gradient-pillar-arena {
+  background: linear-gradient(90deg, #7c3aed, #06b6d4) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.profile-player-badge.title-gradient-pillar-arena {
+  border-color: rgba(124, 58, 237, 0.6) !important;
+  box-shadow: 0 0 6px rgba(6, 182, 212, 0.3) !important;
+  color: #a78bfa !important;
+}
+
+/* Mítikus többszínű átmenetek áramló animációval (225 - 500 meccs) */
+.title-mythic-unwavering-arena {
+  background: linear-gradient(90deg, #10b981, #06b6d4, #6366f1, #f472b6, #10b981) !important;
+  background-size: 280% auto !important;
+  animation: mythicGradientFlow 3.5s ease-in-out infinite !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 900 !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 3px rgba(6, 182, 212, 0.35)) !important;
+}
+.profile-player-badge.title-mythic-unwavering-arena {
+  border-color: rgba(6, 182, 212, 0.8) !important;
+  box-shadow: 0 0 8px rgba(6, 182, 212, 0.35), inset 0 0 4px rgba(99, 102, 241, 0.2) !important;
+  color: #22d3ee !important;
+}
+
+.title-mythic-unstoppable-arena {
+  background: linear-gradient(90deg, #ef4444, #f97316, #facc15, #a855f7, #ef4444) !important;
+  background-size: 280% auto !important;
+  animation: mythicGradientFlow 3.5s ease-in-out infinite !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 900 !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 3px rgba(239, 68, 68, 0.35)) !important;
+}
+.profile-player-badge.title-mythic-unstoppable-arena {
+  border-color: rgba(239, 68, 68, 0.8) !important;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.35), inset 0 0 4px rgba(249, 115, 22, 0.2) !important;
+  color: #f87171 !important;
+}
+
+.title-mythic-primordial-arena {
+  background: linear-gradient(90deg, #7c3aed, #ec4899, #f43f5e, #facc15, #7c3aed) !important;
+  background-size: 280% auto !important;
+  animation: mythicGradientFlow 3.5s ease-in-out infinite !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 900 !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 3px rgba(236, 72, 153, 0.35)) !important;
+}
+.profile-player-badge.title-mythic-primordial-arena {
+  border-color: rgba(236, 72, 153, 0.8) !important;
+  box-shadow: 0 0 8px rgba(124, 58, 237, 0.35), inset 0 0 4px rgba(244, 63, 94, 0.2) !important;
+  color: #f472b6 !important;
+}
+
+.title-mythic-infinite-arena {
+  background: linear-gradient(90deg, #ffffff, #38bdf8, #8b5cf6, #ec4899, #fde047, #ffffff) !important;
+  background-size: 300% auto !important;
+  animation: mythicGradientFlow 3s ease-in-out infinite !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 900 !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 4px rgba(56, 189, 248, 0.4)) !important;
+}
+.profile-player-badge.title-mythic-infinite-arena {
+  border-color: rgba(56, 189, 248, 0.9) !important;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.4), inset 0 0 6px rgba(139, 92, 246, 0.25) !important;
+  color: #e0f2fe !important;
+}
+
 .profile-title-select-wrap {
   margin-left: auto;
   margin-right: 12px;
@@ -2271,7 +2427,163 @@
     gap: 10px;
   }
 
-  .profile-title-select-wrap {
+  /* ==================== MÉRKŐZÉSSZÁM (MATCHES) RANGCÍMEK ==================== */
+/* Sima színek (10 - 30 meccs) */
+.title-solid-regular-arena {
+  color: #38bdf8 !important;
+  font-weight: 800 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7), 0 0 4px rgba(56, 189, 248, 0.35) !important;
+}
+.profile-player-badge.title-solid-regular-arena {
+  border-color: rgba(56, 189, 248, 0.6) !important;
+  box-shadow: 0 0 6px rgba(56, 189, 248, 0.25) !important;
+  color: #38bdf8 !important;
+}
+
+.title-solid-steadfast-arena {
+  color: #34d399 !important;
+  font-weight: 800 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7), 0 0 4px rgba(52, 211, 153, 0.35) !important;
+}
+.profile-player-badge.title-solid-steadfast-arena {
+  border-color: rgba(52, 211, 153, 0.6) !important;
+  box-shadow: 0 0 6px rgba(52, 211, 153, 0.25) !important;
+  color: #34d399 !important;
+}
+
+.title-solid-resolute-arena {
+  color: #fb923c !important;
+  font-weight: 800 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7), 0 0 4px rgba(251, 146, 60, 0.35) !important;
+}
+.profile-player-badge.title-solid-resolute-arena {
+  border-color: rgba(251, 146, 60, 0.6) !important;
+  box-shadow: 0 0 6px rgba(251, 146, 60, 0.25) !important;
+  color: #fb923c !important;
+}
+
+.title-solid-core-arena {
+  color: #facc15 !important;
+  font-weight: 800 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7), 0 0 4px rgba(250, 204, 21, 0.35) !important;
+}
+.profile-player-badge.title-solid-core-arena {
+  border-color: rgba(250, 204, 21, 0.6) !important;
+  box-shadow: 0 0 6px rgba(250, 204, 21, 0.25) !important;
+  color: #facc15 !important;
+}
+
+/* Speciális 2 színű átmenetek (50 - 150 meccs) */
+.title-gradient-addict-arena {
+  background: linear-gradient(90deg, #ec4899, #8b5cf6) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.profile-player-badge.title-gradient-addict-arena {
+  border-color: rgba(236, 72, 153, 0.6) !important;
+  box-shadow: 0 0 6px rgba(139, 92, 246, 0.3) !important;
+  color: #f472b6 !important;
+}
+
+.title-gradient-unbreakable-arena {
+  background: linear-gradient(90deg, #0ea5e9, #10b981) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.profile-player-badge.title-gradient-unbreakable-arena {
+  border-color: rgba(14, 165, 233, 0.6) !important;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.3) !important;
+  color: #38bdf8 !important;
+}
+
+.title-gradient-centurion-arena {
+  background: linear-gradient(90deg, #f59e0b, #dc2626) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.profile-player-badge.title-gradient-centurion-arena {
+  border-color: rgba(245, 158, 11, 0.6) !important;
+  box-shadow: 0 0 6px rgba(220, 38, 38, 0.3) !important;
+  color: #f97316 !important;
+}
+
+.title-gradient-pillar-arena {
+  background: linear-gradient(90deg, #7c3aed, #06b6d4) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+.profile-player-badge.title-gradient-pillar-arena {
+  border-color: rgba(124, 58, 237, 0.6) !important;
+  box-shadow: 0 0 6px rgba(6, 182, 212, 0.3) !important;
+  color: #a78bfa !important;
+}
+
+/* Mítikus többszínű átmenetek áramló animációval (225 - 500 meccs) */
+.title-mythic-unwavering-arena {
+  background: linear-gradient(90deg, #10b981, #06b6d4, #6366f1, #f472b6, #10b981) !important;
+  background-size: 280% auto !important;
+  animation: mythicGradientFlow 3.5s ease-in-out infinite !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 900 !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 3px rgba(6, 182, 212, 0.35)) !important;
+}
+.profile-player-badge.title-mythic-unwavering-arena {
+  border-color: rgba(6, 182, 212, 0.8) !important;
+  box-shadow: 0 0 8px rgba(6, 182, 212, 0.35), inset 0 0 4px rgba(99, 102, 241, 0.2) !important;
+  color: #22d3ee !important;
+}
+
+.title-mythic-unstoppable-arena {
+  background: linear-gradient(90deg, #ef4444, #f97316, #facc15, #a855f7, #ef4444) !important;
+  background-size: 280% auto !important;
+  animation: mythicGradientFlow 3.5s ease-in-out infinite !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 900 !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 3px rgba(239, 68, 68, 0.35)) !important;
+}
+.profile-player-badge.title-mythic-unstoppable-arena {
+  border-color: rgba(239, 68, 68, 0.8) !important;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.35), inset 0 0 4px rgba(249, 115, 22, 0.2) !important;
+  color: #f87171 !important;
+}
+
+.title-mythic-primordial-arena {
+  background: linear-gradient(90deg, #7c3aed, #ec4899, #f43f5e, #facc15, #7c3aed) !important;
+  background-size: 280% auto !important;
+  animation: mythicGradientFlow 3.5s ease-in-out infinite !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 900 !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 3px rgba(236, 72, 153, 0.35)) !important;
+}
+.profile-player-badge.title-mythic-primordial-arena {
+  border-color: rgba(236, 72, 153, 0.8) !important;
+  box-shadow: 0 0 8px rgba(124, 58, 237, 0.35), inset 0 0 4px rgba(244, 63, 94, 0.2) !important;
+  color: #f472b6 !important;
+}
+
+.title-mythic-infinite-arena {
+  background: linear-gradient(90deg, #ffffff, #38bdf8, #8b5cf6, #ec4899, #fde047, #ffffff) !important;
+  background-size: 300% auto !important;
+  animation: mythicGradientFlow 3s ease-in-out infinite !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 900 !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 4px rgba(56, 189, 248, 0.4)) !important;
+}
+.profile-player-badge.title-mythic-infinite-arena {
+  border-color: rgba(56, 189, 248, 0.9) !important;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.4), inset 0 0 6px rgba(139, 92, 246, 0.25) !important;
+  color: #e0f2fe !important;
+}
+
+.profile-title-select-wrap {
     margin-left: 0;
     margin-right: 0;
     width: 100%;
