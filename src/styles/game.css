@@ -375,13 +375,16 @@ select:disabled {
     background: var(--bg-card);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
-    padding: 7px 10px;
-    height: 52px;
+    padding: 8px 10px;
+    height: auto;
+    min-height: 52px;
     flex-shrink: 0;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    gap: 8px;
 }
 
+.audio-row,
 .audio-header {
     display: flex;
     align-items: center;
@@ -405,6 +408,16 @@ select:disabled {
 
 .vol-btn:hover { background: #1b2232; border-color: var(--border-hover); }
 
+.vol-sfx-badge {
+    cursor: default;
+    background: rgba(20, 184, 166, 0.12);
+    border-color: rgba(20, 184, 166, 0.25);
+}
+.vol-sfx-badge:hover {
+    background: rgba(20, 184, 166, 0.18);
+    border-color: rgba(20, 184, 166, 0.35);
+}
+
 #toggleVol {
     width: 16px;
     height: 16px;
@@ -416,7 +429,7 @@ select:disabled {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 5px;
 }
 
 .audio-label-row {
@@ -428,17 +441,28 @@ select:disabled {
     line-height: 1;
 }
 
-#volumeValue { font-family: var(--font-mono); }
-#volumeSlider {
+#volumeValue,
+#sfxVolumeValue { font-family: var(--font-mono); }
+
+#volumeSlider,
+#sfxSlider {
     width: 100%;
-    accent-color: var(--color-blue);
     cursor: pointer;
     margin: 2px 0 0 0;
     height: 5px;
     border-radius: 3px;
 }
 
-#volumeSlider::-webkit-slider-thumb {
+#volumeSlider {
+    accent-color: var(--color-blue);
+}
+
+#sfxSlider {
+    accent-color: var(--color-teal, #14b8a6);
+}
+
+#volumeSlider::-webkit-slider-thumb,
+#sfxSlider::-webkit-slider-thumb {
     width: 12px;
     height: 12px;
     border-radius: 50%;
