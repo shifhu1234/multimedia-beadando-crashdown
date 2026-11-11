@@ -1420,28 +1420,51 @@ export function initCrashdownRuntime() {
     pop: 0.35,
   };
 
-  let toggledVOlume = localStorage.getItem("crashdownMuted") === "true";
-  let masterVolume = parseFloat(
-    localStorage.getItem("crashdownVolume") ?? "0.35",
+  let musicMuted =
+    localStorage.getItem("crashdownMusicMuted") !== null
+      ? localStorage.getItem("crashdownMusicMuted") === "true"
+      : localStorage.getItem("crashdownMuted") === "true";
+  let musicVolume = parseFloat(
+    localStorage.getItem("crashdownMusicVolume") ??
+      localStorage.getItem("crashdownVolume") ??
+      "0.35",
   );
+  let sfxMuted = localStorage.getItem("crashdownSfxMuted") === "true";
   let sfxVolume = parseFloat(
     localStorage.getItem("crashdownSfxVolume") ?? "0.70",
   );
 
   function applyAudioSettings() {
-    const isMuted = toggledVOlume || masterVolume === 0;
-    const effectiveMusic = isMuted ? 0 : masterVolume;
-    const effectiveSfx = isMuted ? 0 : masterVolume * sfxVolume;
+    const effectiveMusic = musicMuted ? 0 : musicVolume;
+    const effectiveSfx = sfxMuted ? 0 : sfxVolume;
 
-    hatterZene.volume = Math.min(1, Math.max(0, BASE_VOLUMES.music * effectiveMusic * 2));
-    tntKatt.volume = Math.min(1, Math.max(0, BASE_VOLUMES.tnt * effectiveSfx * 2));
-    sorEffekt.volume = Math.min(1, Math.max(0, BASE_VOLUMES.row * effectiveSfx * 2));
-    timeEffekt.volume = Math.min(1, Math.max(0, BASE_VOLUMES.time * effectiveSfx * 2));
-    doublerKatt.volume = Math.min(1, Math.max(0, BASE_VOLUMES.doubler * effectiveSfx * 2));
-    sikeresKatt.volume = Math.min(1, Math.max(0, BASE_VOLUMES.pop * effectiveSfx * 2));
+    hatterZene.volume = Math.min(
+      1,
+      Math.max(0, BASE_VOLUMES.music * effectiveMusic * 2),
+    );
+    tntKatt.volume = Math.min(
+      1,
+      Math.max(0, BASE_VOLUMES.tnt * effectiveSfx * 2),
+    );
+    sorEffekt.volume = Math.min(
+      1,
+      Math.max(0, BASE_VOLUMES.row * effectiveSfx * 2),
+    );
+    timeEffekt.volume = Math.min(
+      1,
+      Math.max(0, BASE_VOLUMES.time * effectiveSfx * 2),
+    );
+    doublerKatt.volume = Math.min(
+      1,
+      Math.max(0, BASE_VOLUMES.doubler * effectiveSfx * 2),
+    );
+    sikeresKatt.volume = Math.min(
+      1,
+      Math.max(0, BASE_VOLUMES.pop * effectiveSfx * 2),
+    );
 
-    // Dinamikus zene némítás: ha le van némítva, azonnal állítsuk meg a zenét
-    if (isMuted) {
+    // Dinamikus zene némítás: ha le van némítva a zene vagy 0, azonnal állítsuk meg
+    if (musicMuted || musicVolume === 0) {
       if (!hatterZene.paused) {
         try {
           hatterZene.pause();
@@ -1453,7 +1476,7 @@ export function initCrashdownRuntime() {
     if (volIcon) {
       volIcon.setAttribute(
         "src",
-        isMuted
+        musicMuted || musicVolume === 0
           ? "images/volume_off_icon.png"
           : "images/volume_on_icon.png",
       );
@@ -1461,20 +1484,29 @@ export function initCrashdownRuntime() {
     const slider = document.getElementById("volumeSlider");
     const label = document.getElementById("volumeValue");
     if (slider)
-      slider.value = Math.round((toggledVOlume ? 0 : masterVolume) * 100);
+      slider.value = Math.round((musicMuted ? 0 : musicVolume) * 100);
     if (label)
-      label.textContent = `${Math.round((toggledVOlume ? 0 : masterVolume) * 100)}%`;
+      label.textContent = `${Math.round((musicMuted ? 0 : musicVolume) * 100)}%`;
 
+    const sfxIcon = document.getElementById("toggleSfx");
+    if (sfxIcon) {
+      sfxIcon.setAttribute(
+        "src",
+        sfxMuted || sfxVolume === 0
+          ? "images/volume_off_icon.png"
+          : "images/volume_on_icon.png",
+      );
+    }
     const sfxSliderEl = document.getElementById("sfxSlider");
     const sfxLabelEl = document.getElementById("sfxVolumeValue");
     if (sfxSliderEl)
-      sfxSliderEl.value = Math.round(sfxVolume * 100);
+      sfxSliderEl.value = Math.round((sfxMuted ? 0 : sfxVolume) * 100);
     if (sfxLabelEl)
-      sfxLabelEl.textContent = `${Math.round(sfxVolume * 100)}%`;
+      sfxLabelEl.textContent = `${Math.round((sfxMuted ? 0 : sfxVolume) * 100)}%`;
   }
 
   function playSound(audioObj) {
-    if (toggledVOlume || masterVolume <= 0 || sfxVolume <= 0 || !audioObj) return;
+    if (sfxMuted || sfxVolume <= 0 || !audioObj) return;
     try {
       audioObj.pause();
       audioObj.currentTime = 0;
@@ -1484,20 +1516,36 @@ export function initCrashdownRuntime() {
   }
 
   function toggleVolume() {
-    toggledVOlume = !toggledVOlume;
-    if (!toggledVOlume && masterVolume === 0) {
-      masterVolume = 0.35;
-      localStorage.setItem("crashdownVolume", String(masterVolume));
+    musicMuted = !musicMuted;
+    if (!musicMuted && musicVolume === 0) {
+      musicVolume = 0.35;
+      localStorage.setItem("crashdownMusicVolume", String(musicVolume));
+      localStorage.setItem("crashdownVolume", String(musicVolume));
     }
-    localStorage.setItem("crashdownMuted", String(toggledVOlume));
+    localStorage.setItem("crashdownMusicMuted", String(musicMuted));
+    localStorage.setItem("crashdownMuted", String(musicMuted));
     applyAudioSettings();
 
     // Dinamikus zene engedélyezés: amint feloldjuk a némítást, azonnal induljon el a zene
-    if (!toggledVOlume && masterVolume > 0) {
+    if (!musicMuted && musicVolume > 0) {
       try {
         const p = hatterZene.play();
         if (p && typeof p.catch === "function") p.catch(() => {});
       } catch (_) {}
+    }
+  }
+
+  function toggleSfx() {
+    sfxMuted = !sfxMuted;
+    if (!sfxMuted && sfxVolume === 0) {
+      sfxVolume = 0.70;
+      localStorage.setItem("crashdownSfxVolume", String(sfxVolume));
+    }
+    localStorage.setItem("crashdownSfxMuted", String(sfxMuted));
+    applyAudioSettings();
+
+    if (!sfxMuted && sfxVolume > 0) {
+      playSound(sikeresKatt);
     }
   }
 
@@ -1519,17 +1567,24 @@ export function initCrashdownRuntime() {
       toggleVolBtn.addEventListener("click", toggleVolume);
     }
 
+    const toggleSfxBtn = document.getElementById("toggleSfxBtn");
+    if (toggleSfxBtn) {
+      toggleSfxBtn.addEventListener("click", toggleSfx);
+    }
+
     const volumeSlider = document.getElementById("volumeSlider");
     if (volumeSlider) {
       volumeSlider.addEventListener("input", function () {
-        masterVolume = parseInt(this.value, 10) / 100;
-        toggledVOlume = masterVolume === 0;
-        localStorage.setItem("crashdownVolume", String(masterVolume));
-        localStorage.setItem("crashdownMuted", String(toggledVOlume));
+        musicVolume = parseInt(this.value, 10) / 100;
+        musicMuted = musicVolume === 0;
+        localStorage.setItem("crashdownMusicVolume", String(musicVolume));
+        localStorage.setItem("crashdownVolume", String(musicVolume));
+        localStorage.setItem("crashdownMusicMuted", String(musicMuted));
+        localStorage.setItem("crashdownMuted", String(musicMuted));
         applyAudioSettings();
 
         // Dinamikusan ha 0 fölé húzzuk a hangerőt, azonnal induljon el a zene ha áll
-        if (!toggledVOlume && masterVolume > 0 && hatterZene.paused) {
+        if (!musicMuted && musicVolume > 0 && hatterZene.paused) {
           try {
             const p = hatterZene.play();
             if (p && typeof p.catch === "function") p.catch(() => {});
@@ -1542,7 +1597,9 @@ export function initCrashdownRuntime() {
     if (sfxSlider) {
       sfxSlider.addEventListener("input", function () {
         sfxVolume = parseInt(this.value, 10) / 100;
+        sfxMuted = sfxVolume === 0;
         localStorage.setItem("crashdownSfxVolume", String(sfxVolume));
+        localStorage.setItem("crashdownSfxMuted", String(sfxMuted));
         applyAudioSettings();
       });
       sfxSlider.addEventListener("change", function () {
@@ -1571,8 +1628,8 @@ export function initCrashdownRuntime() {
           (typeof vegeAJateknak === "undefined" || !vegeAJateknak);
         if (
           wasMusicPlayingBeforeHidden &&
-          !toggledVOlume &&
-          masterVolume > 0 &&
+          !musicMuted &&
+          musicVolume > 0 &&
           isGameActive
         ) {
           try {
@@ -6265,7 +6322,7 @@ export function initCrashdownRuntime() {
     const targetColor = grid[y][x].color;
     if (targetColor === "white") return;
 
-    if (hatterZene.paused && !toggledVOlume && masterVolume > 0) {
+    if (hatterZene.paused && !musicMuted && musicVolume > 0) {
       const p = hatterZene.play();
       if (p && typeof p.catch === "function") p.catch(() => {});
     }
@@ -7240,7 +7297,7 @@ export function initCrashdownRuntime() {
     shuffleCooldownRemaining = 0;
     updateShuffleButtonUI();
 
-    if (!toggledVOlume && masterVolume > 0) {
+    if (!musicMuted && musicVolume > 0) {
       const p = hatterZene.play();
       if (p && typeof p.catch === "function") p.catch(() => {});
     }

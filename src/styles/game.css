@@ -408,17 +408,18 @@ select:disabled {
 
 .vol-btn:hover { background: #1b2232; border-color: var(--border-hover); }
 
-.vol-sfx-badge {
-    cursor: default;
+.vol-sfx-btn {
+    cursor: pointer;
     background: rgba(20, 184, 166, 0.12);
     border-color: rgba(20, 184, 166, 0.25);
 }
-.vol-sfx-badge:hover {
-    background: rgba(20, 184, 166, 0.18);
-    border-color: rgba(20, 184, 166, 0.35);
+.vol-sfx-btn:hover {
+    background: rgba(20, 184, 166, 0.22);
+    border-color: rgba(20, 184, 166, 0.45);
 }
 
-#toggleVol {
+#toggleVol,
+#toggleSfx {
     width: 16px;
     height: 16px;
     object-fit: contain;

@@ -200,19 +200,19 @@ export function ControlsPanel() {
             <button
               id="toggleVolBtn"
               className="vol-btn"
-              title="Hang némítása / visszakapcsolása (M)"
+              title="Zene némítása / visszakapcsolása (M)"
             >
               <img
                 src="images/volume_on_icon.png"
                 id="toggleVol"
-                alt="Hangerő"
+                alt="Zene hangerő"
                 width="20"
                 height="20"
               />
             </button>
             <div className="audio-slider-wrap">
               <div className="audio-label-row">
-                <span>Zene / Mester</span>
+                <span>Zene</span>
                 <span id="volumeValue">35%</span>
               </div>
               <input
@@ -225,12 +225,19 @@ export function ControlsPanel() {
             </div>
           </div>
           <div className="audio-row audio-sfx-row">
-            <div
-              className="vol-btn vol-sfx-badge"
-              title="Effektek hangereje (blokk kiütés, power-upok)"
+            <button
+              id="toggleSfxBtn"
+              className="vol-btn vol-sfx-btn"
+              title="Effektek némítása / visszakapcsolása"
             >
-              <span style={{ fontSize: '14px', lineHeight: 1 }}>🎮</span>
-            </div>
+              <img
+                src="images/volume_on_icon.png"
+                id="toggleSfx"
+                alt="Effektek hangerő"
+                width="20"
+                height="20"
+              />
+            </button>
             <div className="audio-slider-wrap">
               <div className="audio-label-row">
                 <span>Effektek (SFX)</span>
