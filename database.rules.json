@@ -1,11 +1,18 @@
 {
   "rules": {
-    ".read": true,
-    ".write": true,
     "leaderboard": {
       ".read": true,
       ".write": true,
       ".indexOn": ["score"]
+    },
+    "profiles": {
+      ".read": true,
+      ".write": true
+    },
+    "presence": {
+      ".read": true,
+      ".write": true
     }
   }
 }
+
